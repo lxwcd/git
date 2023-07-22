@@ -38,6 +38,7 @@ Git-2.39.2-64-bit 下载：[Index of /git-for-windows/v2.39.2.windows.1/](https:
 
 # Git 存储数据方式
 > [Git Internals Part 2: How does Git store your data?](https://www.developernation.net/blog/git-internals-how-does-git-store-your-data)
+> [1.3 Getting Started - What is Git?](https://git-scm.com/book/en/v2/Getting-Started-What-is-Git%3F#what_is_git_section)
 > [Commits are snapshots, not diffs](https://github.blog/2020-12-17-commits-are-snapshots-not-diffs/)
 > [BASIC SNAPSHOTTING](http://git.github.io/git-reference/basic/)
 > [What is a git "Snapshot"?](https://stackoverflow.com/questions/4964099/what-is-a-git-snapshot)
