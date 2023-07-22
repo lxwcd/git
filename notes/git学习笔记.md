@@ -36,15 +36,25 @@ Git-2.39.2-64-bit 下载：[Index of /git-for-windows/v2.39.2.windows.1/](https:
 
 
 
+# Git 存储数据方式
+> [Git Internals Part 2: How does Git store your data?](https://www.developernation.net/blog/git-internals-how-does-git-store-your-data)
+> [Commits are snapshots, not diffs](https://github.blog/2020-12-17-commits-are-snapshots-not-diffs/)
+> [BASIC SNAPSHOTTING](http://git.github.io/git-reference/basic/)
+> [What is a git "Snapshot"?](https://stackoverflow.com/questions/4964099/what-is-a-git-snapshot)
+> [Is the git storage model wasteful?](https://stackoverflow.com/questions/7321360/is-the-git-storage-model-wasteful)
+> [Are Git's pack files deltas rather than snapshots?](https://stackoverflow.com/questions/5176225/are-gits-pack-files-deltas-rather-than-snapshots)
+> [Git Internals - Packfiles](https://git-scm.com/book/en/v2/Git-Internals-Packfiles)
+
+
+- In git, commits are snapshots, not diffs
+
+
+# Git config
+> [Git Config](https://www.gitkraken.com/learn/git/git-config)
 
 
 
-# 远程仓库
 
-
-************
-问题：
-- vim 打开 id_rsa.pub 文件复制到 github 中，提示错误，gedit 打开成功
 
 
 # 删除远程仓库文件
