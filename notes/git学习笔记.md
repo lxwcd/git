@@ -8,19 +8,21 @@
 
 
 
-# github 无法访问问题
-- 系统为 ubuntu 22.04
+# git 配置代理
+> [git设置、查看、取消代理](https://blog.csdn.net/qq_43331089/article/details/129637569)
 
-## 修改 /etc/hosts 文件
-> ip 地址查询：[ipaddress](https://www.ipaddress.com/)
-> [解决GitHub访问不了的方法](https://note.dolyw.com/other/02-Github-Failure.html)
+- 如 windows 中安装 clash for windows，可查看其端口，例如 7890
 
-1. 用 [ip 地址查询工具](https://www.ipaddress.com/) 查询 `www.github.com`，`github.global.ssl.fastly.net` 和 `assets-cdn.github.com` 的 ip 后添加到 `/etc/hosts` 中，查询到的 ip 有几个，就都添加上去，保存退出文件
-2. 保存后没有立即生效，参考 [Linux修改本机/etc/hosts的hostName后经常不生效](https://blog.csdn.net/hguisu/article/details/49278355)，重启后生效
+在 git 设置代理：
+```git
+git config --global http.https://github.com.proxy socks5://127.0.0.1:7890
+```
 
-## 自动更新 hosts 内容
-> Gitee：[GitHub520](https://gitee.com/snow2zhou/GitHub520)
-> Github：[GitHub520](https://github.com/521xueweihan/GitHub520)
+配置完查看：
+```git
+$ git config --global --list
+http.https://github.com.proxy=socks5://127.0.0.1:7890
+```
 
 
 # 安装 git
@@ -52,7 +54,12 @@ Git-2.39.2-64-bit 下载：[Index of /git-for-windows/v2.39.2.windows.1/](https:
 
 # Git config
 > [Git Config](https://www.gitkraken.com/learn/git/git-config)
+> [配置 git config](https://tsejx.github.io/devops-guidebook/code/git/config/)
 
+## 查看全局配置信息
+```bash
+git config --global --list
+```
 
 
 
