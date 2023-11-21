@@ -8,11 +8,42 @@
 
 
 
-# git 配置代理
+
+
+# 安装 git
+## linux 安装
+> [安装 Git](https://www.liaoxuefeng.com/wiki/896043488029600/896067074338496)
+
+## Windows 安装
+官网下载地址：[Download for Windows](https://git-scm.com/download/win)
+
+这个地址下载慢，可能不成功，可以点击下载后可以查看下载的版本，然后在[镜像网站](https://registry.npmmirror.com/binary.html?path=git-for-windows/)下载，从官网页面查看最新的日期和版本： ![1](https://img-blog.csdnimg.cn/fb9fc2812f6b4c7f80f2065b155fb357.png)
+
+Git-2.39.2-64-bit 下载：[Index of /git-for-windows/v2.39.2.windows.1/](https://registry.npmmirror.com/binary.html?path=git-for-windows/v2.39.2.windows.1/)
+
+
+# Git config 配置Git
+> [Git Config](https://www.gitkraken.com/learn/git/git-config)
+> [配置 git config](https://tsejx.github.io/devops-guidebook/code/git/config/)
+
+## 查看全局配置信息
+```bash
+git config --global --list
+```
+
+## 设置用户名和电子邮件
+```bash
+root@ubuntu2204c12:~# git config --global user.name "name"
+root@ubuntu2204c12:~# git config --global user.email "email@163.com"
+```
+
+
+## git 配置代理
 > [git设置、查看、取消代理](https://blog.csdn.net/qq_43331089/article/details/129637569)
 
 - 如 windows 中安装 clash for windows，可查看其端口，例如 7890
 
+### Windows 中安装的 git 设置代理
 在 git 设置代理：
 ```git
 git config --global http.https://github.com.proxy socks5://127.0.0.1:7890
@@ -24,18 +55,13 @@ $ git config --global --list
 http.https://github.com.proxy=socks5://127.0.0.1:7890
 ```
 
+### vmware 虚拟机中安装的 git 设置代理
+```bash
+git config --global http.proxy http://192.168.0.119:7890
+git config --global https.proxy https://192.168.0.119:7890
+```
 
-# 安装 git
-## linux 安装
-> [安装 Git](https://www.liaoxuefeng.com/wiki/896043488029600/896067074338496)
-
-## Windows 安装
-官网下载地址：[Download for Windows](https://git-scm.com/download/win)
-
-这个地址下载慢，可能不成功，可以点击下载后可以查看下载的版本，然后在[镜像网站](https://registry.npmmirror.com/binary.html?path=git-for-windows/)下载，从官网页面查看最新的日期和版本：
-![1](https://img-blog.csdnimg.cn/fb9fc2812f6b4c7f80f2065b155fb357.png)
-Git-2.39.2-64-bit 下载：[Index of /git-for-windows/v2.39.2.windows.1/](https://registry.npmmirror.com/binary.html?path=git-for-windows/v2.39.2.windows.1/)
-
+上面的地址 `192.168.0.119` 为宿主机的 ip 地址，端口 `7890` 为代理端口
 
 
 # Git 存储数据方式
@@ -50,16 +76,6 @@ Git-2.39.2-64-bit 下载：[Index of /git-for-windows/v2.39.2.windows.1/](https:
 
 
 - In git, commits are snapshots, not diffs
-
-
-# Git config
-> [Git Config](https://www.gitkraken.com/learn/git/git-config)
-> [配置 git config](https://tsejx.github.io/devops-guidebook/code/git/config/)
-
-## 查看全局配置信息
-```bash
-git config --global --list
-```
 
 
 
