@@ -79,6 +79,12 @@ git config --global https.proxy https://192.168.0.119:7890
       
 # git clone 克隆仓库到新目录  
 如果远程仓库地址为：https://github.com/lxwcd/learnVim.git，直接用 git clone url 会将远程仓库克隆到当前目录  
+当前目录下会包含远程仓库的目录
+
+如果不想远程仓库的目录，只将目录内的文件克隆到本地当前目录下，则如下：
+```bash     
+git clone https://github.com/lxwcd/cpp.git .
+```
       
 将远程仓库克隆到指定目录并且修改仓库名字为 `new_folder`：  
 ```bash  
@@ -89,7 +95,7 @@ git clone https://github.com/lxwcd/learnVim.git /usr/local/src/new_folder
 ```bash  
 git clone https://github.com/lxwcd/learnVim.git /usr/local/src/1/2/3/new_folder  
 ```  
-      
+
       
 # 删除远程仓库文件  
 > [How to Delete a File or a Directory from a Git Repository](https://www.w3docs.com/snippets/git/how-to-delete-a-file-from-a-git-repository.html)  
