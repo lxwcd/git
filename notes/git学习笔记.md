@@ -1,4 +1,4 @@
-﻿git 学习  
+git 学习  
       
 # 学习资源  
 > 初步了解 git：[廖雪峰 Git 教程](https://www.liaoxuefeng.com/wiki/896043488029600)  
@@ -462,6 +462,10 @@ git init --bare myproject.git
 
 `.gitignore` 是一个在 Git 仓库中使用的特殊文件，用于指定 Git 应该忽略的文件和目录。这个文件帮助你防止不小心提交不需要版本控制的文件，比如编译产物、日志文件、个人配置文件等。
 
+不影响已被跟踪的文件。
+
+可以写到多个位置，如果忽略文件只针对本地仓库，将忽略的文件放到 `$GIT_DIR/info/exclude` 中，即仓库根目录的 `.git` 目录中。
+
 ## 作用
 
 - **指定忽略规则**：`.gitignore` 文件包含一系列的模式（pattern），用于匹配文件和目录路径。Git 会根据这些模式决定哪些文件不需要版本控制。
@@ -483,6 +487,25 @@ git init --bare myproject.git
 - `?`：匹配任意单个字符。
 - `[abc]`：匹配括号内的任意字符（在这个例子中是 `a`、`b` 或 `c`）。
 - `**`：匹配任意数量的目录层级。
+
+### 双星号 `**`
+1. **双星号（`**`）在模式匹配中的特殊含义：**
+   - 当双星号（`**`）出现在模式中，并且与完整路径名进行匹配时，它们具有特殊的含义。
+
+2. **双星号后跟斜杠（`/`）表示在所有目录中匹配：**
+   - 如果模式以双星号（`**`）开始，并且后面紧跟着一个斜杠（`/`），这意味着在所有目录中进行匹配。例如，`**/foo`会匹配任何地方的文件或目录`foo`，这与模式`foo`相同。`**/foo/bar`会匹配任何直接位于目录`foo`下的文件或目录`bar`。
+
+3. **斜杠后跟双星号（`/**`）表示匹配目录内的所有内容：**
+   - 如果模式以斜杠（`/`）开始，后面紧跟着双星号（`/**`），这意味着匹配目录内的所有内容。例如，`abc/**`会匹配`abc`目录内的所有文件，相对于`.gitignore`文件的位置，匹配深度是无限的。
+
+4. **斜杠后跟双星号再跟斜杠表示匹配零个或多个目录：**
+   - 如果模式中包含斜杠（`/`）后跟双星号（`**`），然后再跟一个斜杠（`/`），这意味着匹配零个或多个目录。例如，`a/**/b`会匹配`a/b`、`a/x/b`、`a/x/y/b`等。
+
+5. **其他连续的星号被视为普通星号，并根据之前的规则进行匹配：**
+   - 如果模式中出现其他连续的星号（`*`），它们将被视为普通的星号，并根据之前提到的规则进行匹配。
+
+### 忽略文件夹
+`folder` 和 `folder/` 都会忽略该目录下的子目录
 
 ## 示例内容
 
@@ -978,6 +1001,151 @@ git commit -m "Remove example.txt"
 - **图形化工具**：虽然 `git log` 提供了丰富的文本输出选项，但有时使用图形化工具（如 `gitk` 或其他第三方工具）可能更直观。
 - **性能**：对于非常大的仓库，`git log` 可能会有些慢。在这种情况下，考虑使用过滤选项来减少输出量。
 
+# git reflog
+> [Git - git-reflog Documentation](https://git-scm.com/docs/git-reflog)   
+
+`git reflog` 是 Git 中一个非常强大的命令，它用于管理和查看引用日志（reflogs）。引用日志记录了本地仓库中更新分支和其他引用的操作。以下是 `git reflog` 的详细讲解：
+
+### 1. 什么是 `git reflog`？
+`git reflog` 记录了 HEAD 和分支引用以及标签等的所有更新操作。这意味着即使某些提交被删除或者重写，你仍然可以通过 `git reflog` 来找到它们。这个特性使得 `git reflog` 成为恢复误删除或误操作的重要工具。
+
+### 2. `git reflog` 的基本用法
+- **查看引用日志**：最基本的用法是 `git reflog`，它会显示 HEAD 的引用日志，列出 HEAD 的所有历史更新操作，包括分支切换、提交、重置等。
+  ```bash
+  git reflog
+  ```
+  输出类似于：
+  ```
+  eb1050b (HEAD -> feature_branch) HEAD@{0}: checkout: moving from main to feature_branch
+  1525c48 (origin/main, main) HEAD@{1}: checkout: moving from 2bf1773d87a7806cda25d4d313995bb08adbabf5 to main
+  ```
+  这里 `HEAD@{n}` 表示 HEAD 在过去第 n 次操作时的位置。
+
+### 3. `git reflog` 的子命令
+- **show**：显示指定引用的日志，如果未指定引用，则默认显示 HEAD 的日志。`git reflog show` 是 `git log -g --abbrev-commit --pretty=oneline` 的别名。
+  ```bash
+  git reflog show <ref>
+  ```
+- **list**：列出所有有对应 reflog 的引用。
+  ```bash
+  git reflog list
+  ```
+- **expire**：修剪旧的 reflog 条目，可以指定时间来删除过时的日志条目。
+  ```bash
+  git reflog expire [--expire=<time>] [--expire-unreachable=<time>] [--all]
+  ```
+- **delete**：删除单个 reflog 条目，需要指定确切的条目。
+  ```bash
+  git reflog delete <ref>@{<specifier>}
+  ```
+- **exists**：检查某个引用是否有 reflog。
+  ```bash
+  git reflog exists <ref>
+  ```
+
+### 4. `git reflog` 的高级用法
+- **基于时间的引用**：`git reflog` 支持基于时间的引用，例如 `HEAD@{1.day.ago}` 表示 HEAD 在一天前的位置。
+  ```bash
+  git diff main@{0} main@{1.day.ago}
+  ```
+  这个命令比较了 `main` 分支当前状态和一天前的状态。
+
+### 5. `git reflog` 的重要性
+`git reflog` 是 Git 操作的一道安全保障，它能够记录几乎所有本地仓库的改变，包括所有分支的 commit 提交，以及已经被删除的 commit。这使得 `git reflog` 成为恢复丢失提交或分支的重要工具。
+
+# git show
+> [Git - git-show Documentation](https://git-scm.com/docs/git-show) 
+
+`git show` 是一个非常强大的 Git 命令，用于展示各种 Git 对象的详细内容，包括提交（commit）、标签（tag）和分支（branch）。
+
+## 基本用法
+
+1. **查看提交详情**
+   - `git show <commit>`：显示指定提交的详细信息，包括作者、日期、提交信息和具体的 diff（差异）。
+   - `git show HEAD`：显示当前分支的最新提交的详细信息。
+
+2. **查看标签详情**
+   - `git show <tag>`：显示指定标签的详细信息，包括标签信息和指向的提交。
+
+3. **查看分支比较**
+   - `git show <branch>`：显示指定分支的最新提交的详细信息。
+
+## 常用选项
+
+1. **`--name-only`**
+   - 仅显示提交中涉及的文件名列表。
+
+2. **`--name-status`**
+   - 显示提交中涉及的文件名以及它们的状态（新增、修改、删除）。
+
+3. **`--stat`**
+   - 显示提交的统计信息，包括每个文件的增删行数和文件状态。
+
+4. **`--shortstat`**
+   - 显示提交的简要统计信息，只包括每个文件的增删行数。
+
+5. **`--summary`**
+   - 显示提交的统计信息摘要，类似于 `--stat`，但不包括每个文件的详细信息。
+
+6. **`--patch`**
+   - 显示提交的差异（默认选项），展示具体的代码变化。
+
+7. **`--full-index`**
+   - 显示差异时，显示完整的索引信息。
+
+8. **`--oneline`**
+   - 仅显示提交的 SHA-1 哈希值和提交信息，一行显示。
+
+9. **`--pretty`**
+   - 指定输出格式，例如 `oneline`、`short`、`full`、`fuller`、`reference`、`raw` 等。
+
+10. **`--expand-tabs`**
+    - 在显示差异时，将制表符展开为适当数量的空格。
+
+11. **`--color`**
+    - 显示颜色差异。
+
+12. **`--no-color`**
+    - 不显示颜色差异。
+
+13. **`--textconv`**
+    - 使用文本转换过滤器处理文件的差异。
+
+14. **`--word-diff`**
+    - 显示单词级别的差异。
+
+### 示例
+
+- 查看最新提交的详细信息：
+  ```bash
+  git show HEAD
+  ```
+
+- 查看特定提交的文件列表：
+  ```bash
+  git show --name-only <commit>
+  ```
+
+- 查看特定提交的统计信息：
+  ```bash
+  git show --stat <commit>
+  ```
+
+- 查看特定提交的简要统计信息：
+  ```bash
+  git show --shortstat <commit>
+  ```
+
+- 查看特定提交的差异，不包括文件内容：
+  ```bash
+  git show --pretty=raw <commit>
+  ```
+
+- 查看特定提交的 SHA-1 哈希值和提交信息：
+  ```bash
+  git show --oneline <commit>
+  ```
+
 # HEAD 
 > [Git - Reset Demystified](https://git-scm.com/book/en/v2/Git-Tools-Reset-Demystified#_git_reset)      
 
@@ -1423,64 +1591,17 @@ Switch to topic/wip branch and keep working.
   ```
   这个命令将 HEAD 指针移动到上一次提交，并重置暂存区和工作目录的状态。
 
-
-
 ### 注意事项
 
 - **数据丢失风险**：`git reset --hard` 会丢失所有未提交的更改，使用时需谨慎。
 - **撤销已推送的提交**：如果你已经将提交推送到远程仓库，使用 `git reset` 撤销提交后，需要使用 `git push --force` 来更新远程仓库。
 - **与 `git checkout` 的区别**：`git reset` 用于重置当前分支的 HEAD 和暂存区，而 `git checkout` 用于切换分支或将文件恢复到最后一次提交的状态。
-
-通过理解 `git reset` 的各个参数，你可以更有效地撤销提交、重置暂存区或恢复工作目录中的文件，帮助你管理 Git 历史和工作流程。
-
-
-### 基本使用
-
-- **撤销最后一次提交**：
-  ```bash
-  git reset --soft HEAD~1
-  ```
-  这个命令将 HEAD 指针移动到上一次提交（撤销最后一次提交），但保留工作目录和暂存区的状态。
-
-- **撤销最后一次提交并重置暂存区**：
-  ```bash
-  git reset --mixed HEAD~1
-  ```
-  或者
-  ```bash
-  git reset HEAD~1
-  ```
-  这些命令将 HEAD 指针移动到上一次提交，并重置暂存区，但保留工作目录的状态。
-
-- **撤销最后一次提交并恢复工作目录**：
-  ```bash
-  git reset --hard HEAD~1
-  ```
-  这个命令将 HEAD 指针移动到上一次提交，并重置暂存区和工作目录的状态。
 
 ### 选项
 
 - **`--soft`**：重置 HEAD 到指定状态，但保留工作目录和暂存区的状态。这允许你重新提交。
 - **`--mixed`**（默认）：重置 HEAD 和暂存区到指定状态，但保留工作目录的状态。这允许你重新暂存更改。
 - **`--hard`**：重置 HEAD、暂存区和工作目录到指定状态。这将丢失所有未提交的更改。
-
-### 注意事项
-
-- **数据丢失风险**：`git reset --hard` 会丢失所有未提交的更改，使用时需谨慎。
-- **撤销已推送的提交**：如果你已经将提交推送到远程仓库，使用 `git reset` 撤销提交后，需要使用 `git push --force` 来更新远程仓库。
-- **与 `git checkout` 的区别**：`git reset` 用于重置当前分支的 HEAD 和暂存区，而 `git checkout` 用于切换分支或将文件恢复到最后一次提交的状态。
-
-### 示例
-
-假设你提交了两次更改，但想要撤销最后一次提交：
-
-```bash
-git reset --soft HEAD~1
-```
-
-这个命令将 HEAD 指针移动到上一次提交，允许你重新提交。
-
-通过 `git reset`，你可以有效地撤销提交、重置暂存区或恢复工作目录中的文件，帮助你管理 Git 历史和工作流程。
 
 ## git restore
 > [Git - git-restore Documentation](https://git-scm.com/docs/git-restore) 
@@ -1539,6 +1660,90 @@ git restore [<options>] [--source=<tree>] [--staged] [--worktree] [--] <pathspec
 
 - **实验性命令**：`git restore` 是一个实验性命令，其行为可能会改变。
 - **与 `git reset` 和 `git revert` 的区别**：`git restore` 用于恢复工作目录中的文件，而 `git reset` 用于重置当前分支的 HEAD 和索引，`git revert` 用于创建一个新的提交来“反做”之前的提交。
+
+# git revert
+> [Git - git-revert Documentation](https://git-scm.com/docs/git-revert) 
+
+`git revert` 是一个 Git 命令，用于撤销之前的提交。它创建一个新的提交，这个提交的内容是前一个提交的逆操作，即“反做”之前的提交。这个操作是安全的，因为它不会改变项目的历史记录，而是在历史记录的基础上新增一个提交来表示撤销操作。
+
+## 基本用法
+
+1. **撤销最新的提交**
+   - `git revert HEAD`：撤销当前分支最新的提交。
+
+2. **撤销特定的提交**
+   - `git revert <commit>`：撤销指定的提交。这里的 `<commit>` 可以是提交的哈希值、分支名或者标签。
+
+3. **撤销一系列提交**
+   - `git revert <commit>^..<commit>`：撤销从第一个提交到第二个提交之间的所有提交。
+
+## 选项
+
+1. **`--no-commit`**
+   - 执行撤销操作但不创建一个新的提交对象。这允许你修改撤销的内容后再手动提交。
+
+2. **`--no-edit`**
+   - 通常 `git revert` 会打开一个编辑器让你编辑提交信息。使用这个选项可以跳过编辑步骤，使用默认的提交信息。
+
+3. **`--edit`**
+   - 强制 `git revert` 打开编辑器，即使通常不需要编辑提交信息。
+
+4. **`--merge`**
+   - 在合并操作中使用，允许在合并冲突时撤销。
+
+5. **`--mainline`**
+   - 在合并操作中使用，指定主基线。
+
+6. **`--strategy`**
+   - 指定合并策略。
+
+7. **`--strategy-option`**
+   - 传递额外的选项给合并策略。
+
+8. **`--allow-empty`**
+   - 允许在空树（即没有任何提交的仓库）上执行撤销操作。
+
+9. **`--onto`**
+   - 指定一个基底提交，用于确定撤销操作的目标分支。
+
+## 工作流程
+
+当你执行 `git revert` 时，Git 会做以下事情：
+
+1. **检查提交是否存在**：确认你指定的提交在当前分支的历史中。
+
+2. **计算差异**：计算需要撤销的提交与你指定的基底提交之间的差异。
+
+3. **应用差异**：将这些差异应用到工作目录和暂存区，相当于做了一个“反做”操作。
+
+4. **创建新的提交**：将这些变化作为一个新提交添加到历史记录中。
+
+## 示例
+
+- 撤销最新的提交：
+  ```bash
+  git revert HEAD
+  ```
+
+- 撤销特定的提交（提交哈希值以 `abc123` 为例）：
+  ```bash
+  git revert abc123
+  ```
+
+- 撤销一系列提交（从 `commit1` 到 `commit2`）：
+  ```bash
+  git revert commit1^..commit2
+  ```
+
+- 撤销操作但不创建提交：
+  ```bash
+  git revert --no-commit abc123
+  ```
+
+- 撤销操作并编辑提交信息：
+  ```bash
+  git revert --edit abc123
+  ```
 
 # git remote
 > [Git - git-remote Documentation](https://git-scm.com/docs/git-remote) 
@@ -1623,6 +1828,62 @@ git push -u origin main
 - **权限**：在添加或修改远程仓库时，确保你有足够的权限。
 
 通过 `git remote`，你可以有效地管理远程仓库的引用，这对于协作开发和代码托管非常重要。
+
+# git branch
+> [Git - git-branch Documentation](https://git-scm.com/docs/git-branch/2.13.7) 
+
+
+
+# 本地分支的上游分支 
+在 Git 中，每个本地分支可以设置一个对应的上游分支（也称为远程跟踪分支），这样当你执行 `git push` 或 `git pull` 时，Git 会自动知道要与哪个远程分支交互。
+
+## 设置本地分支的上游分支
+
+1. **设置新分支的上游分支**：
+   当你创建一个新的本地分支并想要将其设置为跟踪远程仓库中的某个分支时，可以使用以下命令：
+   ```bash
+   git checkout -b my-branch origin/existing-remote-branch
+   ```
+   这个命令会创建一个新的本地分支 `my-branch` 并将其设置为跟踪远程分支 `origin/existing-remote-branch`。
+
+2. **修改现有分支的上游分支**：
+   如果你想要更改一个已经存在的本地分支的上游分支，可以使用以下命令：
+   ```bash
+   git branch --set-upstream-to my-branch origin/new-remote-branch
+   ```
+   或者，如果你的 Git 版本较旧，可能需要使用：
+   ```bash
+   git branch --set-upstream my-branch origin/new-remote-branch
+   ```
+   这些命令会将本地分支 `my-branch` 的上游分支设置为 `origin/new-remote-branch`。
+
+### 查看本地分支的上游分支
+
+1. **使用 `git branch` 命令**：
+   你可以使用以下命令查看所有本地分支及其对应的上游分支：
+   ```bash
+   git branch -vv
+   ```
+   这个命令会列出所有本地分支，并显示它们是否与上游分支同步，以及上游分支的最后一次提交信息。
+
+2. **单独查看特定分支的上游分支**：
+   如果你想要查看特定分支的上游分支，可以使用：
+   ```bash
+   git branch -vv my-branch
+   ```
+   这会显示 `my-branch` 分支的上游分支信息。
+
+### 删除本地分支的上游分支设置
+
+如果你想要删除本地分支的上游分支设置，可以使用以下命令：
+```bash
+git branch --unset-upstream my-branch
+```
+
+这个命令会移除 `my-branch` 分支的上游分支设置，之后你将需要手动指定远程分支进行推送和拉取操作。
+
+通过这些命令，你可以灵活地设置和管理你的本地分支与远程分支之间的关系，这对于多人协作的项目来说非常重要。
+
 
 # git fetch
 > [Git - git-fetch Documentation](https://git-scm.com/docs/git-fetch) 
