@@ -7,6 +7,7 @@ git 学习
 > git book：[Pro Git book](https://git-scm.com/book/en/v2)  
 > [Learn Git Branching](https://learngitbranching.js.org/?locale=zh_CN) 
 > [Git 教程 - Rebase](https://www.delftstack.com/zh/tutorial/git/git-rebase/) 
+> [Learn Git and GitHub](https://roadmap.sh/git-github) 
       
 # git 介绍
 > [Git - What is Git?](https://git-scm.com/book/en/v2/Getting-Started-What-is-Git%3F) 
@@ -122,7 +123,7 @@ git 学习
 ## 查看全局配置信息  
 ```bash  
 git config --global --list  
-```  
+```
 
 ## 修改配置文件的路径
 修改 Git 配置文件的路径通常涉及到更改 Git 查找配置文件的位置。Git 配置文件有三个主要层级：系统级（system）、全局级（global）和项目级（local）。每个层级的配置文件路径可以通过环境变量或 Git 命令进行修改。
@@ -177,11 +178,18 @@ git config --global --list
 ```bash  
 root@ubuntu2204c12:~# git config --global user.name "name"  
 root@ubuntu2204c12:~# git config --global user.email "email@163.com"  
-```  
+```
 
 ## 设置初始默认分支名
 ```bash
 sudo git config --system init.defaultBranch main
+```
+
+## 修改时区
+```bash
+user.timezone=Asia/Shanghai
+diff.date=+date: '%Y-%m-%d %H:%M:%S'
+log.date=local
 ```
 
 ## 配置换行符
@@ -192,7 +200,8 @@ sudo git config --system init.defaultBranch main
 
 这些设置的主要目的是在不同操作系统之间协作时，确保文件的换行符保持一致，从而避免因换行符不一致导致的合并冲突和其他问题。
 
-### 对于 Unix/Mac 用户：
+windows 上配置后有点问题，暂未使用。
+### 对于 Unix/Mac 用户
 
 1. **`git config --global core.autocrlf input`**：
    - 这个配置使得当文件从工作目录添加到索引（即暂存区）时，Git 会将 CRLF 转换为 LF。
@@ -205,7 +214,7 @@ sudo git config --system init.defaultBranch main
    - 这个配置选项启用了一个安全检查，以确保在转换过程中不会损坏文件。
    - 如果 Git 检测到转换可能会导致文件内容变化（例如，文件中包含混合的换行符），它会拒绝转换并报错。
 
-### 对于 Windows 用户：
+### 对于 Windows 用户
 
 1. **`git config --global core.autocrlf true`**：
    - 这个配置使得当文件从索引检出到工作目录时，Git 会将 LF 转换为 CRLF。
@@ -224,13 +233,13 @@ sudo git config --system init.defaultBranch main
 在 git 设置代理：  
 ```git  
 git config --global http.https://github.com.proxy socks5://127.0.0.1:7890  
-```  
+```
       
 配置完查看：  
 ```git  
 $ git config --global --list  
 http.https://github.com.proxy=socks5://127.0.0.1:7890  
-```  
+```
 
 ### vmware 虚拟机中安装的 git 设置代理  
 > [vmware Ubuntu虚拟机设置代理](https://blog.csdn.net/qq_36383272/article/details/116307665)  
@@ -238,7 +247,7 @@ http.https://github.com.proxy=socks5://127.0.0.1:7890
 ```bash  
 git config --global http.proxy http://192.168.0.119:7890  
 git config --global https.proxy https://192.168.0.119:7890  
-```  
+```
       
 上面的地址 `192.168.0.119` 为宿主机的 ip 地址，端口 `7890` 为代理端口  
 
@@ -265,7 +274,90 @@ git config --global --list --show-origin
    ```
    这个命令用于获取指定键的配置值以及它们所在的配置文件路径。
 
-      
+# git bash 配置
+## 配置主题字体
+右键选择 option 进行配置，配置完成后保存即可
+
+## vim 配置
+输入 vim 后，输入 `:verion` 查看配置文件的路径，如：
+```bash
+  system vimrc file: "/etc/vimrc"
+     user vimrc file: "$HOME/.vimrc"
+ 2nd user vimrc file: "~/.vim/vimrc"
+ 3rd user vimrc file: "~/.config/vim/vimrc"
+      user exrc file: "$HOME/.exrc"
+       defaults file: "$VIMRUNTIME/defaults.vim"
+  fall-back for $VIM: "/etc"
+ f-b for $VIMRUNTIME: "/usr/share/vim/vim91"
+```
+
+在 Git Bash 和其他类 Unix 环境中，`/etc/vimrc` 是 Vim 编辑器的系统级配置文件的传统路径。这个路径源自 Unix 和 Linux 系统，其中 `/etc` 是用于存储系统级配置文件的目录。然而，在 Windows 系统中，并没有 `/etc` 这样的目录，这是一个 Unix 和 Linux 特有的目录结构。
+
+在 Git Bash 中，`/etc/vimrc` 的路径是一个模拟的路径，它映射到 Windows 系统中的一个实际位置。这样做是为了保持与 Unix 和 Linux 环境的兼容性，使得 Unix 和 Linux 用户能够在 Windows 上的 Git Bash 中使用他们熟悉的 Vim 配置。
+
+最后两行的意思是：
+
+1. **fall-back for $VIM: "/etc"**
+   - 这行表示如果环境变量 `$VIM` 没有设置，Git Bash 会回退到 "/etc" 目录来查找 Vim 相关的配置和文件。这是一个备用方案，以防 `$VIM` 环境变量未定义。
+
+2. **f-b for $VIMRUNTIME: "/usr/share/vim/vim91"**
+   - `$VIMRUNTIME` 是另一个环境变量，它指向 Vim 的运行时文件，包括语法文件、脚本等。这行表示如果 `$VIMRUNTIME` 没有设置，Git Bash 会使用 "/usr/share/vim/vim91" 作为默认路径。这里的 "vim91" 可能指的是 Vim 的某个特定版本，例如 8.1 版本。
+
+下载 [vimrc 文件](https://github.com/lxwcd/learnVim/blob/main/vimrc.local) 重命名到 `$HOME/.vimrc`，退出后重新进入即可生效。
+
+修改配置文件的路径：
+```bash
+" 设置全局自定义配置文件的路径变量
+let $MYVIMRC = "$HOME/.vimrc"
+```
+
+git bash 中用 ls 查看有 /etc/vimrc 文件，可以在最后加上一个自己的 vimrc 文件配置：
+```bash
+" Source a global configuration file if available
+if filereadable("$HOME/.vimrc")
+  source $HOME/.vimrc
+endif
+```
+
+## 设置别名
+希望全局配置，可以在 `/etc/profile.d/aliases.sh` 中添加。
+针对当前用户配置，在 `$HOME/.bashrc` 中添加。
+
+### 修改 vim 中光标样式
+```bash
+" modify cursor style
+if &term =~ "xterm\\|rxvt"
+  " 设置插入模式下的光标样式为竖线
+  let &t_SI .= "\<Esc>[5 q"  " SI = INSERT mode
+  " 设置替换模式下的光标样式为竖线
+  let &t_SR .= "\<Esc>[5 q"  " SR = REPLACE mode
+  " 设置普通模式下的光标样式为块状
+  let &t_EI .= "\<Esc>[2 q"  " EI = NORMAL mode (ELSE)
+endif
+```
+### 复制到系统剪贴板
+选中后使用 `"+ y` 复制内容，即复制到系统剪贴板。
+```bash
+set clipboard=unnamedplus
+```
+`set clipboard=unnamedplus` 是 Vim 中的一个配置选项，用于指定 Vim 如何与系统剪贴板交互。下面是这个配置选项的详细解释：
+
+1. **`clipboard` 选项**：
+   - Vim 的 `clipboard` 选项控制 Vim 如何使用系统剪贴板。通过设置这个选项，你可以让 Vim 的复制（yank）和粘贴（paste）操作直接与系统剪贴板进行交互。
+
+2. **`unnamedplus` 的含义**：
+   - `unnamedplus` 是 `clipboard` 选项的一个值，它告诉 Vim 使用系统剪贴板作为复制和粘贴操作的存储。在 Vim 中，`"+` 寄存器通常与系统剪贴板相关联，而 `unnamedplus` 使得这个寄存器的行为与系统剪贴板一致。
+
+3. **如何工作**：
+   - 当你设置了 `set clipboard=unnamedplus`，Vim 会将复制（yank）操作的内容存储到 `"+` 寄存器，这个寄存器与系统剪贴板同步。因此，当你在 Vim 中复制文本时，它也会出现在系统剪贴板上，你可以在其他程序中粘贴。
+   - 同样地，从系统剪贴板粘贴（paste）文本到 Vim 中时，Vim 会从 `"+` 寄存器读取内容。
+
+4. **在 Linux 中的配置**：
+   - 这个配置同样适用于 Linux 系统。在 Linux 系统中，`"+` 寄存器可能与 X11 的 CLIPBOARD 选区相关联，这取决于你的桌面环境和配置。在大多数现代 Linux 发行版中，`"+` 寄存器用于系统剪贴板操作。
+
+5. **检查 Vim 是否支持剪贴板**：
+   - 可以使用 `vim --version | grep clipboard` 命令来检查你的 Vim 是否支持剪贴板功能。如果输出中包含 `+clipboard`，则表示支持。
+
 # Git 存储数据方式  
 > [Git Internals Part 2: How does Git store your data?](https://www.developernation.net/blog/git-internals-how-does-git-store-your-data)  
 > [1.3 Getting Started - What is Git?](https://git-scm.com/book/en/v2/Getting-Started-What-is-Git%3F#what_is_git_section)  
@@ -287,8 +379,312 @@ Tracked files are files that were in the last snapshot, as well as any newly sta
 
 ## untracked file
 Tracked files are files that were in the last snapshot, as well as any newly staged files; they can be unmodified, modified, or staged. In short, tracked files are files that Git knows about.
-      
-# git clone 克隆仓库到新目录  
+
+# refs 和 refspec
+在 Git 中，`refs`（引用）和 `refspec`（引用规范）是两个重要的概念，它们与分支、标签和其他引用的管理密切相关。
+
+## Refs（引用）
+
+在 Git 中，`refs` 是指向提交对象（commit objects）的指针。它们存储在 `.git/refs` 目录下，分为几个部分：
+
+1. **HEAD**：指向当前分支的最新提交。
+2. **branches**：本地分支引用，例如 `refs/heads/master`。
+3. **remotes**：远程分支引用，例如 `refs/remotes/origin/master`。
+4. **tags**：标签引用，例如 `refs/tags/v1.0`。
+
+## Refspec（引用规范）
+
+`refspec` 是一个字符串，用于定义如何将远程仓库的引用（refs）映射到本地仓库的引用。它通常用于 `git fetch` 和 `git push` 命令中，以指定要操作的远程引用和本地引用。
+
+一个 `refspec` 的一般格式如下：
+
+```
+<src>:<dst>
+```
+
+- **<src>**：源引用，可以是分支名、标签名或使用通配符的引用模式。
+- **<dst>**：目标引用，是远程引用映射到本地引用的路径。
+
+## 举例说明
+
+假设你有一个远程仓库 `origin`，其 URL 为 `https://github.com/user/repo.git`，并且你想要管理远程分支和本地分支的映射。
+
+1. **简单的 refspec**：
+   如果你想要将远程的 `master` 分支拉取到本地的 `master` 分支，你可以使用以下 `refspec`：
+   ```bash
+   git fetch origin master:refs/heads/master
+   ```
+   这里，`master` 是源引用（远程的 `master` 分支），`refs/heads/master` 是目标引用（本地的 `master` 分支）。
+
+2. **使用通配符的 refspec**：
+   如果你想要拉取远程仓库的所有分支到本地，可以使用通配符 `*`：
+   ```bash
+   git fetch origin '*:refs/heads/*'
+   ```
+   这里，`*` 匹配远程仓库的所有引用，`refs/heads/*` 指定所有匹配的远程引用都应该映射到本地的 `refs/heads/` 下。
+
+3. **推送标签**：
+   如果你想要推送本地的所有标签到远程仓库，可以使用以下 `refspec`：
+   ```bash
+   git push origin 'refs/tags/*:refs/tags/*'
+   ```
+   这里，`refs/tags/*` 匹配本地的所有标签，并且将它们推送到远程仓库的 `refs/tags/` 下。
+
+4. **删除远程引用**：
+   `refspec` 也可以用于删除远程引用。例如，要删除远程的 `feature` 分支，可以使用以下命令：
+   ```bash
+   git push origin ':refs/heads/feature'
+   ```
+   注意，这里 `<src>` 只有一个冒号 `:`，这意味着没有源引用，只有目标引用，这将导致远程的 `feature` 分支被删除。
+
+`refspec` 的强大之处在于它允许你精确控制 Git 引用的同步和映射，这对于管理复杂的分支结构和远程仓库非常有用。
+
+# 裸仓库
+裸仓库是一个没有工作目录（working directory）的 Git 仓库。在普通的 Git 仓库中，你有一个 `.git` 目录，它包含了所有的版本控制信息，以及一个工作目录，这是你实际编写代码的地方。而在裸仓库中，没有工作目录，只有 `.git` 目录。这意味着你不能直接在裸仓库中进行提交（commit）或其他修改，它主要用于以下用途：
+
+1. **作为远程仓库**：裸仓库通常用作远程仓库，因为它不包含工作目录，所以不会有任何未提交的更改。这样可以确保所有通过 `git push` 和 `git fetch` 操作推送和拉取的更改都是干净和一致的。
+
+2. **备份**：裸仓库可以作为其他仓库的备份，因为它包含了完整的历史记录和所有分支。
+
+3. **Git 服务**：裸仓库可以作为 Git 服务运行，比如 Git 服务器或 CI/CD 系统，它们需要处理多个项目的推送和拉取操作。
+
+## `git clone --mirror` 命令
+
+当使用 `git clone --mirror` 克隆一个仓库时，你实际上是在创建一个裸仓库。这个命令会复制所有的引用（refs），包括分支、标签和远程引用，并且设置特殊的 refspec，使得所有这些引用在目标仓库中都会被覆盖。这意味着任何推送到这个镜像仓库的更改都会反映到所有相关的引用上。
+
+具体来说，`git clone --mirror` 命令做了以下几件事情：
+
+1. **克隆所有引用**：克隆远程仓库的所有分支和标签。
+
+2. **设置 refspec**：设置一个 refspec，这是一个规则，定义了如何从远程仓库同步引用。对于镜像仓库，这个 refspec 通常设置为 `+refs/*:refs/*`，意味着所有远程的引用都会被推送到本地。
+
+3. **创建裸仓库**：创建的仓库没有工作目录，只有 `.git` 目录。
+
+## 示例
+
+```bash
+git clone --mirror https://github.com/user/repo.git
+```
+
+这个命令会创建一个名为 `repo.git` 的裸仓库，其中包含了 `https://github.com/user/repo.git` 仓库的所有引用。你可以使用这个裸仓库来推送更新到远程服务器，或者作为其他仓库的备份。
+
+# 子模块
+> [Git - git-submodule Documentation](https://git-scm.com/docs/git-submodule) 
+
+Git 子模块（Submodule）是一种将一个 Git 仓库嵌入到另一个 Git 仓库中的方法。这使得你可以将一个项目（子模块）作为另一个项目的依赖项，并保持两者的独立性。以下是子模块的一些基本概念和操作步骤，以及一个实际的例子。
+
+- **依赖管理**：子模块常用于管理项目依赖。例如，一个大型项目可能依赖于几个库或工具，这些库或工具可以作为子模块被包含在项目中。
+
+- **独立性**：子模块有自己的提交历史和分支结构，它们在父项目中是独立的，可以单独更新。
+
+- **同步更新**：你可以在父项目中更新子模块到新的提交或分支，而不影响子模块自己的历史。
+
+## 子模块的操作
+
+1. **添加子模块**：
+   使用 `git submodule add` 命令将远程仓库添加为子模块。
+   ```bash
+   git submodule add <repository-url> <path>
+   ```
+   例如，将一个名为 `lib` 的远程仓库添加为子模块：
+   ```bash
+   git submodule add https://github.com/user/lib.git lib
+   ```
+
+2. **克隆包含子模块的仓库**：
+   克隆时使用 `--recurse-submodules` 参数来初始化并克隆子模块。
+   ```bash
+   git clone --recurse-submodules https://github.com/user/repo.git
+   ```
+
+3. **更新子模块**：
+   使用 `git submodule update` 命令来更新子模块到最新提交。
+   ```bash
+   git submodule update --init --recursive
+   ```
+
+4. **同步子模块**：
+   如果你在父项目中做了一些关于子模块的更改（比如更新了子模块的引用），你需要使用 `git submodule sync` 来同步这些更改。
+   ```bash
+   git submodule sync
+   ```
+
+5. **检出特定提交**：
+   你可以检出子模块的特定提交。
+   ```bash
+   git checkout -b <branch-name>
+   cd <path-to-submodule>
+   git checkout <commit-hash>
+   cd ..
+   ```
+
+## 示例
+
+假设有一个名为 `MyProject` 的项目，它依赖于一个名为 `CommonLib` 的库。你可以将 `CommonLib` 作为子模块添加到 `MyProject` 中。
+
+1. **初始化 MyProject 仓库**：
+   ```bash
+   git init MyProject
+   cd MyProject
+   ```
+
+2. **添加 CommonLib 作为子模块**：
+   ```bash
+   git submodule add https://github.com/user/CommonLib.git lib
+   ```
+   这会在 `MyProject` 中创建一个 `lib` 目录，并将 `CommonLib` 仓库克隆到这个目录中。
+
+3. **提交子模块引用**：
+   ```bash
+   git commit -m "Add CommonLib as a submodule"
+   ```
+
+4. **克隆 MyProject 并递归子模块**：
+   ```bash
+   git clone --recurse-submodules https://github.com/user/MyProject.git
+   cd MyProject
+   ```
+
+5. **更新子模块**：
+   如果 `CommonLib` 有更新，你可以更新子模块：
+   ```bash
+   git submodule update --init --recursive
+   ```
+
+6. **同步子模块引用**：
+   如果你更改了子模块的远程 URL 或其他设置，你需要同步这些更改：
+   ```bash
+   git submodule sync
+   ```
+
+通过使用子模块，你可以保持项目的清晰结构，同时管理复杂的依赖关系。子模块提供了一种灵活的方式来集成外部代码，同时保持项目的独立性和可维护性。
+
+# git clone
+> [Git - git-clone Documentation](https://git-scm.com/docs/git-clone)   
+
+## **克隆默认分支**
+   ```bash
+   git clone https://github.com/user/repo.git
+   ```
+   这将克隆 `user/repo` 仓库的默认分支（通常是 `master` 或 `main`）到本地目录 `repo`。
+
+## **克隆特定分支**
+   ```bash
+   git clone -b develop https://github.com/user/repo.git
+   ```
+   这将克隆 `user/repo` 仓库的 `develop` 分支。
+
+## **克隆不包含标签**
+   ```bash
+   git clone --no-tags https://github.com/user/repo.git
+   ```
+   这将克隆仓库，但不包括任何标签。
+
+## **浅克隆**
+   ```bash
+   git clone --depth 1 https://github.com/user/repo.git
+   ```
+   这将创建一个浅克隆，只包含最新的提交（即最近一次提交的历史）。
+
+## **克隆并指定分支名称**
+   ```bash
+   git clone --branch new-branch --single-branch https://github.com/user/repo.git
+   ```
+   这将克隆 `user/repo` 仓库，并检查出 `new-branch` 分支。
+   `git clone --branch new-branch --single-branch https://github.com/user/repo.git` 这个命令包含了两个参数：`--branch` 和 `--single-branch`。
+
+1. **--branch <name>**：
+   这个参数后面跟的是你想要克隆的分支名称。在这个例子中，`<name>` 被替换成了 `new-branch`，意味着你想要克隆远程仓库中名为 `new-branch` 的分支。
+
+2. **--single-branch**：
+   这个参数告诉 Git 你只想要克隆一个分支，而不是整个仓库的所有分支。当你使用 `--branch` 参数指定了一个分支后，`--single-branch` 会确保 Git 只克隆那个特定的分支，而不是克隆整个仓库的所有分支。
+
+这个命令特别有用在你只对远程仓库中的某个特定分支感兴趣，而不需要整个仓库的所有分支和标签时。这样可以减少克隆操作所需的时间和带宽，因为你只获取了你感兴趣的那部分代码。
+
+## **克隆并初始化所有子模块**
+   ```bash
+   git clone --recurse-submodules https://github.com/user/repo.git
+   ```
+   这将克隆仓库以及所有子模块。
+   `git clone --recurse-submodules https://github.com/user/repo.git` 这个命令用于克隆一个包含子模块的 Git 仓库，并且初始化并克隆所有的子模块。
+
+1. **git clone**：
+   这是 Git 的克隆命令，用于从一个远程仓库复制代码到本地。
+
+2. **--recurse-submodules**：
+   这个参数告诉 Git，在克隆主仓库的同时，也递归地克隆所有子模块（submodule）。子模块是指在 Git 仓库中包含的另一个 Git 仓库，它们可以有自己的提交历史和分支。
+
+3. **https://github.com/user/repo.git**：
+   这是远程仓库的 URL。在这个例子中，`user` 是仓库所有者的 GitHub 用户名，`repo` 是仓库的名称。`.git` 表示这是一个 Git 仓库。
+
+当你执行这个命令时，Git 会做以下几件事情：
+
+- 克隆指定的远程仓库到本地。
+- 检查仓库中的 `.gitmodules` 文件，这个文件列出了所有子模块的路径和对应的远程仓库 URL。
+- 递归地克隆每个子模块到对应的路径。
+- 初始化子模块的 Git 仓库，并设置为相应的远程仓库。
+
+这个命令特别有用在你想要克隆一个复杂的项目时，这个项目包含了多个依赖的子项目（子模块）。使用 `--recurse-submodules` 参数可以确保你不仅克隆了主项目，还克隆了所有需要的子模块，这样可以保证项目的完整性和可构建性。
+
+## **创建裸仓库**
+   ```bash
+   git clone --mirror https://github.com/user/repo.git
+   ```
+   这将创建一个裸仓库，即没有工作目录的仓库，通常用于作为其他仓库的镜像。
+
+## **使用模板克隆**
+   ```bash
+   git clone --template=/path/to/template https://github.com/user/repo.git
+   ```
+   这将使用指定的模板目录来初始化新仓库。
+
+## **设置配置变量**
+   ```bash
+   git clone --config user.name="Your Name" https://github.com/user/repo.git
+   ```
+   这将在克隆时设置仓库的用户名称。
+
+## **不检出 HEAD**
+    ```bash
+    git clone --no-checkout https://github.com/user/repo.git
+    ```
+这将克隆仓库，但不会检出 HEAD 对应的工作目录。
+`git clone --no-checkout` 是一个 Git 命令的选项，它用于克隆远程仓库但不检出代码。
+
+`git clone --no-checkout <repository-url>` 命令会从 `<repository-url>` 指定的远程仓库克隆一个空目录，其中包含远程仓库的所有分支和标签的引用，但不包含任何工作目录中的文件。
+
+- `--no-checkout`：这个选项告诉 Git 在克隆过程中不要检出 HEAD 或任何其他分支的最新提交。这意味着在克隆完成后，你将得到一个空的工作目录。
+
+### 使用场景
+
+1. **节省带宽和时间**：如果你只对仓库的元数据（如分支、标签）感兴趣，或者你想要离线工作而不需要立即检出代码，使用 `--no-checkout` 可以节省下载代码的带宽和时间。
+
+2. **初始化裸仓库**：创建裸仓库（bare repository）时，通常不需要工作目录，因此可以使用 `--no-checkout` 选项来克隆。
+
+3. **脚本和自动化**：在自动化脚本中，你可能需要克隆仓库并执行一些 Git 操作，但不需要实际的代码文件。
+
+### 注意事项
+
+- 克隆完成后，你可以使用 `git checkout` 命令来检出特定的分支或提交。
+- 如果你需要检出特定的分支，可以在克隆后执行 `git checkout <branch-name>`。
+- 如果你想要检出远程分支的最新提交，可以先执行 `git fetch`，然后使用 `git checkout -b <branch-name> origin/<branch-name>`。
+- 使用 `--no-checkout` 克隆的仓库将不会包含任何文件，直到你显式地检出分支或提交。
+
+## **稀疏检出**
+    ```bash
+    git clone --sparse https://github.com/user/repo.git
+    ```
+    这将使用稀疏检出克隆仓库，只检出顶级目录中的文件。
+
+## **部分克隆**
+    ```bash
+    git clone --filter=blob:none https://github.com/user/repo.git
+    ```
+    这将创建一个不包含任何二进制文件的克隆。
+
+这些示例展示了如何根据不同的需求使用 `git clone` 命令的参数。在实际使用中，你可以根据需要组合这些参数来实现更复杂的克隆操作。
+
+## 克隆仓库到新目录  
 如果远程仓库地址为：https://github.com/lxwcd/learnVim.git，直接用 git clone url 会将远程仓库克隆到当前目录  
 当前目录下会包含远程仓库的目录
 
@@ -300,12 +696,12 @@ git clone https://github.com/lxwcd/cpp.git .
 将远程仓库克隆到指定目录并且修改仓库名字为 `new_folder`：  
 ```bash  
 git clone https://github.com/lxwcd/learnVim.git /usr/local/src/new_folder  
-```  
+```
       
 也可以指定多级目录，如果不存在，则自动创建  
 ```bash  
 git clone https://github.com/lxwcd/learnVim.git /usr/local/src/1/2/3/new_folder  
-```  
+```
 
 # git init 初始化仓库
 > [Git - git-init Documentation](https://git-scm.com/docs/git-init) 
@@ -432,23 +828,99 @@ git init --bare myproject.git
 4. **提交建议**：
    - 根据当前状态，`git status` 可能会提供提交建议，如使用 `git add` 暂存文件或使用 `git commit` 提交更改。
 
-## 使用示例
+## 参数详解
 
-- **基本使用**：
-  ```bash
-  git status
-  ```
-  这个命令显示当前仓库的状态。
+1. **-s, --short**
+   - 显示简短的状态信息，不显示文件的具体更改内容。
+   ```bash
+   git status -s
+   ```
 
-- **简洁模式**：
-  ```bash
-  git status --short
-  ```
-  或者简写为：
-  ```bash
-  git status -s
-  ```
-  这个命令以简洁的格式显示状态，通常用于快速查看文件状态。
+2. **-b, --branch**
+   - 显示当前分支的信息以及与上游分支的差异。
+   ```bash
+   git status -b
+   ```
+
+3. **-u, --untracked-files[=<mode>]**
+   - 显示未跟踪的文件。`<mode>` 可以是 `no`, `normal`, 或 `all`。
+     - `no`：不显示未跟踪的文件。
+     - `normal`：显示未跟踪的文件，但排除那些在 `.gitignore` 中指定的文件。
+     - `all`：显示所有未跟踪的文件，包括那些在 `.gitignore` 中指定的文件。
+   ```bash
+   git status -u
+   git status -uno
+   git status -uall
+   ```
+
+4. **--ignored**
+   - 只显示被 `.gitignore` 忽略的文件。
+   ```bash
+   git status --ignored
+   ```
+
+5. **--porcelain**
+   - 机器可读格式输出，便于脚本处理。
+   ```bash
+   git status --porcelain
+   ```
+
+6. **-z, --null**
+   - 分隔输出字段，字段之间用 `\0` 分隔，用于脚本处理。
+   ```bash
+   git status -z
+   ```
+
+7. **---ahead-behind**
+   - 显示当前分支与上游分支的领先或落后的提交数。
+   ```bash
+   git status --ahead-behind
+   ```
+
+8. **--branch --ahead-behind**
+   - 显示当前分支与上游分支的详细领先或落后信息。
+   ```bash
+   git status --branch --ahead-behind
+   ```
+
+9. **--untracked-files=no**
+   - 不显示未跟踪的文件。
+   ```bash
+   git status --untracked-files=no
+   ```
+
+10. **--ignore-submodules**
+    - 忽略子模块的变化。
+    ```bash
+    git status --ignore-submodules
+    ```
+
+假设你有一个名为 `project` 的 Git 仓库，并且你进行了以下操作：
+
+1. 修改了 `file1.txt` 并且已经暂存。
+2. 修改了 `file2.txt` 但还没有暂存。
+3. 添加了 `file3.txt` 但还没有暂存。
+
+```bash
+# 显示完整的仓库状态
+git status
+
+# 显示简短的状态信息
+git status -s
+
+# 显示未跟踪的文件
+git status -u
+
+# 显示被 .gitignore 忽略的文件
+echo "file3.txt" >> .gitignore
+git status --ignored
+
+# 显示机器可读格式的输出
+git status --porcelain
+
+# 使用 \0 分隔输出字段
+git status -z
+```
 
 ## 注意事项
 
@@ -457,8 +929,10 @@ git init --bare myproject.git
 - **分支同步**：`git status` 显示的分支同步状态基于远程分支的最新已知状态，可能需要 `git fetch` 来更新。
 
 # Ignoring files
+> [Learn Git and GitHub](https://roadmap.sh/git-github) 
 > [Git - gitignore Documentation](https://git-scm.com/docs/gitignore) 
 > [GitHub - github/gitignore: A collection of useful .gitignore templates](https://github.com/github/gitignore) 
+> [.gitignore file - ignoring files in Git | Atlassian Git Tutorial](https://www.atlassian.com/git/tutorials/saving-changes/gitignore) 
 
 `.gitignore` 是一个在 Git 仓库中使用的特殊文件，用于指定 Git 应该忽略的文件和目录。这个文件帮助你防止不小心提交不需要版本控制的文件，比如编译产物、日志文件、个人配置文件等。
 
@@ -610,20 +1084,18 @@ node_modules/
 - **行号**：显示差异行的行号。
 - **差异内容**：显示具体的差异内容。
 
-## 使用示例
-
-- **查看特定文件的差异**：
+## **查看特定文件的差异**
   ```bash
   git diff <file>
   ```
 
-- **比较分支与当前工作目录**：
+## **比较分支与当前工作目录**
   ```bash
   git diff <branch>
   ```
   这个命令比较指定分支与当前工作目录的差异。
 
-- **比较标签**：
+## **比较标签**
   ```bash
   git diff <tag1> <tag2>
   ```
@@ -637,6 +1109,88 @@ node_modules/
 
 通过使用 `git diff`，你可以详细查看文件的更改内容，这在代码审查、调试和提交前检查时非常有用。它是一个强大的工具，可以帮助你理解和管理代码的更改。
 
+# git checkout
+> [Git - git-checkout Documentation](https://git-scm.com/docs/git-checkout) 
+
+`git checkout` 是 Git 中用于切换分支或检出特定版本的文件到工作目录的命令。
+
+## 切换分支
+1. **切换到已存在的分支**：
+   ```bash
+   git checkout <branch-name>
+   ```
+   这个命令会将 HEAD 移动到指定的分支，并更新工作目录以匹配该分支的状态。
+
+## 创建并切换分支
+2. **创建新分支并切换**：
+   ```bash
+   git checkout -b <new-branch-name>
+   ```
+   或者在较新版本的 Git 中：
+   ```bash
+   git switch -c <new-branch-name>
+   ```
+   这些命令会创建一个新的分支，并立即切换到这个分支。
+
+3. **基于远程分支创建新分支并切换**：
+   ```bash
+   git checkout -b <new-branch-name> origin/<branch-name>
+   ```
+   这个命令会创建一个新的分支，并将其设置为跟踪远程分支 `origin/<branch-name>`。
+
+### 检出文件
+
+4. **检出特定文件到工作目录**：
+   ```bash
+   git checkout <branch-name> -- <file-path>
+   ```
+   这个命令会从 `<branch-name>` 分支检出 `<file-path>` 文件到当前工作目录，替换本地的文件。
+
+### 检出特定提交
+
+5. **检出特定提交到工作目录**：
+   ```bash
+   git checkout <commit-hash> -- <file-path>
+   ```
+   这个命令会从 `<commit-hash>` 提交检出 `<file-path>` 文件到当前工作目录。
+
+6. **检出特定提交到新分支**：
+   ```bash
+   git checkout <commit-hash> -b <new-branch-name>
+   ```
+   这个命令会创建一个新的分支 `<new-branch-name>` 并检出 `<commit-hash>` 提交的内容到这个新分支。
+
+### 恢复更改
+
+7. **恢复已修改但未暂存的文件**：
+   ```bash
+   git checkout -- <file-path>
+   ```
+   这个命令会将 `<file-path>` 文件恢复到最近一次提交的状态，放弃本地的修改。
+
+8. **恢复已暂存的文件**：
+   ```bash
+   git restore --staged -- <file-path>
+   ```
+   或者使用旧版本的 Git 命令：
+   ```bash
+   git checkout -- <file-path>
+   ```
+   这些命令会将 `<file-path>` 文件从暂存区取消暂存，恢复到工作目录的状态。
+
+### 切换到标签
+
+9. **检出标签对应的版本**：
+   ```bash
+   git checkout <tag-name>
+   ```
+   这个命令会检出包含 `<tag-name>` 标签的提交，通常用于检出某个特定的发布版本。
+
+### 注意事项
+
+- 使用 `git checkout` 切换分支时，如果你有未提交的更改，Git 会警告你，因为这些更改可能会丢失。你可以先暂存更改，或者使用 `git stash` 保存更改。
+- `git checkout` 命令在检出文件时，如果文件在工作目录中被修改过，Git 会阻止检出操作以防止数据丢失。你需要先解决这些冲突，或者使用 `git checkout --force` 强制覆盖本地更改。
+- 在使用 `git checkout` 检出文件时，如果你想要保留工作目录中的更改，可以先将更改暂存，然后再检出文件。
 
 # git add 
 > [Git - git-add Documentation](https://git-scm.com/docs/git-add) 
@@ -728,7 +1282,6 @@ git add -n .
 - **不影响工作目录**：使用 `-n` 选项不会改变工作目录或暂存区的状态。
 - **结合其他选项使用**：你可以结合其他 `git add` 选项使用 `-n`，例如 `git add -A -n` 来查看所有将被添加的文件。
 
-
 # git commit
 > [Git - git-commit Documentation](https://git-scm.com/docs/git-commit) 
 
@@ -768,6 +1321,43 @@ git add -n .
 - **`-C <commit>`**：使用指定提交的信息作为当前提交的信息。
 - **`--dry-run`**：模拟提交操作，显示将要提交的内容，但不实际创建提交。
 
+### --amend
+`git commit --amend` 是一个Git命令，用于修改最近一次提交的信息。这个命令通常用于当你想要修改最后一次提交的提交信息，或者当你想要将未暂存的更改添加到最近的提交中时。
+
+1. **修改提交信息**：
+   - 如果你刚刚做了一次提交，然后意识到提交信息有误或者不完整，你可以使用 `git commit --amend` 来修改它。
+
+2. **合并更改到上一个提交**：
+   - 如果你在提交后发现还有一些更改忘记加入，你可以使用 `git commit --amend` 将这些更改加入到上一个提交中。
+
+#### 操作步骤
+
+1. **检查当前状态**：
+   - 在执行 `git commit --amend` 之前，确保你的工作目录是你想要的状态，因为任何未暂存的更改都会被添加到修正的提交中。
+
+2. **执行命令**：
+   - 运行 `git commit --amend`。如果你有未暂存的更改，它们会被自动暂存并包含在修正的提交中。
+
+3. **修改提交信息**：
+   - 如果你只是想修改提交信息，Git会打开一个编辑器让你修改提交信息。保存并关闭编辑器后，Git会用新的信息更新最近的提交。
+
+4. **处理未暂存的更改**：
+   - 如果你有未暂存的更改，并且想要将它们包含在修正的提交中，确保在执行 `git commit --amend` 之前使用 `git add` 将它们暂存。
+
+#### 注意事项
+
+- **重写历史**：
+  - `git commit --amend` 实际上会创建一个新的提交对象，它有一个不同的提交ID。这意味着它会重写项目的历史。如果你已经将原始提交推送到了远程仓库，那么使用 `git commit --amend` 后，你需要使用 `git push --force` 来更新远程仓库。这可能会影响其他协作者的工作，因此在团队项目中使用时需要谨慎。
+
+- **使用场景限制**：
+  - `git commit --amend` 只能用于最近的提交。如果你想要修改更早的提交，你需要使用 `git rebase` 命令。
+
+- **处理冲突**：
+  - 如果在修正提交的过程中出现冲突，你需要手动解决这些冲突，然后继续修正过程。
+
+- **安全性**：
+  - 在使用 `git commit --amend` 时要小心，尤其是在多人协作的项目中，因为这可能会影响其他人的工作。
+
 ## 钩子脚本
 
 - **`prepare-commit-msg`**：在编辑提交信息之前运行。
@@ -784,6 +1374,21 @@ git add -n .
 - `git rm file`  
 - `git commit -m "delete file"`  
 - `git push origin <remote repo>`  
+
+## 处理错误的提交
+> [Git Guides - git commit](https://github.com/git-guides/git-commit#what-can-go-wrong-while-changing-history) 
+
+- `git revert`是更改历史记录的最安全方式。它不会删除现有提交，而是在新提交中应用特定提交引入变化的逆操作。
+- `git reset`是一个强大的命令，可以移动HEAD指针和分支指针到另一个时间点，但可能会导致工作丢失。在使用`git reset`之前，确保与团队沟通，并了解三种类型的重置（--soft, --mixed, --hard）。
+
+- `git reflog`是一个记录HEAD指向的每个提交的日志。如果你在使用`git reset`时无意中丢失了提交，可以使用`git reflog`找到并访问它们。
+
+- `git commit --amend`只更改当前分支上的最近一次提交。
+- 这个命令对于尚未推送到远程的提交、提交信息中有拼写错误或者提交中未包含预期更改的情况非常有用。
+
+# 防止本地分支修改提交历史顺序
+本地在 git commit 前先 git fetch，更新远程分支的引用，可以查看本地和远程的差异，是否有冲突等，
+然后提交，防止本地先提交后合并，修改提交历史的顺序。
 
 # git rm 删除文件
 > [Git - git-rm Documentation](https://git-scm.com/docs/git-rm) 
@@ -931,6 +1536,7 @@ git commit -m "Remove example.txt"
 # git log 查看日志
 > [Git - git-log Documentation](https://git-scm.com/docs/git-log) 
 > [Git - Viewing the Commit History](https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History) 
+> [Git Log Command Explained](https://www.freecodecamp.org/news/git-log-command/) 
 
 `git log` 是 Git 中用于查看提交历史的命令。它提供了丰富的选项来查看和过滤提交记录，是理解项目历史和追踪更改的重要工具。
 
@@ -981,19 +1587,122 @@ git commit -m "Remove example.txt"
 - **`--author`**：过滤指定作者的提交记录。
 - **`--grep`**：过滤包含特定文本的提交信息。
 
-## 高级用法
+好的，让我们通过一些具体的例子来详细讲解`git log`命令及其参数的使用。
 
-- **组合过滤选项**：可以组合使用多个过滤选项来精确查找特定的提交记录。例如：
-  ```bash
-  git log --since="2023-01-01" --author="John Doe"
-  ```
-  这个命令显示自 2023 年 1 月 1 日以来 John Doe 的提交记录。
+## 基本用法
 
-- **使用路径限制**：可以限制 `git log` 的输出到特定的文件或目录。例如：
-  ```bash
-  git log -- <path>
-  ```
-  这个命令显示与指定路径相关的提交记录。
+```bash
+$ git log
+```
+
+这个命令会列出仓库中所有的提交记录，按照时间倒序排列，最新的提交在最上面。
+
+### 查看差异（Patch）
+
+使用`-p`或`--patch`参数，我们可以查看每个提交的具体差异：
+
+```bash
+$ git log -p
+```
+
+这将显示每个提交的详细差异，包括文件的增删改。
+
+### 限制显示条目
+
+如果我们只想看最后两个提交的差异，可以使用`-2`参数：
+
+```bash
+$ git log -p -2
+```
+
+### 统计信息
+
+`--stat`参数可以显示每个提交影响的文件和行数：
+
+```bash
+$ git log --stat
+```
+
+这将显示每个提交修改的文件列表、文件数量变化以及添加和删除的行数统计。
+
+### 自定义格式
+
+使用`--pretty`参数，我们可以自定义日志的显示格式。例如，`oneline`将每个提交显示在一行上：
+
+```bash
+$ git log --pretty=oneline
+```
+
+输出示例：
+
+```
+ca82a6dff817ec66f44342007202690a93763949 Change version number
+085bb3bcb608e1e8451d4b2432f8ecbe6306e7e7 Remove unnecessary test
+a11bef06a3f659402fe7563abf99ad00de2209e6 Initial commit
+```
+
+### 格式化输出
+
+`--pretty=format`允许我们自定义输出格式。例如，我们可以这样显示提交的哈希值、作者和提交信息：
+
+```bash
+$ git log --pretty=format:"%h - %an, %ar : %s"
+```
+
+输出示例：
+
+```
+ca82a6d - Scott Chacon, 6 years ago : Change version number
+085bb3b - Scott Chacon, 6 years ago : Remove unnecessary test
+a11bef0 - Scott Chacon, 6 years ago : Initial commit
+```
+
+### 分支和合并历史
+
+`--graph`参数可以显示分支和合并历史的ASCII图形：
+
+```bash
+$ git log --pretty=format:"%h %s" --graph
+```
+
+这将显示一个ASCII图形，展示了分支和合并的历史。
+
+### 时间限制
+
+`--since`和`--until`参数可以用来限制显示特定时间范围内的提交：
+
+```bash
+$ git log --since="2 weeks ago"
+```
+
+这将显示最近两周内的提交记录。
+
+### 作者和关键词搜索
+
+`--author`和`--grep`参数可以用来根据作者或提交信息中的关键词来过滤提交：
+
+```bash
+$ git log --author="Scott Chacon" --grep="version"
+```
+
+这将显示所有作者为“Scott Chacon”且提交信息中包含“version”的提交。
+
+### 文件路径过滤
+
+最后，我们可以通过文件路径来限制显示特定文件的提交历史：
+
+```bash
+$ git log -- path/to/file
+```
+
+这将只显示影响`path/to/file`文件的提交记录。
+
+通过这些例子，你可以看到`git log`命令及其参数的强大之处，它们可以帮助你以多种方式查看和管理Git仓库的提交历史。
+
+### 指定查看数目
+```bash
+$ git log origin/testBranch02 --oneline --graph --decorate -15
+```
 
 ## 注意事项
 
@@ -1747,17 +2456,18 @@ git restore [<options>] [--source=<tree>] [--staged] [--worktree] [--] <pathspec
 
 # git remote
 > [Git - git-remote Documentation](https://git-scm.com/docs/git-remote) 
+> [Managing remote repositories - GitHub Docs](https://docs.github.com/en/get-started/getting-started-with-git/managing-remote-repositories) 
 
-`git remote` 是 Git 中用于管理远程仓库的命令。它允许你查看、添加、修改和删除远程仓库的引用。以下是 `git remote` 命令的详细讲解：
+`git remote` 是 Git 中用于管理远程仓库的命令。它允许你查看、添加、修改和删除远程仓库的引用。
 
-### 功能和用途
+## 功能和用途
 
 1. **查看远程仓库**：`git remote` 命令可以列出所有配置的远程仓库。
 2. **添加远程仓库**：你可以使用 `git remote add` 命令添加新的远程仓库。
 3. **修改远程仓库**：可以更改远程仓库的 URL 或其他设置。
 4. **删除远程仓库**：可以删除不再需要的远程仓库引用。
 
-### 基本使用
+## 基本使用
 
 - **查看远程仓库列表**：
   ```bash
@@ -1795,7 +2505,7 @@ git restore [<options>] [--source=<tree>] [--staged] [--worktree] [--] <pathspec
   ```
   这个命令更改指定远程仓库的 URL。
 
-### 选项
+## 选项
 
 - **`-v` 或 `--verbose`**：显示远程仓库的详细信息，包括 URL。
 - **`add`**：添加新的远程仓库引用。
@@ -1803,15 +2513,13 @@ git restore [<options>] [--source=<tree>] [--staged] [--worktree] [--] <pathspec
 - **`rename`**：重命名远程仓库。
 - **`set-url`**：更改远程仓库的 URL。
 
-### 使用场景
+## 使用场景
 
 - **协作开发**：在团队协作中，你可能需要添加远程仓库来共享代码。
 - **代码托管**：你可能需要将代码推送到远程仓库以进行托管或备份。
 - **分支管理**：通过远程仓库，你可以管理不同分支的代码。
 
-### 示例
-
-假设你想要添加一个新的远程仓库：
+## 示例
 
 ```bash
 git remote add origin https://github.com/lxwcd/git_test.git
@@ -1821,7 +2529,7 @@ git push -u origin main
 
 这个命令添加了一个名为 `origin` 的远程仓库引用，指向 `https://github.com/lxwcd/git_test.git`。
 
-### 注意事项
+## 注意事项
 
 - **远程仓库名称**：`origin` 是默认的远程仓库名称，但你可以使用任何名称。
 - **URL 格式**：确保远程仓库的 URL 格式正确，可以是 HTTPS 或 SSH 格式。
@@ -1831,6 +2539,216 @@ git push -u origin main
 
 # git branch
 > [Git - git-branch Documentation](https://git-scm.com/docs/git-branch/2.13.7) 
+
+`git branch` 是一个用于创建、列出、删除和管理 Git 分支的命令。分支在 Git 中是一个轻量级的移动指针，指向你代码历史的某个特定提交。
+
+## 创建新本地分支
+
+1. **创建分支**：
+   ```bash
+   git branch <branch-name>
+   ```
+   这个命令会创建一个新分支，但不会切换到该分支。例如，`git branch feature-x` 会创建一个名为 `feature-x` 的新分支。
+
+2. **创建并切换分支**：
+   ```bash
+   git checkout -b <branch-name>
+   ```
+   或者在某些 Git 版本中：
+   ```bash
+   git switch -c <branch-name>
+   ```
+   这些命令会创建一个新分支并立即切换到该分支。
+
+## 列出分支
+
+1. **列出所有本地分支**：
+   ```bash
+   git branch
+   ```
+   这个命令会列出所有的本地分支。
+
+2. **列出所有远程分支**：
+   ```bash
+   git branch -r
+   ```
+   这个命令会列出所有的远程分支。
+
+3. **列出所有本地和远程分支**：
+   ```bash
+   git branch -a
+   ```
+   这个命令会列出所有的本地分支和远程分支。
+
+## 查看当前分支
+
+1. **显示当前分支**：
+   ```bash
+   git branch --show-current
+   ```
+   或者使用 `git rev-parse --abbrev-ref HEAD`。
+   这个命令会显示当前检出的分支名称。
+
+## 删除分支
+
+1. **删除分支**：
+   ```bash
+   git branch -d <branch-name>
+   ```
+   这个命令会删除一个已经完全合并到当前分支的本地分支。如果分支未完全合并，Git 会阻止删除以防止数据丢失。
+
+2. **强制删除分支**：
+   ```bash
+   git branch -D <branch-name>
+   ```
+   这个命令会强制删除一个分支，无论它是否已经合并。
+
+## 重命名分支
+`git branch -m` 和 `git branch -M` 是 Git 中用于重命名分支的两个命令，它们的主要区别在于处理分支重命名时的安全性。
+
+### git branch -m
+- `-m` 是 `--move` 的缩写。
+- 这个命令用于重命名当前分支。
+- 如果目标分支名称已经存在，并且没有进行任何提交，`git branch -m` 会失败，以防止潜在的数据丢失。
+- 如果目标分支已经存在并且有提交，`git branch -m` 会报错，因为它不想覆盖任何现有的分支历史。
+
+```bash
+git branch -m <old-name> <new-name>
+```
+这个命令会将分支 `<old-name>` 重命名为 `<new-name>`。
+
+### git branch -M
+
+- `-M` 是 `--move` 的缩写，与 `-m` 类似，但它的行为更加激进。
+- 这个命令也用于重命名当前分支。
+- 如果目标分支名称已经存在，`git branch -M` 会强制覆盖目标分支。这意味着目标分支的历史将被当前分支的历史替换，这可能会导致数据丢失。
+- `git branch -M` 通常用于修复损坏的分支或者在确定目标分支没有重要历史的情况下使用。
+
+### 总结
+
+- `git branch -m` 是一个安全的分支重命名命令，它不会覆盖已经存在的分支。
+- `git branch -M` 是一个强制的分支重命名命令，它会覆盖已经存在的分支，因此在使用时需要格外小心。
+
+在实际使用中，除非你完全确定目标分支没有重要的提交历史，否则推荐使用 `git branch -m` 以避免数据丢失。如果你需要强制覆盖一个分支，那么可以使用 `git branch -M`，但应该确保了解这个操作的后果。
+
+## 创建新远程分支
+
+
+
+## 设置跟踪关系
+
+1. **设置上游分支**：
+   ```bash
+   git branch -u <remote-branch>
+   ```
+   或者使用 `git branch --set-upstream-to <remote-branch>`。
+   这个命令会设置当前分支跟踪指定的远程分支。
+
+2. **查看上游分支**：
+   ```bash
+   git branch -vv
+   ```
+   这个命令会显示所有分支及其上游信息。
+
+## 重命名远程分支
+在 Git 中，重命名远程分支可以通过两步完成：首先重命名本地分支，然后将其推送到远程仓库以更新远程分支的名称。
+
+### 步骤 1: 重命名本地分支
+
+1. **检出你想要重命名的分支**：
+   ```bash
+   git checkout <old-branch-name>
+   ```
+   将 `<old-branch-name>` 替换为你想要重命名的分支的当前名称。
+
+2. **重命名本地分支**：
+   ```bash
+   git branch -m <new-branch-name>
+   ```
+   将 `<new-branch-name>` 替换为你想要设置的新分支名称。
+
+如果还没有本地分支，则用下面直接新建本地分支：
+```bash
+git checkout -b <new-branch-name> origin/<old-branch-name>
+```
+可以用 `git branch -vv` 查看本地分支与远程分支对应关系。
+
+### 步骤 2: 推送更改到远程仓库
+
+1. **强制推送到远程仓库**：
+   ```bash
+   git push -u origin :<old-branch-name>
+   git push -u origin <new-branch-name>
+   ```
+   这里的 `<old-branch-name>` 是分支的旧名称，而 `<new-branch-name>` 是新名称。第一个命令用于删除远程分支的旧名称，第二个命令用于将重命名后的本地分支推送到远程仓库。
+
+   - `:<old-branch-name>` 表示删除远程分支。
+   - `-u` 参数是 `--set-upstream` 的简写，它设置远程跟踪分支。
+
+### 注意事项
+
+- 如果你的分支已经被其他人使用，强制推送 (`git push --force`) 可能会导致其他人的工作丢失。在这种情况下，你应该先与团队成员沟通，以确保不会覆盖其他人的更改。
+- 如果你的远程分支已经被设置为跟踪分支，你可能需要使用 `-u` 参数来更新跟踪信息，如下所示：
+  ```bash
+  git push -u origin <new-branch-name>
+  ```
+  这将设置新的本地分支作为远程分支的上游（upstream）。
+
+- 如果你只想更新远程分支的名称，而不改变本地分支的名称，你可以使用以下命令：
+  ```bash
+  git push origin :<old-branch-name>
+  git push origin <new-branch-name>
+  ```
+  这将删除旧的远程分支并推送新的远程分支，而不会改变你当前检出的本地分支名称。
+
+
+## 其他有用的选项
+
+1. **包含已合并/未合并信息**：
+   ```bash
+   git branch --merged
+   git branch --no-merged
+   ```
+   这些命令分别列出所有已经合并到当前分支的分支和所有未合并到当前分支的分支。
+
+2. **删除远程跟踪分支**：
+   ```bash
+   git branch -dr <remote/branch>
+   ```
+   这个命令会删除远程跟踪分支。
+
+`git branch` 命令是 Git 分支管理的核心，它允许你灵活地创建、管理和发展不同的代码线。通过熟练使用这个命令，你可以更有效地利用 Git 的分支功能来管理你的项目。
+
+## 查看所有本地分支和远程分支 
+当你在 Git Bash 中执行 `git branch -a` 命令时，这个命令会列出所有的本地分支和远程分支。下面是你的输出的详细解释：
+
+```bash
+lxw@NEU-20240403OIC MINGW64 /d/lxw/git_test/Bootmon_Test (testPR)
+$ git branch -a
+  master
+* testPR
+  remotes/origin/HEAD -> origin/master
+  remotes/origin/develop
+  remotes/origin/feature_test01
+  remotes/origin/master
+  remotes/origin/testBranch2
+  remotes/origin/testPR
+```
+1. **本地分支**：
+   - `master`：这是名为 `master` 的本地分支。
+   - `* testPR`：`testPR` 是当前检出的本地分支，星号 `*` 表示这是你当前所在的分支。
+
+2. **远程分支**：
+   - `remotes/origin/HEAD -> origin/master`：这表示远程仓库 `origin` 的 HEAD 引用指向 `origin/master` 分支。HEAD 引用通常指向默认分支，在很多 Git 仓库中，默认分支是 `master`。
+
+   - `remotes/origin/develop`：这是名为 `develop` 的远程分支，位于 `origin` 远程仓库。
+
+   - `remotes/origin/feature_test01`：这是名为 `feature_test01` 的远程分支，位于 `origin` 远程仓库。
+
+   - `remotes/origin/master`：这是名为 `master` 的远程分支，位于 `origin` 远程仓库。
+
+`git branch -a` 命令列出的远程分支名前都有 `remotes/origin/` 前缀，这是 Git 用来区分远程分支和本地分支的方式。`remotes/origin/` 下的分支是远程仓库中的分支，而没有这个前缀的分支（如 `master` 和 `testPR`）是本地分支。
+
 
 
 
@@ -1884,9 +2802,90 @@ git branch --unset-upstream my-branch
 
 通过这些命令，你可以灵活地设置和管理你的本地分支与远程分支之间的关系，这对于多人协作的项目来说非常重要。
 
+# git stash
+
+`git stash` 是 Git 中一个非常有用的命令，它允许你临时保存工作目录中的修改，以便你可以在不提交这些修改的情况下切换分支或返回到一个干净的工作状态。
+
+## 功能
+
+- **保存当前工作状态**：当你的工作目录中有未提交的更改，而这些更改可能阻碍你切换分支或执行其他操作时，`git stash` 可以让你保存这些更改，以便稍后恢复。
+- **保持工作目录干净**：使用 `git stash` 可以清理工作目录，让你可以在一个干净的状态下来执行其他 Git 操作，比如拉取最新的代码或切换分支。
+- **恢复工作状态**：你可以在任何时候恢复之前保存的工作状态，无论是在同一个分支还是不同的分支上。
+
+## 基本用法
+
+- **保存工作状态**：
+  ```bash
+  git stash save "optional message"
+  ```
+  这个命令会保存当前的工作状态到一个 stash 中，并清理工作目录。如果省略 `"optional message"`，Git 会自动生成一个消息。
+
+- **列出所有 stash**：
+  ```bash
+  git stash list
+  ```
+  这个命令会列出所有的 stash，每个 stash 前面都有一个标识符，如 `stash@{0}`。
+
+- **应用 stash**：
+  ```bash
+  git stash apply
+  ```
+  这个命令会应用最近的 stash 到当前工作目录。你也可以指定一个 stash 来应用：
+  ```bash
+  git stash apply stash@{n}
+  ```
+  其中 `n` 是 stash 的索引号，最新的 stash 编号为 0，编号最大的为最先 stash 的内容。
+
+- **删除 stash**：
+  ```bash
+  git stash drop stash@{n}
+  ```
+  这个命令会删除指定的 stash。
+
+- **应用 stash 并删除**：
+  ```bash
+  git stash pop
+  ```
+  这个命令会应用最近的 stash 并从 stash 列表中删除它。
+
+### 高级用法
+
+- **保存特定文件的更改**：
+  你可以使用 `git stash push` 的 `-k` 选项来保留索引（即暂存区）的更改，而只 stash 工作目录中的更改：
+  ```bash
+  git stash push -k "optional message"
+  ```
+  或者，你可以使用 `git stash --include-untracked` 来 stash 未跟踪的文件。
+
+- **保存和应用特定文件的更改**：
+  你可以使用 `git stash push` 的 `--patch` 选项来交互式地选择要 stash 的文件：
+  ```bash
+  git stash push --patch
+  ```
+  然后你可以应用特定的 stash 中的文件：
+  ```bash
+  git stash apply --index stash@{n} -- "file1" "file2"
+  ```
+
+- **创建分支并应用 stash**：
+  如果你想要在一个新分支上恢复 stash，你可以这样做：
+  ```bash
+  git stash branch new-branch
+  ```
+  Git 会自动应用 stash 并创建一个新分支。
+
+### 注意事项
+
+- **stash 与分支**：stash 是与分支无关的，你可以在任何分支上保存和应用 stash。
+- **stash 与提交**：stash 不会记录在你的项目历史中，它是一个临时的保存点。
+- **stash 与冲突**：如果你尝试应用一个 stash 到一个与之有冲突的工作目录，Git 会阻止应用并提醒你解决冲突。
+- **stash 与清理**：当你 stash 了更改后，你的工作目录会回到干净的状态，就像你刚刚检出了最新的提交一样。
+
+`git stash` 是一个强大的工具，可以帮助你管理临时的更改，保持工作目录的整洁，并在不同上下文之间灵活切换。
 
 # git fetch
 > [Git - git-fetch Documentation](https://git-scm.com/docs/git-fetch) 
+> [Getting Title at 21:34](https://www.youtube.com/watch?v=uEEcw1s_wWk&ab_channel=GitKraken) 
 
 `git fetch` 是 Git 中用于从远程仓库获取更新的命令。它允许你下载远程分支和标签的最新更改，但不会自动合并这些更改到你的当前分支。
 
@@ -1896,25 +2895,72 @@ git branch --unset-upstream my-branch
 2. **不自动合并**：与 `git pull` 不同，`git fetch` 只是下载更新，不会自动合并到你的当前分支。这允许你在合并之前检查远程更改。
 3. **更新远程跟踪分支**：`git fetch` 会更新本地的远程跟踪分支（如 `origin/master`），使其反映远程仓库的当前状态。
 
-## 基本使用
+`git fetch` 是一个非常重要的 Git 命令，用于从远程仓库获取数据到你的本地仓库。这个命令不会改变你的工作目录，它只是将远程仓库的最新状态下载到你的本地仓库中。以下是 `git fetch` 的详细解释和一些实际使用场景的例子。
 
-- **获取所有远程更新**：
-  ```bash
-  git fetch
-  ```
-  这个命令从所有配置的远程仓库获取更新。
+## 基本用法
 
-- **获取特定远程仓库的更新**：
-  ```bash
-  git fetch <remote-name>
-  ```
-  这个命令从指定的远程仓库（如 `origin`）获取更新。
+1. **获取远程仓库的所有分支的最新状态**：
+   ```bash
+   git fetch origin
+   ```
+   这里 `origin` 是远程仓库的默认名称。这个命令会获取 `origin` 上所有分支的最新状态，并将它们存储为远程分支（如 `origin/master`）。
 
-- **获取特定分支的更新**：
-  ```bash
-  git fetch <remote-name> <branch-name>
-  ```
-  这个命令从指定的远程仓库获取特定分支的更新。
+2. **获取特定远程分支的最新状态**：
+   ```bash
+   git fetch origin develop
+   ```
+   这个命令只会获取 `origin` 远程仓库的 `develop` 分支的最新状态。
+
+## 合并远程分支
+
+1. **合并远程分支到本地分支**：
+   ```bash
+   git fetch origin
+   git merge origin/develop
+   ```
+   首先，使用 `git fetch` 获取 `origin` 远程仓库的所有分支的最新状态，然后使用 `git merge` 将 `origin/develop` 分支合并到当前本地分支。
+
+## 拉取远程分支
+
+1. **拉取远程分支并自动合并**：
+   ```bash
+   git pull origin develop
+   ```
+   `git pull` 命令实际上是 `git fetch` 后跟 `git merge` 的简写。这个命令会获取 `origin/develop` 分支的最新状态，并自动合并到当前本地分支。
+
+## 使用场景
+
+1. **保持本地分支与远程同步**：
+   假设你正在处理一个特性分支，并且想要确保你的本地分支与远程分支保持最新。
+   ```bash
+   git fetch origin
+   git checkout feature-x
+   git merge origin/feature-x
+   ```
+   这个流程确保你在本地 `feature-x` 分支上合并了远程分支的最新更改。
+
+2. **准备拉取最新更改**：
+   在你准备开始工作之前，你可能想要拉取远程仓库的最新更改，以便你的本地仓库包含最新的提交。
+   ```bash
+   git fetch origin
+   ```
+   这个命令让你可以看到远程分支的最新状态，但不会自动合并到你的当前分支。
+
+3. **检查远程分支的提交**：
+   如果你想要查看远程分支上有哪些新的提交，但不打算立即合并它们，你可以使用：
+   ```bash
+   git fetch origin
+   git log origin/develop..
+   ```
+   这个命令会显示从本地 `develop` 分支落后于远程 `origin/develop` 分支的所有提交。
+
+4. **处理冲突前的准备**：
+   在合并远程分支之前，你可能想要检查是否会有冲突：
+   ```bash
+   git fetch origin
+   git diff --name-only origin/develop
+   ```
+   这个命令会显示本地 `develop` 分支和远程 `origin/develop` 分支之间的差异，帮助你在合并之前识别潜在的冲突。
 
 ## 选项
 
@@ -1922,6 +2968,42 @@ git branch --unset-upstream my-branch
 - **`--prune`**：清除远程跟踪分支中不再存在于远程仓库的分支。
 - **`--dry-run`**：模拟获取更新的过程，但不实际下载数据。
 - **`--verbose`**：显示详细的输出，包括下载过程中的信息。
+
+### --dry-run 选项
+`git fetch --dry-run` 命令用于模拟执行 `git fetch` 操作，但实际上不会改变任何东西。这个选项在 Git 中并不常用，因为 `git fetch` 本身就是一个“安全”的操作，不会改变工作目录，所以通常不需要模拟。但是，如果你想查看即将被拉取的提交，可以使用 `git fetch --dry-run` 来查看。
+
+### --prune
+`git fetch --prune` 是一个Git命令，用于在从远程仓库获取最新信息的同时，删除本地引用的远程分支，如果这些分支已经从远程仓库中删除。
+
+也可以进行配置：
+```bash
+git config --global fetch.prune true
+```
+
+1. **功能**：
+   - `git fetch --prune` 命令的功能是获取远程仓库的最新状态，并同步到本地。同时，它会检查本地的远程分支引用，如果远程分支已经被删除，那么对应的本地引用也会被删除。
+
+2. **使用场景**：
+   - 当你在一个团队中工作时，可能会有分支被合并后删除，或者不再需要的分支被移除。使用 `git fetch --prune` 可以确保你的本地仓库不会保留这些已经不存在的远程分支的引用。
+
+3. **命令组合**：
+   - `git fetch --prune` 实际上等同于先执行 `git fetch --all` 来获取所有远程分支的最新状态，然后执行 `git remote prune origin` 来删除那些在远程仓库中已经不存在的分支的本地引用。
+
+4. **配置自动修剪**：
+   - 你可以通过配置Git的全局变量或远程仓库的特定设置来实现每次执行 `git fetch` 或 `git pull` 命令时自动修剪已删除的分支。这可以通过设置 `fetch.prune` 或 `remote.<name>.prune` 来实现。
+
+5. **修剪标签**：
+   - 与 `git fetch --prune` 类似，`git fetch --prune-tags` 可以用于删除那些在远程仓库中不存在的本地标签引用。
+
+6. **命令效果**：
+   - 使用 `git fetch --prune` 后，Git会自动检测远程仓库中已删除的分支，并将其从本地仓库中清除，保持本地和远程仓库的一致性。
+
+7. **注意事项**：
+   - 使用 `git fetch --prune` 时，只有在远程仓库的refspec（参考规范）中包含对应的规则时，本地的引用才会被删除。例如，如果远程仓库的refspec包括 `refs/tags/*:refs/tags/*`，那么本地不存在的远程标签也会被删除。
+
+8. **命令示例**：
+   - 要清理所有远程仓库中已删除的分支，可以使用 `git fetch --prune origin`。
+   - 如果只想修剪特定的远程仓库，可以指定远程仓库的名字，如 `git fetch --prune <remote_name>`。
 
 ## 使用场景
 
@@ -2018,6 +3100,79 @@ $ git branch -a
   remotes/origin/remote_branch01
 ```
 
+# git push
+> [Pushing commits to a remote repository - GitHub Docs](https://docs.github.com/en/get-started/using-git/pushing-commits-to-a-remote-repository) 
+> [Git - git-push Documentation](https://git-scm.com/docs/git-push) 
+
+`git push` 是一个将本地 Git 仓库的更改（提交）推送到远程仓库的命令。在 Git 的分布式版本控制模型中，每个开发者都有自己的本地仓库，并且通常也会有至少一个共享的远程仓库，通常是在服务器上。`git push` 命令使得开发者可以将本地的更改分享给其他团队成员。
+
+- **同步更改**：当你在本地仓库完成一系列提交后，你可能希望将这些更改同步到远程仓库，以便其他团队成员可以看到和使用这些更改。
+- **备份**：推送到远程仓库也是备份你的代码的一种方式，以防本地仓库损坏或丢失。
+- **协作**：在团队项目中，多个开发者可能在不同的分支上工作。`git push` 允许他们分享自己的进度，并在远程仓库中合并更改。
+
+当运行 `git push` 命令时，Git 会尝试将指定的本地分支的更改推送到远程仓库。如果远程仓库中没有对应的分支，Git 会为你创建一个。
+
+## **推送到远程仓库**
+   ```bash
+   git push <remote> <branch>
+   ```
+   - `<remote>`：远程仓库的名称，通常是 `origin`，但也可以是任何你在 `git remote` 中设置的远程仓库名称。
+   - `<branch>`：你想要推送的本地分支的名称。
+
+## **推送到远程仓库的特定分支**
+   如果你想要推送到远程仓库的特定分支，而不是本地分支的同名分支，你可以使用：
+   ```bash
+   git push <remote> <local-branch>:<remote-branch>
+   ```
+
+## **设置本地分支跟踪远程分支**
+   使用 `-u` 选项，你可以设置本地分支跟踪远程分支，这样后续的推送和拉取都会更加方便：
+   ```bash
+   git push -u origin <branch>
+   ```
+
+## **推送所有本地分支**
+   如果你想要推送所有本地分支到远程仓库，可以使用：
+   ```bash
+   git push --all <remote>
+   ```
+
+## **推送所有标签**
+   如果你想要推送所有本地标签到远程仓库，可以使用：
+   ```bash
+   git push --tags <remote>
+   ```
+
+## **强制推送**
+   如果你需要覆盖远程仓库的历史（这通常是不推荐的做法，因为它会导致其他人丢失工作），可以使用 `--force` 选项：
+   ```bash
+   git push --force <remote> <branch>
+   ```
+   或者，如果你使用的是 Git 2.0 或更高版本，可以使用更安全的 `-f` 选项：
+   ```bash
+   git push -f <remote> <branch>
+   ```
+
+## **删除远程分支**
+   如果你想要删除远程仓库中的分支，可以使用：
+   ```bash
+   git push <remote> --delete <branch>
+   ```
+   或者：
+   ```bash
+   git push <remote> :<branch>
+   ```
+
+## **推送特定提交**
+   如果你想要推送某个特定的提交到远程分支，可以使用：
+   ```bash
+   git push <remote> <commit>:<branch>
+   ```
+
+## 推送冲突
+
+- 如果你尝试推送到的远程分支有你本地分支没有的提交，Git 会阻止推送，以防止覆盖远程仓库的历史。你需要先拉取远程分支的更改并解决任何冲突，然后再尝试推送。
+
 # git pull
 > [Git - git-pull Documentation](https://git-scm.com/docs/git-pull) 
 
@@ -2030,6 +3185,99 @@ $ git branch -a
 2. **`git pull <remote-name>`：** 指定从哪个远程仓库拉取更改。`<remote-name>` 是远程仓库的名称，例如 `origin`。
 
 3. **`git pull <remote-name> <branch-name>`：** 指定从哪个远程仓库的哪个分支拉取更改。`<branch-name>` 是远程分支的名称。
+
+`git pull` 是一个常用的 Git 命令，用于将远程仓库的更改合并到当前分支中。它实际上是 `git fetch` 和 `git merge` 的组合。以下是 `git pull` 的详细讲解和常用参数：
+
+### 基本用法
+
+1. **从远程仓库拉取最新代码并合并到当前分支**：
+   ```bash
+   git pull origin master
+   ```
+   这个命令会从远程仓库 `origin` 的 `master` 分支拉取最新的代码，并尝试与当前分支合并。
+
+2. **省略远程分支名**：
+   如果当前分支已经设置跟踪远程分支，可以省略远程分支名：
+   ```bash
+   git pull origin
+   ```
+   这个命令会将远程分支的更新合并到当前分支。
+
+3. **省略远程仓库和分支名**：
+   如果当前分支只跟踪一个远程分支，可以完全省略参数：
+   ```bash
+   git pull
+   ```
+   这个命令会合并唯一跟踪的远程分支的更新到当前分支。
+
+4. **--rebase**：
+   使用 `rebase` 代替 `merge` 来合并更改：
+   ```bash
+   git pull --rebase origin master
+   ```
+   这个命令会将本地更改重新应用到拉取的远程更改之上，保持提交历史的线性。
+
+5. **--ff-only**：
+   只允许快进式合并，不允许产生新合并提交：
+   ```bash
+   git pull --ff-only origin master
+   ```
+   如果无法进行快进式合并，命令会失败。
+
+6. **--no-rebase**：
+   覆盖配置选项，强制使用 `merge` 而不是 `rebase`：
+   ```bash
+   git pull --no-rebase origin master
+   ```
+
+7. **--no-commit**：
+   拉取后不自动提交合并的结果：
+   ```bash
+   git pull --no-commit origin master
+   ```
+   这个参数在需要进一步审查和修改合并结果时很有用。
+
+8. **--allow-unrelated-histories**：
+   允许合并没有共同历史记录的分支：
+   ```bash
+   git pull --allow-unrelated-histories origin master
+   ```
+
+9. **--tags**：
+   拉取远程仓库的标签：
+   ```bash
+   git pull --tags origin master
+   ```
+
+10. **--prune**：
+   拉取后清除本地不存在于远程仓库的分支：
+   ```bash
+   git pull --prune origin master
+   ```
+
+11. **--recurse-submodules**：
+   递归地拉取和更新子模块：
+   ```bash
+   git pull --recurse-submodules origin master
+   ```
+
+12. **--depth**：
+   指定拉取的历史记录深度，减少拉取的数据量，加快拉取速度：
+   ```bash
+   git pull --depth=1 origin master
+   ```
+
+13. **--verbose**：
+    详细输出拉取的过程：
+    ```bash
+    git pull --verbose origin master
+    ```
+
+14. **--progress**：
+    显示拉取进度：
+    ```bash
+    git pull --progress origin master
+    ```
 
 ## 工作原理
 
@@ -2045,9 +3293,9 @@ $ git branch -a
 
 - **`--rebase`：** 使用 `git pull --rebase` 代替默认的合并行为。这会将你的本地更改重新应用到远程分支的顶部，使得历史更加线性。
 
-## 常见问题
+## 合并冲突处理
 
-1. **合并冲突：** 如果远程分支的更改与你的本地更改冲突，`git pull` 会停止并要求你解决冲突。解决冲突后，你需要提交这些更改以完成合并。 如远程和本地对同一个文件的同一行进行修改，本地 git pull:
+**合并冲突：** 如果远程分支的更改与你的本地更改冲突，`git pull` 会停止并要求你解决冲突。解决冲突后，你需要提交这些更改以完成合并。 如远程和本地对同一个文件的同一行进行修改，本地 git pull:
 ```bash
 lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (remote_branch01)
 $ git pull
@@ -2087,46 +3335,13 @@ local modify test01.txt
 git pull
 >>>>>>> c8d5a8479666ce11a479c2ed9568bde02dc17257
 ```
-在你提供的代码片段中，`test01` 文件发生了冲突。冲突发生在 `HEAD`（你的本地分支）和远程分支 `c8d5a8479666ce11a479c2ed9568bde02dc17257` 之间。以下是冲突的标记：
+在上面代码片段中，`test01` 文件发生了冲突。冲突发生在 `HEAD`（你的本地分支）和远程分支 `c8d5a8479666ce11a479c2ed9568bde02dc17257` 之间。以下是冲突的标记：
 
 - `<<<<<<< HEAD`：标记冲突的开始，以下是本地分支的代码。
 - `=======`：分隔符，标记远程分支的代码开始。
 - `>>>>>>> c8d5a8479666ce11a479c2ed9568bde02dc17257`：标记冲突的结束，以上是远程分支的代码。
 
-要解决这个冲突，你需要决定保留哪些更改。以下是如何手动解决这个冲突的步骤：
-
-### 步骤 1: 打开冲突文件
-在 VSCode 中打开 `test01` 文件。
-
-### 步骤 2: 查看冲突内容
-文件内容显示了冲突的部分：
-
-```plaintext
-test01
-<<<<<<< HEAD
-local modify test01.txt
-=======
-git pull
->>>>>>> c8d5a8479666ce11a479c2ed9568bde02dc17257
-```
-如果你想保留本地更改并忽略远程更改，文件内容将变为：
-```plaintext
-test01
-local modify test01.txt
-```
-
-如果你想保留远程更改并忽略本地更改，文件内容将变为：
-```plaintext
-test01
-git pull
-```
-
-如果你想合并两者，文件内容可能变为：
-```plaintext
-test01
-local modify test01.txt
-git pull
-```
+要解决这个冲突，需要决定保留哪些更改，打开冲突文件，编辑，删除上面的冲突标记行。
 
 # github 文档换行处理  
 上传到 github 上的文档，行末尾需要添加两个空格才会换行  
@@ -2148,19 +3363,19 @@ git pull
 不用 very magic 模式：  
 ```bash  
 %s/\(\S\)\s\{2,\}$/\1/g  
-```  
+```
       
 用 very magic 模式：  
 ```bash  
 %s/\v(\S)\s{2,}$/\1/g  
-```  
+```
       
 可用 `:set list` 查看文本  
       
 ### sed 处理  
 ```bash  
 sed -rn '/^ *$/!s/\s{2,}$//p'  
-```  
+```
       
 # 不能提交到远程仓库管理的文件  
 windows 中为一个文件建立硬链接，然后将链接文件用 git 管理，git push 上传到远程仓库时失败  
@@ -2171,7 +3386,7 @@ windows 中为一个文件建立硬链接，然后将链接文件用 git 管理�
 git clone --depth 1 --filter=blob:none --no-checkout https://github.com/lxwcd/linux.git  
 cd linux  
 git checkout main -- notes/shell_scripts  
-```  
+```
   
 克隆后不要直接提交到远程仓库  
   
@@ -2188,19 +3403,19 @@ git checkout main -- notes/shell_scripts
 ```bash  
 git log -3   
 git log -3 --oneline # 简化输出  
-```  
+```
 ```bash  
 [root@lx-virtual-machine linux]$ git log -3 --oneline   
 11ca27e (HEAD -> main, origin/main, origin/HEAD) add shell scripts  
 8e041c9 update shell scripts  
 4951326 update shell scripts  
-```  
+```
   
 *******************  
 如上面，要退回到 80=e041c9 的版本，执行以下命令：  
 ```bash  
 git reset 8e041c9 # 这里模式 --soft --mixed --hard 根据实际需求选择  
-```  
+```
 **`git reset --soft HEAD^`：**  
 - `--soft` 选项表示软重置，只是移动 `HEAD` 指针到上一个提交，不会修改暂存区和工作目录。  
 - 保留了在上一个提交中的所有更改，这些更改会保留在暂存区和工作目录中。  
@@ -2221,4 +3436,129 @@ git reset 8e041c9 # 这里模式 --soft --mixed --hard 根据实际需求选择
 提交到远程仓库：  
 ```bash  
 git push origin main --force  # brance name 通过 git branch --show-current 查看  
-```  
+```
+
+# 合并到错误的分支解决
+案例：本地从 develop 分支新建一个 bug01 分支解决 bug，但合并时错误的合并到 main 分支并推送到远程仓库。
+
+## 步骤 1: 确定错误的提交
+
+首先，你需要确定合并到 `main` 分支的提交的哈希值。你可以使用 `git log` 查看提交历史：
+
+```bash
+git log origin/main
+```
+## 步骤 2: 从 `main` 分支中移除提交
+
+你可以选择强制推送一个没有该提交的新的历史到 `main` 分支。这可以通过 `git reset` 和 `git push --force` 来完成：
+
+```bash
+git checkout main
+git reset --hard <正确的提交哈希值>
+git push origin main --force
+```
+
+**警告**：`git push --force` 是一个危险的操作，因为它会重写远程分支的历史。只有在你完全确定需要这么做，并且没有其他人正在基于这个分支工作时才使用。
+
+如果不介意保留历史，可以用 git revert：
+```bash
+git checkout main
+git log
+git rever <错误的提交哈希值>
+git add
+git commit
+```
+这样不会修改历史，而是重新添加一个提交
+
+## 步骤 3: 将更改合并到 `develop` 分支
+
+```bash
+git checkout develop
+git merge main
+git push origin develop
+```
+也可以直接将本地 bug01 分支推送到远程的 develop 分支。
+或者用 git cherry-pick。
+
+## 步骤 4: 检查远程仓库
+
+最后，检查远程仓库以确保 `main` 和 `develop` 分支现在的状态是正确的：
+
+```bash
+git log origin/main
+git log origin/develop
+```
+
+## 替代方案：使用 `git revert`
+
+如果你不想重写历史，另一个选择是使用 `git revert` 来撤销对 `main` 分支的合并：
+
+```bash
+git checkout main
+git revert --no-commit <错误的提交哈希值>
+git commit -m "Revert incorrect merge"
+git push origin main
+```
+
+这将创建一个新的提交，撤销了错误的合并更改，然后你可以将这个撤销操作推送到远程的 `main` 分支。
+
+## 如果 main 分支错误合并后有新的提交记录
+如果 `main` 分支在错误合并之后又有新的提交，而你希望撤销中间的某个特定合并，同时又不影响后面的提交，你可以使用 `git revert` 来逐个撤销不需要的提交。`git revert` 会创建一个新的提交，它包含被撤销更改的内容，因此不会影响分支上的其他提交。
+
+### 步骤 1: 确定要撤销的提交
+
+首先，使用 `git log` 查看 `main` 分支的提交历史，并找到你希望撤销的合并提交的哈希值：
+
+```bash
+git log origin/main
+```
+
+### 步骤 2: 使用 `git revert` 撤销提交
+
+对于每个需要撤销的提交，执行 `git revert` 命令。假设你找到了需要撤销的提交的哈希值是 `<commit-hash>`：
+
+```bash
+git checkout main
+git revert <commit-hash>
+```
+
+这会创建一个新的提交，它撤销了 `<commit-hash>` 提交所做的更改。如果撤销过程中出现冲突，你需要解决这些冲突，并完成撤销提交：
+
+```bash
+# 解决可能出现的冲突
+git add <resolved-files>
+# 完成 revert 提交
+git commit --no-edit
+```
+
+### 步骤 3: 推送更改到远程仓库
+
+将这些撤销操作推送到远程 `main` 分支：
+
+```bash
+git push origin main
+```
+
+### 步骤 4: 重复撤销操作
+
+如果需要撤销多个提交，重复步骤 2 和步骤 3，直到所有需要撤销的提交都被撤销。
+
+### 注意事项
+
+- 使用 `git revert` 撤销提交时，每次只能撤销一个提交。如果需要撤销多个提交，你需要对每个提交重复执行 `git revert` 命令。
+- `git revert` 会创建新的提交，因此不会影响分支上的其他提交。这是它与 `git reset` 的主要区别，后者会重写历史。
+- 在执行 `git revert` 之前，最好与团队成员沟通，确保撤销操作不会干扰到其他人的工作。
+- 如果你不确定哪些提交需要被撤销，可以使用 `git log` 查看每个提交的详细信息，包括合并提交和它们的描述。
+
+通过这种方式，你可以安全地撤销 `main` 分支上的特定合并，而不影响分支上的其他提交。
+
+# 保存不能提交但修改的特定文件
+有些文件被修改，但不能提交到远程仓库，每次切换分支或者合并总提示，可以 git stash 保存，
+因为操作频繁，可以创建别名，如在 git bash 中 `$HOME/.bashrc` 中创建别名：
+```bash
+alias stashTempFiles='git diff --name-only | grep -E "\.(suo|bin)$" | xargs git stash save "save .suo and .bin files which can't commit"'
+```
+
+# 本地开发需要用测试代码
+- 本地拉取最新的代码到主分支，然后以此新建
+- 编写测试代码，git stash 保存
