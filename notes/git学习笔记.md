@@ -3915,9 +3915,81 @@ git status --porcelain | cut -d" " -f3- | grep -E "*/demo/*"
 git status --porcelain | cut -d" " -f3- |  grep -E "\.(cpp|h)$"
 ```
 
-# git stash 
+# git stash 过滤文件保存
 ```bash
 git status --porcelain | cut -d" " -f3- | grep -E "*/demo/*" | xargs git stash push -m "stash demo files" --
 ```
 
-# skip-worktree
+# git add 过滤 - 筛选路径包含特定文件夹的文件
+```bash
+git diff --name-only | grep -E "*/demo/*" | xargs git add --
+```
+
+# 忽略本地已经被跟踪文件的修改
+> [How to ignore files already managed by Git: how to use assume-unchanged and skip-worktree](https://tips.madoromi.org/en/git-ignore-assume-unchanged-skip-worktree/) 
+
+## skip-worktree
+`git skip-worktree` 是一个 Git 属性，用于控制 Git 如何处理特定文件或目录的更改。这个属性可以用来优化仓库性能，或者在多个分支间共享文件时避免不必要的冲突。
+
+`skip-worktree` 是一个文件级别的属性，当你设置一个文件为 `skip-worktree` 时，Git 会停止跟踪该文件在本地工作目录中的更改。这意味着即使文件被修改，Git 也不会认为它是“已修改”的状态，也不会包括在下次提交中，除非你明确地告诉 Git 这样做。
+
+- **用途**：`skip-worktree` 命令用于将文件标记为忽略工作树中的更改，但仍会进行某些操作。这适用于那些需要在本地修改但不希望这些更改被提交到远程仓库的场景，比如配置文件。
+- **行为**：与 `assume-unchanged` 不同，`skip-worktree` 会保留本地的更改，即使这些更改与远程仓库中的版本不同。这意味着，当你执行 `git pull` 或 `git push` 时，Git 会尽量维护你的本地更改，而不是覆盖它们。
+- **取消**：可以通过 `git update-index --no-skip-worktree <file>` 命令来取消 `skip-worktree` 标记，恢复对文件的跟踪。
+### 设置 `skip-worktree`
+
+```bash
+git update-index --skip-worktree <file>
+```
+
+这个命令会更新索引，告诉 Git 忽略 `<file>` 文件的本地更改。
+
+### 取消 `skip-worktree`
+
+如果想要重新开始跟踪文件的更改，可以使用以下命令取消 `skip-worktree` 属性：
+
+```bash
+git update-index --no-skip-worktree <file>
+```
+
+### 查看 `skip-worktree` 状态
+
+要查看哪些文件被设置了 `skip-worktree` 属性，可以使用 `git ls-files` 命令：
+
+```bash
+git ls-files -v
+```
+
+这将列出所有被 Git 跟踪的文件，以及它们各自的属性。带有 `S` 前缀的文件表示被设置了 `skip-worktree` 属性。
+
+### 使用场景
+
+1. **性能优化**：对于大型文件或二进制文件，频繁的提交可能会降低性能。通过设置 `skip-worktree`，可以避免这些文件的更改被跟踪，从而提高性能。
+
+2. **跨分支共享文件**：如果你有多个分支需要共享某些文件，但又不希望这些文件的更改在分支间传播，可以使用 `skip-worktree` 来避免冲突。
+
+3. **忽略特定文件更改**：在某些情况下，你可能不希望跟踪某些文件的更改，例如自动生成的配置文件或日志文件。
+
+### 注意事项
+
+- **冲突处理**：如果你在本地对一个设置了 `skip-worktree` 的文件进行了更改，并且这些更改与远程仓库中的更改冲突，Git 在下次拉取时可能会报告冲突。你需要手动解决这些冲突。
+当执行 `git pull` 并且远程的更改与本地的更改发生冲突时，Git 会识别这些冲突并通知用户。即使文件被标记为 `skip-worktree`，Git 仍然会识别出冲突，因为 `skip-worktree` 只影响文件状态的跟踪，并不会影响合并过程。Git 会提示哪些文件有冲突，并需要用户手动解决这些冲突。
+
+总结来说，即使文件被标记为 `skip-worktree`，远程的修改仍然可以被拉取到本地，并且在发生冲突时，Git 能够识别并提示用户解决这些冲突。
+
+- **分支切换**：当你切换到另一个分支时，Git 会尝试应用 `skip-worktree` 文件的远程版本，这可能会覆盖你的本地更改。如果你有未提交的更改，最好在切换分支之前提交它们。
+
+- **远程仓库影响**：`skip-worktree` 属性只影响本地仓库。当你推送更改到远程仓库时，这个属性不会推送，所以其他协作者不会自动应用这个设置。
+
+- **与其他 Git 属性的关系**：`skip-worktree` 与 `assume-unchanged` 类似，但 `assume-unchanged` 用于告诉 Git 一个文件没有被修改，即使它实际上已经被修改了。`skip-worktree` 则用于告诉 Git 忽略文件的修改。
+
+通过使用 `git skip-worktree`，你可以更精细地控制 Git 如何处理工作目录中的文件，这对于管理大型项目或处理特定类型的文件非常有用。
+
+## git assume-unchanged
+- **用途**：这个命令告诉 Git 忽略对某个文件的更改，即使文件实际上已经被修改了。这可以用于提高性能，特别是在处理大文件或者不需要跟踪的文件时。
+- **行为**：当一个文件被标记为 `assume-unchanged` 后，Git 会认为这个文件没有被修改，即使实际上文件内容已经发生了变化。这会导致 Git 在执行 `git status` 时不再显示这个文件为已修改状态。
+- **取消**：可以通过 `git update-index --no-assume-unchanged <file>` 命令来取消 `assume-unchanged` 标记，恢复对文件的跟踪。
+
+- **性能与用途**：`assume-unchanged` 通常用于优化性能，比如忽略那些不需要跟踪的大文件或者二进制文件；而 `skip-worktree` 更多用于处理需要在本地修改但不希望影响远程仓库的文件。
+- **冲突处理**：在使用 `pull` 时，`assume-unchanged` 可能会导致本地更改被远程版本覆盖，而 `skip-worktree` 会尽量保留本地的更改。
+- **文件状态**：`assume-unchanged` 会使得 Git 认为文件未被修改，而 `skip-worktree` 允许文件在本地被修改，但这些修改不会被 Git 跟踪。
