@@ -323,6 +323,13 @@ endif
 希望全局配置，可以在 `/etc/profile.d/aliases.sh` 中添加。
 针对当前用户配置，在 `$HOME/.bashrc` 中添加。
 
+```bash
+export TZ='Asia/Shanghai'
+alias stashsimulator='git diff --name-only | grep -E "\.(suo|bin)$" | xargs git stash push -m ".suo and .bin files" '
+alias restoresimulator='git status --porcelain | cut -d" " -f3- |  grep -E "\.(suo|bin)$" | xargs git restore -- '
+alias addCppAndHFiles='git diff --name-only | grep -E "\.(cpp|h)$" | xargs git add -- '
+```
+
 ### 修改 vim 中光标样式
 ```bash
 " modify cursor style
@@ -380,10 +387,11 @@ Tracked files are files that were in the last snapshot, as well as any newly sta
 ## untracked file
 Tracked files are files that were in the last snapshot, as well as any newly staged files; they can be unmodified, modified, or staged. In short, tracked files are files that Git knows about.
 
-# refs 和 refspec
-在 Git 中，`refs`（引用）和 `refspec`（引用规范）是两个重要的概念，它们与分支、标签和其他引用的管理密切相关。
+# 快速前进（fast-forward）和非快速前进
+- **快速前进（fast-forward）**：当你的本地分支落后于远程分支时，Git 可以安全地将本地分支的指针向前移动到远程分支的最新提交，这称为快速前进。这种情况下，没有新的合并提交产生，因为历史是线性的。
+- **非快速前进**：如果远程分支有新的提交分叉，你的本地分支不是远程分支的直接祖先，那么 Git 无法通过快速前进来更新本地分支。这时，Git 需要创建一个新的合并提交，将两个分支的历史合并在一起。
 
-## Refs（引用）
+# Refs（引用）
 
 在 Git 中，`refs` 是指向提交对象（commit objects）的指针。它们存储在 `.git/refs` 目录下，分为几个部分：
 
@@ -392,7 +400,8 @@ Tracked files are files that were in the last snapshot, as well as any newly sta
 3. **remotes**：远程分支引用，例如 `refs/remotes/origin/master`。
 4. **tags**：标签引用，例如 `refs/tags/v1.0`。
 
-## Refspec（引用规范）
+# Refspec（引用规范）
+> [Git - The Refspec](https://git-scm.com/book/en/v2/Git-Internals-The-Refspec) 
 
 `refspec` 是一个字符串，用于定义如何将远程仓库的引用（refs）映射到本地仓库的引用。它通常用于 `git fetch` 和 `git push` 命令中，以指定要操作的远程引用和本地引用。
 
@@ -405,39 +414,61 @@ Tracked files are files that were in the last snapshot, as well as any newly sta
 - **<src>**：源引用，可以是分支名、标签名或使用通配符的引用模式。
 - **<dst>**：目标引用，是远程引用映射到本地引用的路径。
 
-## 举例说明
-
-假设你有一个远程仓库 `origin`，其 URL 为 `https://github.com/user/repo.git`，并且你想要管理远程分支和本地分支的映射。
-
-1. **简单的 refspec**：
-   如果你想要将远程的 `master` 分支拉取到本地的 `master` 分支，你可以使用以下 `refspec`：
-   ```bash
-   git fetch origin master:refs/heads/master
-   ```
-   这里，`master` 是源引用（远程的 `master` 分支），`refs/heads/master` 是目标引用（本地的 `master` 分支）。
-
-2. **使用通配符的 refspec**：
-   如果你想要拉取远程仓库的所有分支到本地，可以使用通配符 `*`：
-   ```bash
-   git fetch origin '*:refs/heads/*'
-   ```
-   这里，`*` 匹配远程仓库的所有引用，`refs/heads/*` 指定所有匹配的远程引用都应该映射到本地的 `refs/heads/` 下。
-
-3. **推送标签**：
-   如果你想要推送本地的所有标签到远程仓库，可以使用以下 `refspec`：
-   ```bash
-   git push origin 'refs/tags/*:refs/tags/*'
-   ```
-   这里，`refs/tags/*` 匹配本地的所有标签，并且将它们推送到远程仓库的 `refs/tags/` 下。
-
-4. **删除远程引用**：
-   `refspec` 也可以用于删除远程引用。例如，要删除远程的 `feature` 分支，可以使用以下命令：
-   ```bash
-   git push origin ':refs/heads/feature'
-   ```
-   注意，这里 `<src>` 只有一个冒号 `:`，这意味着没有源引用，只有目标引用，这将导致远程的 `feature` 分支被删除。
-
 `refspec` 的强大之处在于它允许你精确控制 Git 引用的同步和映射，这对于管理复杂的分支结构和远程仓库非常有用。
+
+假设有一个远程仓库 `origin`，其 URL 为 `https://github.com/user/repo.git`，并且你想要管理远程分支和本地分支的映射。
+
+## **简单的 refspec**
+如果你想要将远程的 `master` 分支拉取到本地的 `master` 分支，你可以使用以下 `refspec`：
+```bash
+git fetch origin master:refs/heads/master
+```
+这里，`master` 是源引用（远程的 `master` 分支），`refs/heads/master` 是目标引用（本地的 `master` 分支）。
+
+## **使用通配符的 refspec**
+如果你想要拉取远程仓库的所有分支到本地，可以使用通配符 `*`：
+```bash
+git fetch origin '*:refs/heads/*'
+```
+这里，`*` 匹配远程仓库的所有引用，`refs/heads/*` 指定所有匹配的远程引用都应该映射到本地的 `refs/heads/` 下。
+
+## **推送标签**
+如果你想要推送本地的所有标签到远程仓库，可以使用以下 `refspec`：
+```bash
+git push origin 'refs/tags/*:refs/tags/*'
+```
+这里，`refs/tags/*` 匹配本地的所有标签，并且将它们推送到远程仓库的 `refs/tags/` 下。
+
+## **删除远程引用**
+`refspec` 也可以用于删除远程引用。例如，要删除远程的 `feature` 分支，可以使用以下命令：
+```bash
+git push origin ':refs/heads/feature'
+```
+注意，这里 `<src>` 只有一个冒号 `:`，这意味着没有源引用，只有目标引用，这将导致远程的 `feature` 分支被删除。
+
+## `+` 的用途
+> $ git fetch origin +seen:seen maint:tmp
+> This updates (or creates, as necessary) branches seen and tmp in the local repository by fetching from the branches (respectively) seen and maint from the remote repository.
+> The seen branch will be updated even if it does not fast-forward, because it is prefixed with a plus sign; tmp will not be.
+
+在 refspec 中，`+` 符号用于强制更新本地分支以匹配远程分支的状态，即使这个更新不是快速前进。具体来说：
+- **带有 `+` 的 refspec**：`+seen:seen` 表示强制更新本地的 `seen` 分支以匹配远程的 `seen` 分支，即使这个更新需要创建一个新的合并提交。
+- **不带 `+` 的 refspec**：`maint:tmp` 表示更新本地的 `tmp` 分支以匹配远程的 `maint` 分支，但如果这个更新不是快速前进，Git 将拒绝这个操作，以避免覆盖本地的提交历史。
+
+假设你有两个分支：本地的 `seen` 和远程的 `origin/seen`。
+
+1. **不带 `+` 的情况**：
+   - 你执行 `git fetch origin seen:seen`。
+   - 如果远程的 `origin/seen` 分支有新的提交，并且这些提交可以被快速前进，那么本地的 `seen` 分支将被更新。
+   - 如果远程的 `origin/seen` 分支有新的提交分叉，Git 将拒绝更新本地的 `seen` 分支，以保护你的本地提交历史。
+
+2. **带 `+` 的情况**：
+   - 你执行 `git fetch origin +seen:seen`。
+   - 不管远程的 `origin/seen` 分支的更新是否可以被快速前进，本地的 `seen` 分支都将被强制更新以匹配远程分支的状态。
+   - 如果远程分支有新的提交分叉，Git 将创建一个新的合并提交，将这些更改合并到本地分支。
+
+**结论**: 
+`+` 符号的用途是强制更新本地分支，即使这个更新涉及到非快速前进的合并。这可以确保本地分支始终与远程分支保持一致，但也可能会覆盖本地的提交历史，因此在没有 `+` 的情况下，Git 会拒绝这种操作以保护本地数据。
 
 # 裸仓库
 裸仓库是一个没有工作目录（working directory）的 Git 仓库。在普通的 Git 仓库中，你有一个 `.git` 目录，它包含了所有的版本控制信息，以及一个工作目录，这是你实际编写代码的地方。而在裸仓库中，没有工作目录，只有 `.git` 目录。这意味着你不能直接在裸仓库中进行提交（commit）或其他修改，它主要用于以下用途：
@@ -950,6 +981,12 @@ git status -z
 - **项目根目录**：通常，`.gitignore` 文件位于 Git 仓库的根目录。
 - **多个 `.gitignore` 文件**：可以在子目录中创建 `.gitignore` 文件，这些文件会影响其所在目录及其子目录。
 
+## 本地仓库忽略
+放在下面文件中
+```bash
+.git/info/excluede
+```
+
 ## 忽略规则
 
 - **模式匹配**：`.gitignore` 文件中的每一行都是一个模式，用于匹配文件路径。模式可以使用通配符，如 `*`、`?`、`[` 和 `]`。
@@ -1023,6 +1060,9 @@ node_modules/
 
 - **`.gitignore` 模板**：GitHub 提供了许多预定义的 `.gitignore` 模板，你可以根据你的项目类型选择合适的模板。
 - **在线生成器**：有些在线工具可以帮助你生成 `.gitignore` 文件，例如 `gitignore.io`。
+
+## 将已跟踪的文件加入 .gitignore
+
 
 # git diff 查看文件差异
 > [Git - git-diff Documentation](https://git-scm.com/docs/git-diff)   
@@ -1240,9 +1280,15 @@ node_modules/
 - **`-i`**：启动交互式暂存模式，允许你选择要暂存的更改。
 - **`-N` 或 `--intent-to-add`**：标记新文件为暂存状态，但不实际添加内容。
 
+## 使用通配符
+```bash
+git add *.cpp *.h
+```
+
 ## 交互式暂存
 
 使用 `git add -i` 或 `git add --interactive` 可以进入交互式暂存模式，这允许你逐个选择要暂存的更改。这个模式特别有用，当你有多个更改但只想提交其中一部分时。
+
 
 ## 注意事项
 
@@ -2723,7 +2769,7 @@ git checkout -b <new-branch-name> origin/<old-branch-name>
 当你在 Git Bash 中执行 `git branch -a` 命令时，这个命令会列出所有的本地分支和远程分支。下面是你的输出的详细解释：
 
 ```bash
-lxw@NEU-20240403OIC MINGW64 /d/lxw/git_test/Bootmon_Test (testPR)
+lxw@NEU-20240403OIC MINGW64 /d/lxw/git_test/Demo_Test (testPR)
 $ git branch -a
   master
 * testPR
@@ -2848,7 +2894,26 @@ git branch --unset-upstream my-branch
   ```
   这个命令会应用最近的 stash 并从 stash 列表中删除它。
 
-### 高级用法
+## 查看 stash 的内容
+1. **查看 stash 列表**：
+   使用 `git stash list` 命令来查看所有存储的 stash 列表。这个列表会显示每个 stash 的唯一标识符和相关的提交信息。
+
+2. **预览 stash 内容**：
+   要预览特定 stash 的内容，可以使用 `git stash show stash@{n}` 命令，其中 `n` 是 stash 的索引号。这个命令会显示指定 stash 的详细信息，包括更改的文件列表和更改的内容。
+
+3. **比较 stash 与当前工作目录**：
+   如果你需要比较某个 stash 与当前工作目录的差异，可以使用 `git stash show -p stash@{n}` 命令。这个命令会以补丁格式显示 stash 的变更详情，包括修改的文件和具体的变更内容。
+
+4. **查看 stash 的变更文件列表**：
+   如果你只想查看某个 stash 的变更文件列表，可以使用 `git stash show --name-only stash@{n}` 命令。这个命令会显示该 stash 中所有修改的文件名。
+
+通过这些命令，你可以查看 stash 的内容，并且对于有冲突的 stash，可以使用 `git stash show -p` 来查看与当前分支的差异，从而更好地决定如何应用 stash。这些方法可以帮助你管理和恢复工作目录中的更改。
+
+## git stash push
+
+## git stash save
+
+## 高级用法
 
 - **保存特定文件的更改**：
   你可以使用 `git stash push` 的 `-k` 选项来保留索引（即暂存区）的更改，而只 stash 工作目录中的更改：
@@ -2874,7 +2939,7 @@ git branch --unset-upstream my-branch
   ```
   Git 会自动应用 stash 并创建一个新分支。
 
-### 注意事项
+## 注意事项
 
 - **stash 与分支**：stash 是与分支无关的，你可以在任何分支上保存和应用 stash。
 - **stash 与提交**：stash 不会记录在你的项目历史中，它是一个临时的保存点。
@@ -2897,19 +2962,72 @@ git branch --unset-upstream my-branch
 
 `git fetch` 是一个非常重要的 Git 命令，用于从远程仓库获取数据到你的本地仓库。这个命令不会改变你的工作目录，它只是将远程仓库的最新状态下载到你的本地仓库中。以下是 `git fetch` 的详细解释和一些实际使用场景的例子。
 
-## 基本用法
+## **获取远程仓库的所有分支的最新状态**
+```bash
+git fetch origin
+```
+这里 `origin` 是远程仓库的默认名称。这个命令会获取 `origin` 上所有分支的最新状态，并将它们存储为远程分支（如 `origin/master`）。
 
-1. **获取远程仓库的所有分支的最新状态**：
-   ```bash
-   git fetch origin
-   ```
-   这里 `origin` 是远程仓库的默认名称。这个命令会获取 `origin` 上所有分支的最新状态，并将它们存储为远程分支（如 `origin/master`）。
+## **获取特定远程分支的最新状态**
+```bash
+git fetch origin develop
+```
+这个命令只会获取 `origin` 远程仓库的 `develop` 分支的最新状态。
 
-2. **获取特定远程分支的最新状态**：
-   ```bash
-   git fetch origin develop
-   ```
-   这个命令只会获取 `origin` 远程仓库的 `develop` 分支的最新状态。
+### **在当前 `develop` 分支上执行 `git fetch origin develop`**
+这个命令是合法的，并且通常会执行以下操作：
+- 从远程 `origin` 仓库拉取 `develop` 分支的最新内容。
+- 更新本地的远程分支引用 `origin/develop`。
+- 如果你在本地 `develop` 分支上，Git 会将远程的 `develop` 分支的最新内容与本地的 `develop` 分支进行比较，但不会自动合并或重写你的本地提交历史。
+
+## **获取远程特定分支并映射到本地分支**
+**`git fetch origin develop:develop`**：
+这个命令是一个带有特定参数的 `git fetch` 命令，它执行了一个特定的操作，称为“分支映射”（branch mapping）。这里的 `origin develop:develop` 表示从远程的 `origin` 仓库的 `develop` 分支拉取内容，并与本地的 `develop` 分支进行关联。这样做的好处是，你可以只更新特定的远程分支到本地，而不影响其他分支。这个命令实际上执行了两个步骤：
+- 首先，它会从远程仓库拉取 `develop` 分支的最新内容，即 `:` 前的分支，`:` 前表示 src，即拉取的来源。
+- 然后，它会将拉取的内容与本地的 `develop` 分支进行关联，这样你就可以通过 `git merge origin/develop` 或 `git rebase origin/develop` 将这些更改合并到本地分支。
+
+### **在当前 `develop` 分支上执行 `git fetch origin develop:develop`**
+这个命令尝试将远程的 `develop` 分支映射到本地的 `develop` 分支，但当你已经在本地的 `develop` 分支上时，Git 会拒绝这个操作，因为它不想覆盖你当前的工作。Git 的这个限制是为了防止潜在的数据丢失，特别是当你的本地分支落后于远程分支时。
+
+如提示错误信息 `fatal: refusing to fetch into branch 'refs/heads/develop' checked out at 'E:/src_git/demo'` 就是 Git 拒绝执行这个操作的提示。
+
+为了避免这个问题，你可以采取以下步骤：
+
+- **切换到其他分支**：在执行 `git fetch origin develop:develop` 之前，先切换到其他分支，比如 `master` 或者一个新的临时分支。
+
+  ```bash
+  git checkout master
+  ```
+
+  或者创建并切换到一个新的分支：
+
+  ```bash
+  git checkout -b temp_branch
+  ```
+
+- **执行 `git fetch`**：在其他分支上执行 `git fetch origin develop:develop`。
+
+  ```bash
+  git fetch origin develop:develop
+  ```
+
+- **切换回 `develop` 分支**：完成 `git fetch` 后，切换回 `develop` 分支。
+
+  ```bash
+  git checkout develop
+  ```
+
+- **合并或重新基线**：如果你想将远程 `develop` 分支的更改合并到本地 `develop` 分支，可以使用 `git merge` 或 `git rebase` 命令。
+
+  ```bash
+  git merge origin/develop
+  ```
+
+  或者
+
+  ```bash
+  git rebase origin/develop
+  ```
 
 ## 合并远程分支
 
@@ -3343,6 +3461,75 @@ git pull
 
 要解决这个冲突，需要决定保留哪些更改，打开冲突文件，编辑，删除上面的冲突标记行。
 
+# git rebase
+> [Git - Rebasing](https://git-scm.com/book/en/v2/Git-Branching-Rebasing) 
+
+## git rebase --onto
+`git rebase --onto` 是一个强大的 Git 命令，它允许你将一系列提交从一个分支重新应用到另一个分支上。这个命令特别有用，当你想要将一个特性分支上的特定提交应用到另一个分支上，而不希望在目标分支上保留这些提交的原始提交记录。
+
+`git rebase --onto <newbase> <since> <onto>`
+
+- `<newbase>`：目标分支，你想要将提交应用到这个分支上。
+- `<since>`：起始提交，你想要从这个提交开始重新应用。
+- `<onto>`：结束提交，你想要到这个提交结束重新应用。
+
+当你执行 `git rebase --onto B A` 命令时，Git 会做以下事情：
+
+1. **找到共同祖先**：Git 会找到分支 A 和分支 B 的共同祖先提交。
+2. **暂存提交**：从共同祖先提交开始，Git 会暂存分支 A 上的所有提交。
+3. **重置分支 A**：Git 会将分支 A 重置到共同祖先提交。
+4. **重新应用提交**：Git 会将暂存的提交重新应用到分支 B 的顶部。
+
+假设你有两个分支：`master` 和 `feature`。`feature` 分支基于 `master` 分支的某个提交 A 分叉出去，并在 A 之后做了几个提交 B、C 和 D。现在你想要将 B、C 和 D 这三个提交应用到 `master` 分支上，但不保留这些提交的原始记录。
+
+1. **切换到 `feature` 分支**：
+   ```bash
+   git checkout feature
+   ```
+
+2. **执行 `git rebase --onto` 命令**：
+   ```bash
+   git rebase --onto master A feature
+   ```
+   这个命令的意思是：“从 `feature` 分支的起始提交 A 开始，将所有提交重新应用到 `master` 分支上。”
+
+3. **结果**：
+   - `feature` 分支上的提交 B、C 和 D 会被重新应用到 `master` 分支上，就像是直接在 `master` 分支上做的一样。
+   - `feature` 分支本身不会改变，它的提交历史仍然包含 A、B、C 和 D。
+   - `master` 分支现在包含了来自 `feature` 分支的更改，但是没有额外的合并提交记录。
+
+### 注意事项
+
+- 使用 `git rebase --onto` 时，如果重新应用的提交与目标分支有冲突，你需要解决这些冲突，然后继续变基过程。
+- 这个命令会改变历史，所以如果你的分支已经推送到远程仓库，你应该避免使用这个命令，除非你确定不会影响其他人的工作。
+- 如果你需要撤销变基操作，可以使用 `git rebase --abort` 命令。
+
+通过这种方式，`git rebase --onto` 允许你在不合并提交记录的情况下，将一个分支上的更改应用到另一个分支上，使得项目的历史更加清晰和线性。
+
+# git merge
+
+## git merge --squash
+
+
+# git prune
+> [Git - git-prune Documentation](https://git-scm.com/docs/git-prune) 
+
+# 分支共同祖先
+> [Git - git-merge-base Documentation](https://git-scm.com/docs/git-merge-base#_discussion) 
+
+Git 中的共同祖先（common ancestor）是指两个分支之间最后一个共有的提交。
+```
+A <- B <- C (master)
+ \
+  D <- E <- F (feature)
+```
+
+- `A` 是共同祖先，因为它是 `master` 和 `feature` 分支在分叉之前共享的最后一个提交。
+- `B` 是 `master` 和 `feature` 分支分叉后的第一个提交，它是两个分支共有的。
+- `C` 是 `master` 分支独有的提交。
+- `D`、`E`、`F` 是 `feature` 分支独有的提交。
+
+
 # github 文档换行处理  
 上传到 github 上的文档，行末尾需要添加两个空格才会换行  
       
@@ -3352,7 +3539,6 @@ git pull
 利用宏，普通模式，按 q，然后选择一个寄存器，如 a，开始录制：按 `A` 切换到行末尾且切换到插入模式，输入两个空格，按 `Esc` 回到普通模式，按 `q` 录制结束  
       
 选择需要处理的行，如全文处理，则切换到第一行，按 `V` 选择当前行，按 `G` 选择到最后一行，即选中全文，然后按 `:` 切换到命令行模式，此时自动选中选择的行 `:'<,'>`，后面输入 `normal @a`，即 `:'<,'>normal @a`  
-      
       
 ## 删除行末尾空格  
 在文档上传前，批量处理每行，在其末尾加两个空格，但文档可能重复修改，不能每次上传都加空格，因此在加空格前，先删除末尾的空格  
@@ -3562,3 +3748,176 @@ alias stashTempFiles='git diff --name-only | grep -E "\.(suo|bin)$" | xargs git 
 # 本地开发需要用测试代码
 - 本地拉取最新的代码到主分支，然后以此新建
 - 编写测试代码，git stash 保存
+
+# 合并本地分支但不产生新的提交
+将本地一个分支 A  合并到本地 分支 B，分支 A 多了一些提交，希望合并到 B 后不要这些提交记录。
+
+## git rebase --onto
+如果希望将本地分支 A 合并到本地分支 B，并且不希望在分支 B 的合并历史中保留分支 A 的提交记录，你可以使用 `git rebase` 命令将分支 A 上的更改“重新播放”到分支 B 上，然后再将分支 B 合并回它原来的位置。这样，分支 A 的更改就像是直接在分支 B 上做的一样，不会有额外的合并提交记录。
+
+1. **切换到分支 B**：
+   ```bash
+   git checkout B
+   ```
+
+2. **将分支 A 变基到分支 B 上**：
+   首先，你需要确保分支 A 上的更改是最新的。然后，使用 `git rebase` 将分支 A 上的更改变基到分支 B 上：
+   ```bash
+   git rebase --onto B A
+   ```
+   这个命令会将分支 A 上的更改重新应用到分支 B 的顶部。这里的 `--onto` 选项指定了目标基底分支（这里是分支 B），而 A 是当前分支。
+
+3. **解决可能出现的冲突**：
+   如果变基过程中出现冲突，你需要手动解决这些冲突。解决冲突后，使用以下命令添加更改并继续变基：
+   ```bash
+   git add .
+   git rebase --continue
+   ```
+   如果一切顺利，没有冲突，那么分支 A 上的更改就会被应用到分支 B 上，而不会有额外的合并提交。
+
+4. **快进合并分支 B**：
+   由于分支 A 的更改已经被“重新播放”到分支 B 上，你现在可以简单地使用 `git merge` 命令将分支 B 合并回它原来的位置，这将是一个快进合并，不会产生新的合并提交：
+   ```bash
+   git checkout A
+   git merge B
+   ```
+
+5. **推送更改**：
+   如果你需要将这些更改推送到远程仓库，可以使用以下命令：
+   ```bash
+   git push origin A
+   git push origin B
+   ```
+
+请注意，如果你的分支已经推送到远程仓库，并且其他人可能基于这些分支进行了工作，那么你应该避免使用 `git rebase`，因为这会改变历史。如果确实需要这样做，你需要使用 `--force` 选项来推送更改，但这可能会影响其他人的工作。在这种情况下，最好与团队成员沟通，以确保所有人都了解这些更改。
+
+## git merge --squash
+如果你希望通过合并的方式将分支 A 的内容合并到分支 B，同时又不想在分支 B 上产生新的提交记录，你可以使用 `git merge` 命令的 `--squash` 选项。这样可以将分支 A 的所有提交压缩成单个提交，或者直接将更改应用到分支 B 上而不创建新的提交。
+
+1. **切换到分支 B**：
+   ```bash
+   git checkout B
+   ```
+
+2. **合并分支 A 并压缩提交**：
+   ```bash
+   git merge --squash A
+   ```
+   这个命令会将分支 A 自上次合并以来的所有提交压缩成单个更改集，但不创建新的提交。你的工作目录将包含所有分支 A 的更改，但这些更改尚未被提交。
+
+3. **（可选）提交更改**：
+   如果你对合并的更改满意，可以手动提交这些更改到分支 B：
+   ```bash
+   git commit -m "Merge changes from A without commit history"
+   ```
+   这将创建一个新的提交，它包含了分支 A 的所有更改。
+
+### 注意事项
+
+- 使用 `git merge --squash` 时，你可以选择不提交合并的更改，这样就不会在分支 B 上产生新的提交记录。
+- 快进合并不会在分支历史中添加新的提交，但它要求分支 B 能够直接快进到分支 A，这意味着分支 A 必须是分支 B 的直接上游。
+- 如果你不想保留任何合并记录，确保在合并前没有未提交的更改，因为未提交的更改总是需要被提交。
+
+## git rebase --onto 和 git merge --squash 区别
+`git merge --squash` 和 `git rebase --onto` 都可以用来将一个分支的更改合并到另一个分支，同时避免产生额外的提交记录。但是，它们在实现方式和使用场景上有一些区别：
+
+### git merge --squash
+
+1. **合并但不创建新提交**：
+   `git merge --squash` 将另一个分支上的更改合并到当前分支，但不创建一个新的合并提交。所有合并的更改都处于暂存状态，你可以检查这些更改，然后手动创建一个提交。
+
+2. **非线性历史**：
+   使用 `git merge --squash` 不会改变项目的历史记录，它只是在当前分支上复制了另一个分支的更改。
+
+3. **简单易用**：
+   这个命令比较简单直接，不需要考虑分支的基底（base）问题，适合快速合并更改。
+
+4. **适用于**：
+   当你想要将某个分支上的更改合并到当前分支，并且不希望在当前分支上保留合并分支的提交历史时。
+
+### git rebase --onto
+
+1. **变基和重新应用**：
+   `git rebase --onto` 将一个分支上的提交重新应用到另一个分支上，实际上是在进行变基操作。这个命令会将一个分支上的提交“移植”到另一个分支的顶部。
+
+2. **线性历史**：
+   使用 `git rebase --onto` 会创建一个线性的提交历史，它改变了项目的历史记录，使得所有提交都看起来像是在另一个分支上直接进行的。
+
+3. **复杂的操作**：
+   这个命令相对复杂，需要考虑多个分支之间的关系，并且可能会涉及到解决冲突。
+
+4. **适用于**：
+   当你想要将一个特性分支的更改移植到另一个分支上，并且希望保持一个清晰的线性历史时。
+
+### 主要区别
+
+- **历史改变**：
+  `git rebase --onto` 会改变历史，因为它实际上是在重写提交。而 `git merge --squash` 不会改变历史，它只是在当前分支上复制了另一个分支的更改。
+
+- **冲突处理**：
+  在使用 `git rebase --onto` 时，如果出现冲突，你需要解决冲突并继续变基。而在 `git merge --squash` 中，如果出现冲突，你只需要解决冲突然后提交更改。
+
+- **安全性**：
+  `git rebase --onto` 因为会改变历史，所以如果你的分支已经被推送到远程仓库，使用这个命令可能会影响其他人的工作。`git merge --squash` 更安全，因为它不会改变历史。
+
+- **使用场景**：
+  `git rebase --onto` 适合在特性分支开发过程中，将特性分支的更改移植到主分支上。`git merge --squash` 适合在准备将特性分支合并到主分支时，快速合并更改而不产生新的提交记录。
+
+# git status 过滤 - 只显示文件名 
+`git status --porcelain | cut -d" " -f3-`
+1. `git status --porcelain` 命令以一种格式化的方式输出当前 Git 仓库的状态信息。
+2. 这个输出被传递给 `cut` 命令，该命令使用空格作为分隔符。
+3. `cut` 命令提取每一行的第三个字段及其后的所有字段，这些字段通常包含文件名和可能的状态信息。
+
+## git status --porcelain
+
+`git status` 命令用于显示当前 Git 仓库的状态，包括未跟踪的文件、已修改但未暂存的文件，以及已暂存的文件。
+
+- `--porcelain` 选项是 `git status` 命令的一个输出选项，它生成一种易于脚本解析的输出格式。在这种模式下，输出被设计成机器可读的格式，而不是为人类阅读设计的。这个选项对于自动化脚本和工具特别有用。
+
+## | (管道)
+
+管道符号（`|`）用于将一个命令的输出作为另一个命令的输入。在这个命令组合中，`git status --porcelain` 的输出被传递给 `cut` 命令。
+
+## cut -d" " -f3-
+
+`cut` 是一个文本处理工具，用于从输入文本中提取特定的字段。
+
+- `-d" "` 选项指定字段的分隔符。在这里，`" "`（空格）被指定为字段分隔符，意味着 `cut` 命令将使用空格来分割每一行的输入。
+
+- `-f3-` 选项指定要提取的字段范围。`-f` 表示字段（field），而 `3-` 表示从第三个字段到最后一个字段的所有字段。在这个上下文中，这意味着 `cut` 命令将提取每一行的第三个字段及其后的所有字段。
+
+## 示例
+假设你有以下 Git 仓库状态：
+```bash
+$ git status --porcelain
+ M README.md
+?? NEWFILE.txt
+```
+
+当你运行 `git status --porcelain | cut -d" " -f3-` 时，输出将是：
+
+```bash
+README.md
+NEWFILE.txt
+```
+这里，`cut` 命令提取了每个状态行的第三个字段及其后的所有字段，即文件名。
+
+# git status 过滤 - 筛选特定文件 
+
+## 筛选路径包含特定文件夹的文件
+```bash
+git status --porcelain | cut -d" " -f3- | grep -E "*/demo/*"
+```
+
+## 筛选特定后缀的文件
+```bash
+git status --porcelain | cut -d" " -f3- |  grep -E "\.(cpp|h)$"
+```
+
+# git stash 
+```bash
+git status --porcelain | cut -d" " -f3- | grep -E "*/demo/*" | xargs git stash push -m "stash demo files" --
+```
+
+# skip-worktree
