@@ -2916,6 +2916,19 @@ git branch -dr <remote/branch>
 ```
 这个命令会删除远程跟踪分支。
 
+## **包含已合并/未合并信息**
+```bash
+git branch --merged
+git branch --no-merged
+```
+这些命令分别列出所有已经合并到当前分支的分支和所有未合并到当前分支的分支。
+
+## **删除远程跟踪分支**
+```bash
+git branch -dr <remote/branch>
+```
+这个命令会删除远程跟踪分支。
+
 `git branch` 命令是 Git 分支管理的核心，它允许你灵活地创建、管理和发展不同的代码线。通过熟练使用这个命令，你可以更有效地利用 Git 的分支功能来管理你的项目。
 
 # 本地分支的上游分支 
