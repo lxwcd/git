@@ -328,6 +328,7 @@ export TZ='Asia/Shanghai'
 alias stashsimulator='git diff --name-only | grep -E "\.(suo|bin)$" | xargs git stash push -m ".suo and .bin files" '
 alias restoresimulator='git status --porcelain | cut -d" " -f3- |  grep -E "\.(suo|bin)$" | xargs git restore -- '
 alias addCppAndHFiles='git diff --name-only | grep -E "\.(cpp|h)$" | xargs git add -- '
+alias checkSkipWorktree=' git ls-files -v | grep "^S"'
 ```
 
 ### 修改 vim 中光标样式
@@ -1074,36 +1075,6 @@ node_modules/
 3. **比较不同提交**：可以比较任意两个提交之间的差异。
 4. **比较分支**：可以比较不同分支或标签之间的差异。
 
-## 基本使用
-
-- **查看未暂存的更改**：
-  ```bash
-  git diff
-  ```
-  这个命令显示自上次提交以来未暂存的更改。
-
-- **查看已暂存的更改**：
-  ```bash
-  git diff --cached
-  ```
-  或者
-  ```bash
-  git diff --staged
-  ```
-  这些命令显示已暂存的更改与上次提交的差异。
-
-- **比较两个提交**：
-  ```bash
-  git diff <commit1> <commit2>
-  ```
-  这个命令比较两个提交之间的差异。
-
-- **比较分支**：
-  ```bash
-  git diff <branch1> <branch2>
-  ```
-  这个命令比较两个分支之间的差异。
-
 ## 选项
 
 - **`--cached` 或 `--staged`**：显示已暂存的更改。
@@ -1124,6 +1095,75 @@ node_modules/
 - **行号**：显示差异行的行号。
 - **差异内容**：显示具体的差异内容。
 
+## **查看未暂存的更改**
+  ```bash
+  git diff
+  ```
+  这个命令显示自上次提交以来未暂存的更改。
+
+## **查看已暂存的更改**
+  ```bash
+  git diff --cached
+  ```
+  或者
+  ```bash
+  git diff --staged
+  ```
+  这些命令显示已暂存的更改与上次提交的差异。
+
+## **比较两个提交**
+  ```bash
+  git diff <commit1> <commit2>
+  ```
+  这个命令比较两个提交之间的差异。
+
+## **比较分支**
+  ```bash
+  git diff <branch1> <branch2>
+  ```
+  这个命令比较两个分支之间的差异。
+
+## 查看特定文件和 stash 内容的差异
+```bash
+lxw@NEU-20240403OIC MINGW64 /e/doc/git (main)
+$ git diff stash@{0} -- a.txt
+diff --git a/a.txt b/a.txt
+deleted file mode 100644
+index d00491f..0000000
+--- a/a.txt
++++ /dev/null
+@@ -1 +0,0 @@
+-1
+```
+
+## 查看当前工作目录和 stash 的差异
+```bash
+lxw@NEU-20240403OIC MINGW64 /e/doc/git (main)
+$ git diff stash@{0} --name-status
+D       11.txt
+D       a.txt
+M       notes/git学习笔记.md
+```
+
+这个命令比较的是最新的 stash（`stash@{0}`）和工作目录（包括索引）中的内容。具体来说，它显示的是 stash 中的文件和当前工作目录中相同文件的差异。这包括了工作目录中的任何未提交更改。
+
+如果查看差异的详细内容，用 git difftool
+
+## 查看当前最新提交和 stash 的差异
+`git diff stash@{0} HEAD`
+
+这个命令不考虑工作目录中的任何未提交更改。
+
+## 查看两个分支某个文件的差异
+```bash
+git diff <branch1> <branch2> -- <file-path>
+```
+
+要查看两个分支中某个文件夹的差异，你可以使用以下命令：
+```bash
+git diff <branch1> <branch2> -- <folder-path>
+```
+
 ## **查看特定文件的差异**
   ```bash
   git diff <file>
@@ -1141,7 +1181,7 @@ node_modules/
   ```
   这个命令比较两个标签之间的差异。
 
-### 注意事项
+## 注意事项
 
 - **未跟踪的文件**：`git diff` 不显示未跟踪的文件。要查看这些文件，请使用 `git status`。
 - **合并冲突**：在合并冲突时，`git diff` 可以帮助你查看冲突的详细内容。
@@ -1154,83 +1194,210 @@ node_modules/
 
 `git checkout` 是 Git 中用于切换分支或检出特定版本的文件到工作目录的命令。
 
-## 切换分支
-1. **切换到已存在的分支**：
+## **切换到已存在的分支**
+```bash
+git checkout <branch-name>
+```
+这个命令会将 HEAD 移动到指定的分支，并更新工作目录以匹配该分支的状态。
+
+## **创建新分支并切换**
+```bash
+git checkout -b <new-branch-name>
+```
+或者在较新版本的 Git 中：
+```bash
+git switch -c <new-branch-name>
+```
+这些命令会创建一个新的分支，并立即切换到这个分支。
+
+## **基于远程分支创建新分支并切换**
+```bash
+git checkout -b <new-branch-name> origin/<branch-name>
+```
+这个命令会创建一个新的分支，并将其设置为跟踪远程分支 `origin/<branch-name>`。
+
+## **检出特定文件到工作目录**
+```bash
+git checkout <branch-name> -- <file-path>
+```
+这个命令会从 `<branch-name>` 分支检出 `<file-path>` 文件到当前工作目录，替换本地的文件。
+
+## **检出特定提交到工作目录**
+```bash
+git checkout <commit-hash> -- <file-path>
+```
+这个命令会从 `<commit-hash>` 提交检出 `<file-path>` 文件到当前工作目录。
+
+## **检出特定提交到新分支**
+```bash
+git checkout <commit-hash> -b <new-branch-name>
+```
+这个命令会创建一个新的分支 `<new-branch-name>` 并检出 `<commit-hash>` 提交的内容到这个新分支。
+
+## **恢复已修改但未暂存的文件**
+```bash
+git checkout -- <file-path>
+```
+这个命令会将 `<file-path>` 文件恢复到最近一次提交的状态，放弃本地的修改。
+
+## **恢复已暂存的文件**
+```bash
+git restore --staged -- <file-path>
+```
+或者使用旧版本的 Git 命令：
+```bash
+git checkout -- <file-path>
+```
+这些命令会将 `<file-path>` 文件从暂存区取消暂存，恢复到工作目录的状态。
+
+## **检出标签对应的版本**
+```bash
+git checkout <tag-name>
+```
+这个命令会检出包含 `<tag-name>` 标签的提交，通常用于检出某个特定的发布版本。
+
+## **有冲突时使用对方版本**
+1. **识别冲突文件**：
+   合并操作后，使用 `git status` 命令来识别哪些文件存在冲突。
+
+2. **手动选择对方版本**：
+   对于每个存在冲突的文件，你可以手动编辑文件来解决冲突，或者使用以下命令来选择对方的版本：
+
    ```bash
-   git checkout <branch-name>
+   git checkout --ours -- <file-path>
    ```
-   这个命令会将 HEAD 移动到指定的分支，并更新工作目录以匹配该分支的状态。
 
-## 创建并切换分支
-2. **创建新分支并切换**：
+   或者，如果你想要使用对方的版本（即被合并分支的版本），可以使用：
+
    ```bash
-   git checkout -b <new-branch-name>
+   git checkout --theirs -- <file-path>
    ```
-   或者在较新版本的 Git 中：
+
+   这里 `<file-path>` 是存在冲突的文件的路径。这些命令会用被合并分支（对方的分支）的版本覆盖工作目录中的文件。
+
+3. **添加到暂存区**：
+   选择对方版本后，你需要将这些文件添加到暂存区：
+
    ```bash
-   git switch -c <new-branch-name>
+   git add <file-path>
    ```
-   这些命令会创建一个新的分支，并立即切换到这个分支。
 
-3. **基于远程分支创建新分支并切换**：
+4. **继续合并**：
+   如果你已经解决了所有文件的冲突，你可以继续完成合并操作：
+
    ```bash
-   git checkout -b <new-branch-name> origin/<branch-name>
+   git commit
    ```
-   这个命令会创建一个新的分支，并将其设置为跟踪远程分支 `origin/<branch-name>`。
 
-### 检出文件
+   Git 会提示你输入合并提交的消息。
 
-4. **检出特定文件到工作目录**：
-   ```bash
-   git checkout <branch-name> -- <file-path>
-   ```
-   这个命令会从 `<branch-name>` 分支检出 `<file-path>` 文件到当前工作目录，替换本地的文件。
-
-### 检出特定提交
-
-5. **检出特定提交到工作目录**：
-   ```bash
-   git checkout <commit-hash> -- <file-path>
-   ```
-   这个命令会从 `<commit-hash>` 提交检出 `<file-path>` 文件到当前工作目录。
-
-6. **检出特定提交到新分支**：
-   ```bash
-   git checkout <commit-hash> -b <new-branch-name>
-   ```
-   这个命令会创建一个新的分支 `<new-branch-name>` 并检出 `<commit-hash>` 提交的内容到这个新分支。
-
-### 恢复更改
-
-7. **恢复已修改但未暂存的文件**：
-   ```bash
-   git checkout -- <file-path>
-   ```
-   这个命令会将 `<file-path>` 文件恢复到最近一次提交的状态，放弃本地的修改。
-
-8. **恢复已暂存的文件**：
-   ```bash
-   git restore --staged -- <file-path>
-   ```
-   或者使用旧版本的 Git 命令：
-   ```bash
-   git checkout -- <file-path>
-   ```
-   这些命令会将 `<file-path>` 文件从暂存区取消暂存，恢复到工作目录的状态。
-
-### 切换到标签
-
-9. **检出标签对应的版本**：
-   ```bash
-   git checkout <tag-name>
-   ```
-   这个命令会检出包含 `<tag-name>` 标签的提交，通常用于检出某个特定的发布版本。
-
-### 注意事项
+## 注意事项
 
 - 使用 `git checkout` 切换分支时，如果你有未提交的更改，Git 会警告你，因为这些更改可能会丢失。你可以先暂存更改，或者使用 `git stash` 保存更改。
 - `git checkout` 命令在检出文件时，如果文件在工作目录中被修改过，Git 会阻止检出操作以防止数据丢失。你需要先解决这些冲突，或者使用 `git checkout --force` 强制覆盖本地更改。
 - 在使用 `git checkout` 检出文件时，如果你想要保留工作目录中的更改，可以先将更改暂存，然后再检出文件。
+
+# git checkout 和 git cherry-pick
+`git checkout <commit-hash> -- <file-path>` 命令和 `git cherry-pick` 命令都可以用来将更改应用到当前分支，但它们的目的和行为有所不同，因此不能互相代替。
+
+## `git checkout <commit-hash> -- <file-path>`
+这个命令用于从特定的提交（`<commit-hash>`）中检出文件（`<file-path>`）到当前工作目录。这个操作不会改变分支的历史记录，也不会创建新的提交。它仅仅是替换工作目录中的文件内容，用指定提交中的文件版本覆盖。这个命令不会记录任何新的提交，也不会影响项目的提交历史。
+
+## `git cherry-pick`
+`git cherry-pick` 命令用于将一个或多个提交的应用到当前分支，从而创建新的提交。这个操作会将指定提交的更改作为新的提交引入到当前分支的历史中。`git cherry-pick` 可以用于将特定提交从一个分支应用到另一个分支，或者在同一个分支中重新应用已经存在的提交。
+
+## 区别
+
+- **历史记录**：`git checkout` 不会改变分支的历史记录，而 `git cherry-pick` 会创建新的提交，改变历史记录。
+- **提交**：`git cherry-pick` 会创建新的提交，而 `git checkout` 不会。
+- **原子性**：`git cherry-pick` 操作是原子性的，要么全部成功，要么全部失败。如果一个提交被 cherry-picked，那么它会被完全应用到当前分支。而 `git checkout` 只是简单地替换文件，不涉及提交的过程。
+- **冲突解决**：在使用 `git cherry-pick` 时，如果出现冲突，你需要解决冲突并完成 cherry-pick 操作。而在使用 `git checkout` 时，如果文件存在冲突，Git 会停止操作并让你手动解决。
+
+虽然 `git checkout <commit-hash> -- <file-path>` 可以用来获取特定提交的文件版本，但它不能代替 `git cherry-pick` 的功能，因为后者涉及到创建新的提交和改变项目的历史记录。如果你只是想替换文件而不创建新的提交，使用 `git checkout`。如果你需要将更改作为新的提交引入到当前分支，那么 `git cherry-pick` 是正确的选择。
+
+# git switch 
+`git switch` 是 Git 2.23 版本引入的命令，用于切换分支。这个命令的作用与 `git checkout` 类似，但提供了更清晰的语义和错误检查。
+
+## **切换到已存在的分支**
+```bash
+git switch <branch-name>
+```
+例如，将工作目录切换到主分支：
+```bash
+git switch master
+```
+
+## **使用 `-c` 或 `--create` 参数创建并切换新分支**
+  ```bash
+  git switch -c <new-branch-name>
+  ```
+  例如，创建一个名为 `feature-branch` 的新分支并切换到它：
+  ```bash
+  git switch -c feature-branch
+  ```
+  这相当于先执行 `git branch <new-branch-name>` 然后执行 `git switch <new-branch-name>` 的快捷方式。
+
+## **使用 `-C` 或 `--force-create` 参数强制创建新分支**
+  ```bash
+  git switch -C <new-branch>
+  ```
+  如果 `<new-branch>` 已经存在，它将被重置为 `<start-point>`。这相当于先执行 `git branch -f <new-branch>` 然后执行 `git switch <new-branch>`。
+
+## 根据远程分支创建本地分支
+使用 `git switch --track` 命令创建一个新的本地分支，并设置它跟踪远程分支。例如，如果你想要创建一个本地分支 `feature` 并跟踪远程的 `origin/feature`，可以执行以下命令：
+
+```bash
+git switch --track origin/feature
+```
+
+或者使用 `-t` 选项：
+
+```bash
+git switch -t origin/feature
+```
+
+这个命令会创建一个新的本地 `feature` 分支，并立即设置它跟踪远程的 `origin/feature` 分支。
+
+也可以使用下面方法：
+```bash
+git checkout -b feature origin/feature
+```
+
+## **使用 `-d` 或 `--detach` 参数切换到一个提交**
+  ```bash
+  git switch -d <commit-hash>
+  ```
+  这会将 HEAD 分离并指向 `<commit-hash>`，允许你在一个提交上进行临时的检查或实验。
+
+## **使用 `<commit_hash>` 恢复工作目录**
+  ```bash
+  git switch <commit_hash>
+  ```
+  这会将工作目录切换到指定提交 `<commit_hash>` 的状态，处于分离 HEAD 的状态。
+
+## **使用 `-` 快速切换回前一个分支**
+  ```bash
+  git switch -
+  ```
+  这允许你快速切换回前一个分支，无需记住分支名称。
+
+## **使用 `git switch <branchName>` 从远程分支创建同名的本地分支并关联远程分支**
+  ```bash
+  git switch testmaster
+  ```
+  这会拉取远程分支到本地，并建立远程分支和本地分支的关联关系。
+
+## **使用 `--orphan <new-branch>` 创建孤儿分支**
+  ```bash
+  git switch --orphan <new-branch>
+  ```
+  这会创建一个新的孤儿分支，并删除所有跟踪的文件。
+
+## **使用 `--recurse-submodules` 更新所有初始化的子模块**
+  ```bash
+  git switch --recurse-submodules <branch>
+  ```
+  这会根据超级项目中记录的提交更新所有活动子模块的内容。
 
 # git add 
 > [Git - git-add Documentation](https://git-scm.com/docs/git-add) 
@@ -2678,8 +2845,7 @@ git branch -m <old-name> <new-name>
 在实际使用中，除非你完全确定目标分支没有重要的提交历史，否则推荐使用 `git branch -m` 以避免数据丢失。如果你需要强制覆盖一个分支，那么可以使用 `git branch -M`，但应该确保了解这个操作的后果。
 
 ## 创建新远程分支
-
-
+本地创建一个分支，git push -u origin remote_branch 可以将本地和远程分支关联且新建远程分支
 
 ## 设置跟踪关系
 
@@ -2746,7 +2912,6 @@ git checkout -b <new-branch-name> origin/<old-branch-name>
   git push origin <new-branch-name>
   ```
   这将删除旧的远程分支并推送新的远程分支，而不会改变你当前检出的本地分支名称。
-
 
 ## 其他有用的选项
 
@@ -2848,6 +3013,46 @@ git branch --unset-upstream my-branch
 
 通过这些命令，你可以灵活地设置和管理你的本地分支与远程分支之间的关系，这对于多人协作的项目来说非常重要。
 
+# git apply
+
+`git apply` 命令用于将补丁文件（通常是通过 `git diff` 生成的）应用到工作目录中的文件上。基本语法如下：
+```bash
+git apply <patch-file>
+```
+
+其中 `<patch-file>` 是补丁文件的路径。执行此命令后，Git 会根据补丁文件的内容对当前工作目录中的文件进行修改。
+
+## 参数选项
+
+- `--stat`：显示补丁文件应用的统计信息，包括修改了哪些文件以及进行了何种修改。
+- `--numstat`：显示每个文件的详细统计信息，包括添加和删除的行数。
+- `--summary`：显示补丁文件应用的概要信息。
+- `--check`：检查补丁文件是否能够成功应用，但并不实际应用补丁文件。
+- `--3way`：当补丁文件与目标文件存在冲突时，尝试使用三方合并算法解决冲突。
+- `--index`：将补丁文件应用到索引中，而不仅仅是应用到工作目录中的文件。
+- `--intent-to-add`：允许应用补丁到尚未跟踪的文件，Git 会将这些文件添加到索引中。
+- `--allow-binary-replacement`：允许补丁替换二进制文件。
+- `-R` 或 `--reverse`：反向应用补丁，即撤销补丁中所做的更改。
+- `-p<n>`：指定补丁文件中路径的前缀层数，用于处理包含前缀的补丁文件。
+
+## **应用补丁文件**
+```bash
+git apply patchfile.diff
+```
+这会将 `patchfile.diff` 中的差异应用到当前工作目录中的对应文件。
+
+## **检查补丁是否可应用**
+```bash
+git apply --check patchfile.diff
+```
+这会检查 `patchfile.diff` 是否可以成功应用到当前工作目录中的文件，但不会实际应用补丁。
+
+## **应用补丁并添加到索引**
+```bash
+git apply --index patchfile.diff
+```
+这会将补丁应用到索引中，而不仅仅是工作目录中的文件。
+
 # git stash
 
 `git stash` 是 Git 中一个非常有用的命令，它允许你临时保存工作目录中的修改，以便你可以在不提交这些修改的情况下切换分支或返回到一个干净的工作状态。
@@ -2912,6 +3117,93 @@ git branch --unset-upstream my-branch
 ## git stash push
 
 ## git stash save
+
+## 应用特定文件
+`git checkout stash@{n} -- <file-path>`
+
+1. **`git checkout`**：
+   这是 Git 中用于切换分支或恢复工作树文件的命令。它可以用于切换到不同的分支，或者检出特定的文件或分支到当前工作目录。
+
+2. **`stash@{n}`**：
+   这是指最新的 stash（暂存）。在 Git 中，`stash` 是一个用于临时存储你的工作进度的机制，允许你保存当前工作目录的状态（包括未提交的修改和暂存的变更），以便之后可以恢复。`stash@{0}` 表示最近一次 stash 的引用，`stash@{1}` 表示之前的 stash，以此类推。
+
+3. **`--`**：
+   这是一个分隔符，用于区分 stash 引用和后续的文件路径参数。在 Git 命令中，`--` 通常用于指示命令行参数的结束，确保之后的参数不被解释为命令的选项或参数。
+
+4. **`<file-path>`**：
+   这是你想要检出的文件的路径。你需要替换 `<file-path>` 为实际的文件名或路径。例如，如果你想要检出 `README.md` 文件，你应该使用 `git checkout stash@{0} -- README.md`。
+
+`git checkout stash@{0} -- <file-path>` 命令的作用是从最新的 stash（`stash@{0}`）中检出特定的文件（`<file-path>`）到当前工作目录。这个操作会覆盖工作目录中指定文件的内容，用 stash 中的版本替换它。
+
+这个命令在以下场景中非常有用：
+
+- 当你想要恢复某个文件到 stash 时的状态，但不想应用整个 stash。
+- 当你之前 stash 了一些更改，现在想要将这些更改的部分文件恢复到工作目录，而不是恢复所有文件。
+- 当你解决了合并冲突后，想要从 stash 中恢复特定文件的版本，而不是使用工作目录或分支中的版本。
+
+### 强制覆盖
+```bash
+git checkout --force stash@{0} -- <file-path>
+```
+或者：
+```bash
+git checkout -f stash@{0} -- <file-path>
+```
+
+## 应用部分文件
+
+1. **列出 stash 中的文件**：
+首先，你需要列出 stash@{0} 中的所有文件。可以使用 `git stash show` 命令来查看 stash 中的内容。
+
+2. **应用 stash 中的 `.cpp` 文件**：
+然后，你可以使用 `git checkout` 命令从 stash 中检出 `.cpp` 文件。以下是一个示例脚本，它使用 `git stash show` 命令来获取 stash 中的 `.cpp` 文件列表，并逐个检出：
+
+```bash
+git stash show stash@{0} -- .cpp | git apply
+```
+
+这个命令会显示 stash@{0} 中所有 `.cpp` 文件的差异，并尝试应用这些差异到工作目录中。
+
+3. **添加应用后的文件**：
+应用 stash 中的更改后，你需要将这些更改添加到暂存区：
+
+```bash
+git add *.cpp
+```
+
+这个方法可能会有一些限制和风险：
+
+- 如果 stash 中的 `.cpp` 文件在当前分支上不存在或者已经被修改，这可能会导致冲突。
+- 使用 `git apply` 命令时，如果存在冲突，你需要手动解决这些冲突。
+- 这个方法不会自动删除 stash，如果你想要删除应用后的 stash，需要手动运行 `git stash drop stash@{0}`。
+
+## 冲突时强制使用 stash 的更改
+1. **应用 stash 中的更改**：
+   首先，尝试应用 stash 中的更改：
+   ```bash
+   git stash apply stash@{0}
+   ```
+   如果遇到冲突，Git 会提示你哪些文件存在冲突。
+
+2. **解决冲突**：
+   手动编辑冲突的文件，解决冲突后，你需要将这些文件标记为已解决。这可以通过添加冲突文件到暂存区来完成：
+   ```bash
+   git add <resolved-file>
+   ```
+   其中 `<resolved-file>` 是你解决冲突后的文件。
+
+3. **强制应用 stash**：
+   如果你想要强制使用 stash 中的版本，忽略本地的更改，可以使用以下命令：
+   ```bash
+   git checkout stash@{0} -- <file-path>
+   ```
+   这会用 stash 中的版本覆盖工作目录中的文件。请注意，这会丢弃本地对该文件的任何更改。
+
+4. **删除 stash**：
+   一旦冲突解决并且更改被应用，你可以删除 stash：
+   ```bash
+   git stash drop stash@{0}
+   ```
 
 ## 高级用法
 
@@ -3936,6 +4228,7 @@ git diff --name-only | grep -E "*/demo/*" | xargs git add --
 - **用途**：`skip-worktree` 命令用于将文件标记为忽略工作树中的更改，但仍会进行某些操作。这适用于那些需要在本地修改但不希望这些更改被提交到远程仓库的场景，比如配置文件。
 - **行为**：与 `assume-unchanged` 不同，`skip-worktree` 会保留本地的更改，即使这些更改与远程仓库中的版本不同。这意味着，当你执行 `git pull` 或 `git push` 时，Git 会尽量维护你的本地更改，而不是覆盖它们。
 - **取消**：可以通过 `git update-index --no-skip-worktree <file>` 命令来取消 `skip-worktree` 标记，恢复对文件的跟踪。
+
 ### 设置 `skip-worktree`
 
 ```bash
@@ -3952,15 +4245,26 @@ git update-index --skip-worktree <file>
 git update-index --no-skip-worktree <file>
 ```
 
-### 查看 `skip-worktree` 状态
+### 使用远程最新的版本
+```bash
+git update-index --no-skip-worktree <file>
+git pull
+```
+
+### 查看所有被 `skip-worktree` 的文件
 
 要查看哪些文件被设置了 `skip-worktree` 属性，可以使用 `git ls-files` 命令：
 
 ```bash
-git ls-files -v
+git ls-files -v | grep '^S'
 ```
 
 这将列出所有被 Git 跟踪的文件，以及它们各自的属性。带有 `S` 前缀的文件表示被设置了 `skip-worktree` 属性。
+
+### 查看某个文件是否被 `skip-worktree`
+```bash
+git ls-files -v | grep '^S' | grep 'file.cpp'
+```
 
 ### 使用场景
 
@@ -3969,6 +4273,10 @@ git ls-files -v
 2. **跨分支共享文件**：如果你有多个分支需要共享某些文件，但又不希望这些文件的更改在分支间传播，可以使用 `skip-worktree` 来避免冲突。
 
 3. **忽略特定文件更改**：在某些情况下，你可能不希望跟踪某些文件的更改，例如自动生成的配置文件或日志文件。
+
+4. **配置文件**：当你的主仓库中包含了一些生产就绪的配置文件，而你不想不小心提交对这些文件的更改时，使用 `skip-worktree` 是一个很好的选择。
+
+5. **本地环境依赖**：开发时，可能需要的开发环境部分配置与测试及生产环境不一样，如数据库配置，需要手动修改，又不想把修改过的配置文件提交，这时候可以使用 `skip-worktree`。
 
 ### 注意事项
 
@@ -3989,7 +4297,75 @@ git ls-files -v
 - **用途**：这个命令告诉 Git 忽略对某个文件的更改，即使文件实际上已经被修改了。这可以用于提高性能，特别是在处理大文件或者不需要跟踪的文件时。
 - **行为**：当一个文件被标记为 `assume-unchanged` 后，Git 会认为这个文件没有被修改，即使实际上文件内容已经发生了变化。这会导致 Git 在执行 `git status` 时不再显示这个文件为已修改状态。
 - **取消**：可以通过 `git update-index --no-assume-unchanged <file>` 命令来取消 `assume-unchanged` 标记，恢复对文件的跟踪。
-
 - **性能与用途**：`assume-unchanged` 通常用于优化性能，比如忽略那些不需要跟踪的大文件或者二进制文件；而 `skip-worktree` 更多用于处理需要在本地修改但不希望影响远程仓库的文件。
 - **冲突处理**：在使用 `pull` 时，`assume-unchanged` 可能会导致本地更改被远程版本覆盖，而 `skip-worktree` 会尽量保留本地的更改。
 - **文件状态**：`assume-unchanged` 会使得 Git 认为文件未被修改，而 `skip-worktree` 允许文件在本地被修改，但这些修改不会被 Git 跟踪。
+
+`git update-index --assume-unchanged` 命令用于更新 Git 索引或暂存区，允许用户更改或更新索引中的文件状态信息。使用 `--assume-unchanged` 选项可以告知 Git 忽略某些已修改但未提交的文件。
+
+### **标记文件为 assume-unchanged**
+```bash
+git update-index --assume-unchanged <file>
+```
+这会告诉 Git 忽略 `<file>` 文件的后续更改。
+
+### **取消标记**
+```bash
+git update-index --no-assume-unchanged <file>
+```
+这会取消对 `<file>` 文件的 “假定未更改” 标记，并让 Git 开始跟踪和提交对该文件的更改。
+
+### 查看被标记的文件
+如果你想要查看哪些文件被标记为 `assume-unchanged`，可以使用以下命令：
+```bash
+git ls-files -v | grep "^h"
+```
+这会列出所有标记为 `assume-unchanged` 的文件，其中 `h` 表示文件被标记为 `assumed-unchanged`。
+
+### 注意事项
+- **标记只在本地有效**：`assume-unchanged` 标记只在本地有效，其他协作用户不会受到该标记的影响。
+- **克隆或拉取时的标记丢失**：默认情况下，`git update-index –assume-unchanged` 命令不会将标记的文件保存到 Git 仓库中。因此，在克隆或拉取代码时，这些标记可能会丢失。如果你希望这些标记在克隆或拉取代码后依然有效，可以使用 `git update-index –skip-worktree` 命令来实现。
+
+通过合理使用 `git assume-unchanged`，你可以更高效地处理代码版本控制，特别是在处理大型项目或需要优化性能的场景中。
+
+### assume-unchanged 配置场景
+`assume-unchanged` 用于优化性能，假定文件未更改，适用于那些不需要或不应该被更改的文件。例如：
+
+- **大型二进制文件或 SDK**：对于大型二进制文件或者 SDK 这类不常更改的文件，使用 `assume-unchanged` 可以提高 Git 的性能。
+- **不想跟踪的文件**：如果你有一些文件不想被 Git 跟踪更改，但又不想完全忽略它们（比如因为需要这些文件来构建项目），你可以使用 `assume-unchanged` 来告诉 Git 忽略这些文件的更改。
+
+`skip-worktree` 更适合那些需要在本地更改但不希望这些更改影响到远程仓库的情况，而 `assume-unchanged` 更适合那些不需要更改的文件，用于提高性能和避免不必要的跟踪。
+
+# 检出特定版本
+## 使用 `git checkout` 检出对方的版本
+
+如果你想要检出（即覆盖）当前分支上特定文件的版本，可以使用 `git checkout` 命令。以下是如何操作的：
+
+```bash
+git checkout <their-branch> -- <file-path>
+```
+
+这里 `<their-branch>` 是对方分支的名称，而 `<file-path>` 是你想要检出的文件的路径。这个命令会将指定文件从对方分支检出到你当前的工作目录，覆盖本地的版本。
+
+## 使用 `git checkout` 检出提交的版本
+
+如果你知道对方的具体提交哈希值，你也可以直接检出那个提交中的文件版本：
+
+```bash
+git checkout <commit-hash>^ -- <file-path>
+```
+
+这里 `<commit-hash>` 是对方提交的哈希值，`^` 符号表示父提交（即对方提交的前一个提交），而 `<file-path>` 是文件的路径。这个命令会检出指定提交中的文件版本。
+
+## 使用 `git reset` 检出版本
+你还可以使用 `git reset` 命令将文件重置为特定版本：
+
+```bash
+git reset <commit-hash> -- <file-path>
+```
+
+然后，你可以使用 `git checkout` 来检出这些文件：
+
+```bash
+git checkout -- <file-path>
+```
