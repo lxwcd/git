@@ -1191,9 +1191,9 @@ git diff <branch1> <branch2> -- <folder-path>
 > [Git - Basic Branching and Merging](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging) 
 > [Git Branches Tutorial](https://www.youtube.com/watch?v=e2IbNHi4uCI&ab_channel=freeCodeCamp.org) 
 
-
 # git checkout
 > [Git - git-checkout Documentation](https://git-scm.com/docs/git-checkout) 
+> [git checkout - Switching branches and restoring files](https://www.git-tower.com/learn/git/commands/git-checkout) 
 
 `git checkout` 是 Git 中用于切换分支或检出特定版本的文件到工作目录的命令。
 
@@ -2902,6 +2902,19 @@ git checkout -b <new-branch-name> origin/<old-branch-name>
   git push origin <new-branch-name>
   ```
   这将删除旧的远程分支并推送新的远程分支，而不会改变你当前检出的本地分支名称。
+
+## **包含已合并/未合并信息**
+```bash
+git branch --merged
+git branch --no-merged
+```
+这些命令分别列出所有已经合并到当前分支的分支和所有未合并到当前分支的分支。
+
+## **删除远程跟踪分支**
+```bash
+git branch -dr <remote/branch>
+```
+这个命令会删除远程跟踪分支。
 
 ## **包含已合并/未合并信息**
 ```bash
