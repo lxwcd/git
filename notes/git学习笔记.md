@@ -6,7 +6,6 @@
 > git 命令官方文档：[git](https://git-scm.com/docs/)  
 > git book：[Pro Git book](https://git-scm.com/book/en/v2)  
 > [Learn Git Branching](https://learngitbranching.js.org/?locale=zh_CN) 
-> [Git 教程 - Rebase](https://www.delftstack.com/zh/tutorial/git/git-rebase/) 
 > [Learn Git and GitHub](https://roadmap.sh/git-github) 
       
 # git 介绍
@@ -90,10 +89,7 @@
 
 通过使用 `git config --system`，你可以为整个系统设置统一的 Git 配置，确保所有用户和仓库都遵循相同的规则和行为。这种方法在管理多用户环境或确保一致性时非常有用。
 
-## global and local level
-`git config --local` 和 `git config --global` 是 Git 配置命令的两个选项，它们用于指定配置的范围。这两个选项的主要区别在于它们应用配置的层级和影响范围。下面详细解释这两个选项的区别：
-
-### `git config --local`
+## `git config --local`
 
 - **作用范围**：`--local` 选项用于设置特定 Git 仓库的配置。这些配置仅适用于当前仓库，不会影响其他仓库或全局 Git 配置。
 - **配置文件位置**：使用 `--local` 时，配置信息存储在当前仓库的 `.git/config` 文件中。每个 Git 仓库都有自己的 `.git` 目录，其中包含该仓库的配置文件。
@@ -104,21 +100,16 @@
   ```
   这个命令会将 `user.email` 配置设置为 `local@example.com`，但仅适用于当前仓库。
 
-### `git config --global`
+## `git config --global`
 
 - **作用范围**：`--global` 选项用于设置全局 Git 配置。这些配置适用于当前用户的所有 Git 仓库。
 - **配置文件位置**：使用 `--global` 时，配置信息存储在用户的主目录下的 `.gitconfig` 文件中（例如，`~/.gitconfig`）。这个文件包含了适用于所有仓库的全局配置。
-- **使用场景**：当你想要为所有项目设置统一的配置选项时（例如，全局的用户名或编辑器），使用 `--global` 是合适的。这样，你不需要在每个项目中重复设置相同的配置。
+- **使用场景**：当想要为所有项目设置统一的配置选项时（例如，全局的用户名或编辑器），使用 `--global` 是合适的。这样，你不需要在每个项目中重复设置相同的配置。
 - **示例命令**：
   ```bash
   git config --global user.email "global@example.com"
   ```
   这个命令会将 `user.email` 配置设置为 `global@example.com`，适用于当前用户的所有仓库。
-
-### 总结
-
-- **`--local`**：特定于单个仓库的配置，存储在 `.git/config` 中。
-- **`--global`**：特定于用户的全局配置，存储在 `~/.gitconfig` 中。
 
 ## 查看全局配置信息  
 ```bash  
@@ -201,6 +192,7 @@ log.date=local
 这些设置的主要目的是在不同操作系统之间协作时，确保文件的换行符保持一致，从而避免因换行符不一致导致的合并冲突和其他问题。
 
 windows 上配置后有点问题，暂未使用。
+
 ### 对于 Unix/Mac 用户
 
 1. **`git config --global core.autocrlf input`**：
@@ -255,10 +247,9 @@ git config --global https.proxy https://192.168.0.119:7890
 ```cpp
 git config --global --list --show-origin
 ```
-`git config --show-origin` 是一个非常有用的命令，它允许你查看 Git 配置项及其来源文件。这个命令可以帮助你理解每个配置项是从哪个配置文件中读取的。
+`git config --show-origin` 允许查看 Git 配置项及其来源文件。
 
 - **显示配置来源**：`--show-origin` 选项用于显示每个配置项的来源，即配置项是从哪个文件中读取的。这包括文件路径、标准输入、blob 或命令行等来源。
-
 - **调试配置问题**：当你不确定某个配置项是从哪个文件中读取时，使用 `--show-origin` 可以帮助你找到答案。
 - **查看配置文件路径**：通过显示配置项的来源，你可以快速找到相关的配置文件路径。
 
@@ -295,13 +286,11 @@ git config --global --list --show-origin
 
 在 Git Bash 中，`/etc/vimrc` 的路径是一个模拟的路径，它映射到 Windows 系统中的一个实际位置。这样做是为了保持与 Unix 和 Linux 环境的兼容性，使得 Unix 和 Linux 用户能够在 Windows 上的 Git Bash 中使用他们熟悉的 Vim 配置。
 
-最后两行的意思是：
-
 1. **fall-back for $VIM: "/etc"**
-   - 这行表示如果环境变量 `$VIM` 没有设置，Git Bash 会回退到 "/etc" 目录来查找 Vim 相关的配置和文件。这是一个备用方案，以防 `$VIM` 环境变量未定义。
+   - 表示如果环境变量 `$VIM` 没有设置，Git Bash 会回退到 "/etc" 目录来查找 Vim 相关的配置和文件。这是一个备用方案，以防 `$VIM` 环境变量未定义。
 
 2. **f-b for $VIMRUNTIME: "/usr/share/vim/vim91"**
-   - `$VIMRUNTIME` 是另一个环境变量，它指向 Vim 的运行时文件，包括语法文件、脚本等。这行表示如果 `$VIMRUNTIME` 没有设置，Git Bash 会使用 "/usr/share/vim/vim91" 作为默认路径。这里的 "vim91" 可能指的是 Vim 的某个特定版本，例如 8.1 版本。
+   - `$VIMRUNTIME` 是另一个环境变量，它指向 Vim 的运行时文件，包括语法文件、脚本等。这行表示如果 `$VIMRUNTIME` 没有设置，Git Bash 会使用 "/usr/share/vim/vim91" 作为默认路径。
 
 下载 [vimrc 文件](https://github.com/lxwcd/learnVim/blob/main/vimrc.local) 重命名到 `$HOME/.vimrc`，退出后重新进入即可生效。
 
@@ -343,25 +332,20 @@ if &term =~ "xterm\\|rxvt"
   let &t_EI .= "\<Esc>[2 q"  " EI = NORMAL mode (ELSE)
 endif
 ```
+
 ### 复制到系统剪贴板
-选中后使用 `"+ y` 复制内容，即复制到系统剪贴板。
+在 linux 中没必要做这个配置，git bash 中可以配置，见[linux 中配置](https://github.com/lxwcd/learnVim/blob/main/notes/vim学习笔记.md#与系统剪贴板互动)。
+
+git bash 中如下配置，选中后使用 `"+ y` 复制内容，即复制到系统剪贴板。
 ```bash
 set clipboard=unnamedplus
 ```
-`set clipboard=unnamedplus` 是 Vim 中的一个配置选项，用于指定 Vim 如何与系统剪贴板交互。下面是这个配置选项的详细解释：
+`set clipboard=unnamedplus` 是 Vim 中的一个配置选项，用于指定 Vim 如何与系统剪贴板交互。
 
-1. **`clipboard` 选项**：
-   - Vim 的 `clipboard` 选项控制 Vim 如何使用系统剪贴板。通过设置这个选项，你可以让 Vim 的复制（yank）和粘贴（paste）操作直接与系统剪贴板进行交互。
-
-2. **`unnamedplus` 的含义**：
-   - `unnamedplus` 是 `clipboard` 选项的一个值，它告诉 Vim 使用系统剪贴板作为复制和粘贴操作的存储。在 Vim 中，`"+` 寄存器通常与系统剪贴板相关联，而 `unnamedplus` 使得这个寄存器的行为与系统剪贴板一致。
-
-3. **如何工作**：
-   - 当你设置了 `set clipboard=unnamedplus`，Vim 会将复制（yank）操作的内容存储到 `"+` 寄存器，这个寄存器与系统剪贴板同步。因此，当你在 Vim 中复制文本时，它也会出现在系统剪贴板上，你可以在其他程序中粘贴。
-   - 同样地，从系统剪贴板粘贴（paste）文本到 Vim 中时，Vim 会从 `"+` 寄存器读取内容。
-
-4. **在 Linux 中的配置**：
-   - 这个配置同样适用于 Linux 系统。在 Linux 系统中，`"+` 寄存器可能与 X11 的 CLIPBOARD 选区相关联，这取决于你的桌面环境和配置。在大多数现代 Linux 发行版中，`"+` 寄存器用于系统剪贴板操作。
+- Vim 的 `clipboard` 选项控制 Vim 如何使用系统剪贴板。通过设置这个选项，你可以让 Vim 的复制（yank）和粘贴（paste）操作直接与系统剪贴板进行交互。
+- `unnamedplus` 是 `clipboard` 选项的一个值，它告诉 Vim 使用系统剪贴板作为复制和粘贴操作的存储。在 Vim 中，`"+` 寄存器通常与系统剪贴板相关联，而 `unnamedplus` 使得这个寄存器的行为与系统剪贴板一致。
+- 当设置了 `set clipboard=unnamedplus`，Vim 会将复制（yank）操作的内容存储到 `"+` 寄存器，这个寄存器与系统剪贴板同步。因此，当你在 Vim 中复制文本时，它也会出现在系统剪贴板上，你可以在其他程序中粘贴。
+- 同样地，从系统剪贴板粘贴（paste）文本到 Vim 中时，Vim 会从 `"+` 寄存器读取内容。
 
 5. **检查 Vim 是否支持剪贴板**：
    - 可以使用 `vim --version | grep clipboard` 命令来检查你的 Vim 是否支持剪贴板功能。如果输出中包含 `+clipboard`，则表示支持。
@@ -1121,6 +1105,12 @@ node_modules/
   ```
   这个命令比较两个分支之间的差异。
 
+## 查看两个分支文件差异
+查看 test 分支相对当前分支最新提交的文件名的修改
+```bash
+$ git diff HEAD...test --name-only
+```
+
 ## 查看特定文件和 stash 内容的差异
 ```bash
 lxw@NEU-20240403OIC MINGW64 /e/doc/git (main)
@@ -1191,9 +1181,9 @@ git diff <branch1> <branch2> -- <folder-path>
 > [Git - Basic Branching and Merging](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging) 
 > [Git Branches Tutorial](https://www.youtube.com/watch?v=e2IbNHi4uCI&ab_channel=freeCodeCamp.org) 
 
+
 # git checkout
 > [Git - git-checkout Documentation](https://git-scm.com/docs/git-checkout) 
-> [git checkout - Switching branches and restoring files](https://www.git-tower.com/learn/git/commands/git-checkout) 
 
 `git checkout` 是 Git 中用于切换分支或检出特定版本的文件到工作目录的命令。
 
@@ -1765,21 +1755,19 @@ git commit -m "Remove example.txt"
 - **追踪更改**：如果需要追踪特定文件或目录的更改历史，`git log` 可以提供详细的信息。
 - **调试问题**：在调试问题时，查看提交历史可以帮助你找到引入问题的提交。
 
-## 基本使用
-
-- **查看所有提交**：
+## **查看所有提交**
   ```bash
   git log
   ```
   这个命令显示项目的完整提交历史。
 
-- **查看特定分支的提交**：
+## **查看特定分支的提交**
   ```bash
   git log <branch-name>
   ```
   这个命令显示指定分支的提交历史。
 
-- **查看特定文件的提交**：
+## **查看特定文件的提交**
   ```bash
   git log <file>
   ```
@@ -1803,17 +1791,7 @@ git commit -m "Remove example.txt"
 - **`--author`**：过滤指定作者的提交记录。
 - **`--grep`**：过滤包含特定文本的提交信息。
 
-好的，让我们通过一些具体的例子来详细讲解`git log`命令及其参数的使用。
-
-## 基本用法
-
-```bash
-$ git log
-```
-
-这个命令会列出仓库中所有的提交记录，按照时间倒序排列，最新的提交在最上面。
-
-### 查看差异（Patch）
+## 查看差异（Patch）
 
 使用`-p`或`--patch`参数，我们可以查看每个提交的具体差异：
 
@@ -1823,15 +1801,15 @@ $ git log -p
 
 这将显示每个提交的详细差异，包括文件的增删改。
 
-### 限制显示条目
+## 限制显示条目
 
-如果我们只想看最后两个提交的差异，可以使用`-2`参数：
+如果只想看最后两个提交的差异，可以使用`-2`参数：
 
 ```bash
 $ git log -p -2
 ```
 
-### 统计信息
+## 统计信息
 
 `--stat`参数可以显示每个提交影响的文件和行数：
 
@@ -1841,7 +1819,7 @@ $ git log --stat
 
 这将显示每个提交修改的文件列表、文件数量变化以及添加和删除的行数统计。
 
-### 自定义格式
+## 自定义格式
 
 使用`--pretty`参数，我们可以自定义日志的显示格式。例如，`oneline`将每个提交显示在一行上：
 
@@ -1857,7 +1835,7 @@ ca82a6dff817ec66f44342007202690a93763949 Change version number
 a11bef06a3f659402fe7563abf99ad00de2209e6 Initial commit
 ```
 
-### 格式化输出
+## 格式化输出
 
 `--pretty=format`允许我们自定义输出格式。例如，我们可以这样显示提交的哈希值、作者和提交信息：
 
@@ -1873,7 +1851,7 @@ ca82a6d - Scott Chacon, 6 years ago : Change version number
 a11bef0 - Scott Chacon, 6 years ago : Initial commit
 ```
 
-### 分支和合并历史
+## 分支和合并历史
 
 `--graph`参数可以显示分支和合并历史的ASCII图形：
 
@@ -1883,7 +1861,7 @@ $ git log --pretty=format:"%h %s" --graph
 
 这将显示一个ASCII图形，展示了分支和合并的历史。
 
-### 时间限制
+## 时间限制
 
 `--since`和`--until`参数可以用来限制显示特定时间范围内的提交：
 
@@ -1893,7 +1871,7 @@ $ git log --since="2 weeks ago"
 
 这将显示最近两周内的提交记录。
 
-### 作者和关键词搜索
+## 作者和关键词搜索
 
 `--author`和`--grep`参数可以用来根据作者或提交信息中的关键词来过滤提交：
 
@@ -1903,7 +1881,7 @@ $ git log --author="Scott Chacon" --grep="version"
 
 这将显示所有作者为“Scott Chacon”且提交信息中包含“version”的提交。
 
-### 文件路径过滤
+## 文件路径过滤
 
 最后，我们可以通过文件路径来限制显示特定文件的提交历史：
 
@@ -1913,11 +1891,20 @@ $ git log -- path/to/file
 
 这将只显示影响`path/to/file`文件的提交记录。
 
-通过这些例子，你可以看到`git log`命令及其参数的强大之处，它们可以帮助你以多种方式查看和管理Git仓库的提交历史。
-
-### 指定查看数目
+## 指定查看数目
 ```bash
 $ git log origin/testBranch02 --oneline --graph --decorate -15
+```
+
+## 查看两个分支之间提交记录的差异
+查看当前分支最新提交相对于 origin/main 分支的提交记录差异 
+```bash
+$ git log --oneline origin/main..HEAD
+```
+
+查看 origin/main 相对于当前分支最新提交记录差异 
+```bash
+$ git log --oneline HEAD..origin/main
 ```
 
 ## 注意事项
@@ -2494,15 +2481,16 @@ Switch to topic/wip branch and keep working.
 ### Split a commit apart into a sequence of commits
 > [Git - git-reset Documentation](https://git-scm.com/docs/git-reset#Documentation/git-reset.txt-Splitacommitapartintoasequenceofcommits) 
 
-### 使用示例
+### 撤销远程的提交
+本地提交后 Push 到远程，本地用 git reset --soft HEAD^ 撤销了最近一次提交，如果远程该分支只有自己用，可以 git push --force 覆盖远程提交记录。
 
-- **撤销最后一次提交**：
+### **撤销最后一次提交**
   ```bash
   git reset --soft HEAD~1
   ```
   这个命令将 HEAD 指针移动到上一次提交，但保留工作目录和暂存区的状态。
 
-- **撤销最后一次提交并重置暂存区**：
+### **撤销最后一次提交并重置暂存区**
   ```bash
   git reset --mixed HEAD~1
   ```
@@ -2512,7 +2500,7 @@ Switch to topic/wip branch and keep working.
   ```
   这些命令将 HEAD 指针移动到上一次提交，并重置暂存区，但保留工作目录的状态。
 
-- **撤销最后一次提交并恢复工作目录**：
+### **撤销最后一次提交并恢复工作目录**
   ```bash
   git reset --hard HEAD~1
   ```
