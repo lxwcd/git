@@ -6,6 +6,7 @@
 > git 命令官方文档：[git](https://git-scm.com/docs/)  
 > git book：[Pro Git book](https://git-scm.com/book/en/v2)  
 > [Learn Git Branching](https://learngitbranching.js.org/?locale=zh_CN) 
+> [Git 教程 - Rebase](https://www.delftstack.com/zh/tutorial/git/git-rebase/) 
 > [Learn Git and GitHub](https://roadmap.sh/git-github) 
       
 # git 介绍
@@ -89,7 +90,10 @@
 
 通过使用 `git config --system`，你可以为整个系统设置统一的 Git 配置，确保所有用户和仓库都遵循相同的规则和行为。这种方法在管理多用户环境或确保一致性时非常有用。
 
-## `git config --local`
+## global and local level
+`git config --local` 和 `git config --global` 是 Git 配置命令的两个选项，它们用于指定配置的范围。这两个选项的主要区别在于它们应用配置的层级和影响范围。下面详细解释这两个选项的区别：
+
+### `git config --local`
 
 - **作用范围**：`--local` 选项用于设置特定 Git 仓库的配置。这些配置仅适用于当前仓库，不会影响其他仓库或全局 Git 配置。
 - **配置文件位置**：使用 `--local` 时，配置信息存储在当前仓库的 `.git/config` 文件中。每个 Git 仓库都有自己的 `.git` 目录，其中包含该仓库的配置文件。
@@ -100,16 +104,21 @@
   ```
   这个命令会将 `user.email` 配置设置为 `local@example.com`，但仅适用于当前仓库。
 
-## `git config --global`
+### `git config --global`
 
 - **作用范围**：`--global` 选项用于设置全局 Git 配置。这些配置适用于当前用户的所有 Git 仓库。
 - **配置文件位置**：使用 `--global` 时，配置信息存储在用户的主目录下的 `.gitconfig` 文件中（例如，`~/.gitconfig`）。这个文件包含了适用于所有仓库的全局配置。
-- **使用场景**：当想要为所有项目设置统一的配置选项时（例如，全局的用户名或编辑器），使用 `--global` 是合适的。这样，你不需要在每个项目中重复设置相同的配置。
+- **使用场景**：当你想要为所有项目设置统一的配置选项时（例如，全局的用户名或编辑器），使用 `--global` 是合适的。这样，你不需要在每个项目中重复设置相同的配置。
 - **示例命令**：
   ```bash
   git config --global user.email "global@example.com"
   ```
   这个命令会将 `user.email` 配置设置为 `global@example.com`，适用于当前用户的所有仓库。
+
+### 总结
+
+- **`--local`**：特定于单个仓库的配置，存储在 `.git/config` 中。
+- **`--global`**：特定于用户的全局配置，存储在 `~/.gitconfig` 中。
 
 ## 查看全局配置信息  
 ```bash  
@@ -192,7 +201,6 @@ log.date=local
 这些设置的主要目的是在不同操作系统之间协作时，确保文件的换行符保持一致，从而避免因换行符不一致导致的合并冲突和其他问题。
 
 windows 上配置后有点问题，暂未使用。
-
 ### 对于 Unix/Mac 用户
 
 1. **`git config --global core.autocrlf input`**：
@@ -247,9 +255,10 @@ git config --global https.proxy https://192.168.0.119:7890
 ```cpp
 git config --global --list --show-origin
 ```
-`git config --show-origin` 允许查看 Git 配置项及其来源文件。
+`git config --show-origin` 是一个非常有用的命令，它允许你查看 Git 配置项及其来源文件。这个命令可以帮助你理解每个配置项是从哪个配置文件中读取的。
 
 - **显示配置来源**：`--show-origin` 选项用于显示每个配置项的来源，即配置项是从哪个文件中读取的。这包括文件路径、标准输入、blob 或命令行等来源。
+
 - **调试配置问题**：当你不确定某个配置项是从哪个文件中读取时，使用 `--show-origin` 可以帮助你找到答案。
 - **查看配置文件路径**：通过显示配置项的来源，你可以快速找到相关的配置文件路径。
 
@@ -286,11 +295,13 @@ git config --global --list --show-origin
 
 在 Git Bash 中，`/etc/vimrc` 的路径是一个模拟的路径，它映射到 Windows 系统中的一个实际位置。这样做是为了保持与 Unix 和 Linux 环境的兼容性，使得 Unix 和 Linux 用户能够在 Windows 上的 Git Bash 中使用他们熟悉的 Vim 配置。
 
+最后两行的意思是：
+
 1. **fall-back for $VIM: "/etc"**
-   - 表示如果环境变量 `$VIM` 没有设置，Git Bash 会回退到 "/etc" 目录来查找 Vim 相关的配置和文件。这是一个备用方案，以防 `$VIM` 环境变量未定义。
+   - 这行表示如果环境变量 `$VIM` 没有设置，Git Bash 会回退到 "/etc" 目录来查找 Vim 相关的配置和文件。这是一个备用方案，以防 `$VIM` 环境变量未定义。
 
 2. **f-b for $VIMRUNTIME: "/usr/share/vim/vim91"**
-   - `$VIMRUNTIME` 是另一个环境变量，它指向 Vim 的运行时文件，包括语法文件、脚本等。这行表示如果 `$VIMRUNTIME` 没有设置，Git Bash 会使用 "/usr/share/vim/vim91" 作为默认路径。
+   - `$VIMRUNTIME` 是另一个环境变量，它指向 Vim 的运行时文件，包括语法文件、脚本等。这行表示如果 `$VIMRUNTIME` 没有设置，Git Bash 会使用 "/usr/share/vim/vim91" 作为默认路径。这里的 "vim91" 可能指的是 Vim 的某个特定版本，例如 8.1 版本。
 
 下载 [vimrc 文件](https://github.com/lxwcd/learnVim/blob/main/vimrc.local) 重命名到 `$HOME/.vimrc`，退出后重新进入即可生效。
 
@@ -332,20 +343,25 @@ if &term =~ "xterm\\|rxvt"
   let &t_EI .= "\<Esc>[2 q"  " EI = NORMAL mode (ELSE)
 endif
 ```
-
 ### 复制到系统剪贴板
-在 linux 中没必要做这个配置，git bash 中可以配置，见[linux 中配置](https://github.com/lxwcd/learnVim/blob/main/notes/vim学习笔记.md#与系统剪贴板互动)。
-
-git bash 中如下配置，选中后使用 `"+ y` 复制内容，即复制到系统剪贴板。
+选中后使用 `"+ y` 复制内容，即复制到系统剪贴板。
 ```bash
 set clipboard=unnamedplus
 ```
-`set clipboard=unnamedplus` 是 Vim 中的一个配置选项，用于指定 Vim 如何与系统剪贴板交互。
+`set clipboard=unnamedplus` 是 Vim 中的一个配置选项，用于指定 Vim 如何与系统剪贴板交互。下面是这个配置选项的详细解释：
 
-- Vim 的 `clipboard` 选项控制 Vim 如何使用系统剪贴板。通过设置这个选项，你可以让 Vim 的复制（yank）和粘贴（paste）操作直接与系统剪贴板进行交互。
-- `unnamedplus` 是 `clipboard` 选项的一个值，它告诉 Vim 使用系统剪贴板作为复制和粘贴操作的存储。在 Vim 中，`"+` 寄存器通常与系统剪贴板相关联，而 `unnamedplus` 使得这个寄存器的行为与系统剪贴板一致。
-- 当设置了 `set clipboard=unnamedplus`，Vim 会将复制（yank）操作的内容存储到 `"+` 寄存器，这个寄存器与系统剪贴板同步。因此，当你在 Vim 中复制文本时，它也会出现在系统剪贴板上，你可以在其他程序中粘贴。
-- 同样地，从系统剪贴板粘贴（paste）文本到 Vim 中时，Vim 会从 `"+` 寄存器读取内容。
+1. **`clipboard` 选项**：
+   - Vim 的 `clipboard` 选项控制 Vim 如何使用系统剪贴板。通过设置这个选项，你可以让 Vim 的复制（yank）和粘贴（paste）操作直接与系统剪贴板进行交互。
+
+2. **`unnamedplus` 的含义**：
+   - `unnamedplus` 是 `clipboard` 选项的一个值，它告诉 Vim 使用系统剪贴板作为复制和粘贴操作的存储。在 Vim 中，`"+` 寄存器通常与系统剪贴板相关联，而 `unnamedplus` 使得这个寄存器的行为与系统剪贴板一致。
+
+3. **如何工作**：
+   - 当你设置了 `set clipboard=unnamedplus`，Vim 会将复制（yank）操作的内容存储到 `"+` 寄存器，这个寄存器与系统剪贴板同步。因此，当你在 Vim 中复制文本时，它也会出现在系统剪贴板上，你可以在其他程序中粘贴。
+   - 同样地，从系统剪贴板粘贴（paste）文本到 Vim 中时，Vim 会从 `"+` 寄存器读取内容。
+
+4. **在 Linux 中的配置**：
+   - 这个配置同样适用于 Linux 系统。在 Linux 系统中，`"+` 寄存器可能与 X11 的 CLIPBOARD 选区相关联，这取决于你的桌面环境和配置。在大多数现代 Linux 发行版中，`"+` 寄存器用于系统剪贴板操作。
 
 5. **检查 Vim 是否支持剪贴板**：
    - 可以使用 `vim --version | grep clipboard` 命令来检查你的 Vim 是否支持剪贴板功能。如果输出中包含 `+clipboard`，则表示支持。
