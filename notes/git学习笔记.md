@@ -1,4 +1,4 @@
-﻿git 学习  
+git 学习  
       
 # 学习资源  
 > 初步了解 git：[廖雪峰 Git 教程](https://www.liaoxuefeng.com/wiki/896043488029600)  
@@ -1765,11 +1765,23 @@ git commit -m "Remove example.txt"
 1. **查看提交历史**：`git log` 显示项目的提交历史记录，包括提交信息、作者、日期等。
 2. **过滤和格式化**：通过各种选项，可以过滤特定的提交记录、格式化输出内容等。
 
-## 使用场景
+## 选项
 
-- **查看项目历史**：当你需要了解项目的更改历史时，可以使用 `git log`。
-- **追踪更改**：如果需要追踪特定文件或目录的更改历史，`git log` 可以提供详细的信息。
-- **调试问题**：在调试问题时，查看提交历史可以帮助你找到引入问题的提交。
+- **`--summary`**：显示每个提交的简要总结。
+- **`--stat`**：显示每个提交的统计信息，包括文件更改数量。
+- **`--shortstat`**：以更简洁的格式显示统计信息。
+- **`--name-only`**：仅显示提交中更改的文件名。
+- **`--name-status`**：显示文件名及其更改状态（如 A 表示添加，M 表示修改）。
+- **`--pretty=format:"<format>"`**：自定义输出格式。例如：
+  ```bash
+  git log --pretty=format:"%h - %an, %ar : %s"
+  ```
+  这个命令自定义输出格式，显示提交哈希、作者、日期和提交信息。
+- **`--oneline`**：每个提交显示为一行，包含提交哈希和提交信息。
+- **`--graph`**：以图形方式显示提交历史，帮助理解分支和合并关系。
+- **`--since` 和 `--until`**：过滤自指定日期以来的提交记录。
+- **`--author`**：过滤指定作者的提交记录。
+- **`--grep`**：过滤包含特定文本的提交信息。
 
 ## **查看所有提交**
   ```bash
@@ -1789,27 +1801,9 @@ git commit -m "Remove example.txt"
   ```
   这个命令显示指定文件的提交历史。
 
-## 选项
-
-- **`--summary`**：显示每个提交的简要总结。
-- **`--stat`**：显示每个提交的统计信息，包括文件更改数量。
-- **`--shortstat`**：以更简洁的格式显示统计信息。
-- **`--name-only`**：仅显示提交中更改的文件名。
-- **`--name-status`**：显示文件名及其更改状态（如 A 表示添加，M 表示修改）。
-- **`--pretty=format:"<format>"`**：自定义输出格式。例如：
-  ```bash
-  git log --pretty=format:"%h - %an, %ar : %s"
-  ```
-  这个命令自定义输出格式，显示提交哈希、作者、日期和提交信息。
-- **`--oneline`**：每个提交显示为一行，包含提交哈希和提交信息。
-- **`--graph`**：以图形方式显示提交历史，帮助理解分支和合并关系。
-- **`--since` 和 `--until`**：过滤自指定日期以来的提交记录。
-- **`--author`**：过滤指定作者的提交记录。
-- **`--grep`**：过滤包含特定文本的提交信息。
-
 ## 查看差异（Patch）
 
-使用`-p`或`--patch`参数，我们可以查看每个提交的具体差异：
+使用`-p`或`--patch`参数，可以查看每个提交的具体差异：
 
 ```bash
 $ git log -p
@@ -1986,19 +1980,7 @@ git diff main@{0} main@{1.day.ago}
 # git show
 > [Git - git-show Documentation](https://git-scm.com/docs/git-show) 
 
-`git show` 是一个非常强大的 Git 命令，用于展示各种 Git 对象的详细内容，包括提交（commit）、标签（tag）和分支（branch）。
-
-## 基本用法
-
-1. **查看提交详情**
-   - `git show <commit>`：显示指定提交的详细信息，包括作者、日期、提交信息和具体的 diff（差异）。
-   - `git show HEAD`：显示当前分支的最新提交的详细信息。
-
-2. **查看标签详情**
-   - `git show <tag>`：显示指定标签的详细信息，包括标签信息和指向的提交。
-
-3. **查看分支比较**
-   - `git show <branch>`：显示指定分支的最新提交的详细信息。
+`git show` 用于展示各种 Git 对象的详细内容，包括提交（commit）、标签（tag）和分支（branch）。
 
 ## 常用选项
 
@@ -2042,39 +2024,47 @@ git diff main@{0} main@{1.day.ago}
     - 使用文本转换过滤器处理文件的差异。
 
 14. **`--word-diff`**
-    - 显示单词级别的差异。
+- 显示单词级别的差异。
 
-### 示例
+## **查看提交详情**
+- `git show <commit>`：显示指定提交的详细信息，包括作者、日期、提交信息和具体的 diff（差异）。
+- `git show HEAD`：显示当前分支的最新提交的详细信息。
 
-- 查看最新提交的详细信息：
-  ```bash
-  git show HEAD
-  ```
+## **查看标签详情**
+- `git show <tag>`：显示指定标签的详细信息，包括标签信息和指向的提交。
 
-- 查看特定提交的文件列表：
-  ```bash
-  git show --name-only <commit>
-  ```
+## **查看分支比较**
+- `git show <branch>`：显示指定分支的最新提交的详细信息。
 
-- 查看特定提交的统计信息：
-  ```bash
-  git show --stat <commit>
-  ```
+## **查看最新提交的详细信息**
+```bash
+git show HEAD
+```
 
-- 查看特定提交的简要统计信息：
-  ```bash
-  git show --shortstat <commit>
-  ```
+## **查看特定提交的文件列表**
+```bash
+git show --name-only <commit>
+```
 
-- 查看特定提交的差异，不包括文件内容：
-  ```bash
-  git show --pretty=raw <commit>
-  ```
+## **查看特定提交的统计信息**
+```bash
+git show --stat <commit>
+```
 
-- 查看特定提交的 SHA-1 哈希值和提交信息：
-  ```bash
-  git show --oneline <commit>
-  ```
+## **查看特定提交的简要统计信息**
+```bash
+git show --shortstat <commit>
+```
+
+## **查看特定提交的差异，不包括文件内容**
+```bash
+git show --pretty=raw <commit>
+```
+
+## **查看特定提交的 SHA-1 哈希值和提交信息**
+```bash
+git show --oneline <commit>
+```
 
 # HEAD 
 > [Git - Reset Demystified](https://git-scm.com/book/en/v2/Git-Tools-Reset-Demystified#_git_reset)      
@@ -4326,4 +4316,37 @@ git reset <commit-hash> -- <file-path>
 
 ```bash
 git checkout -- <file-path>
+```
+
+## 查看两个分支之间提交日志的差异
+### 查看分支 branch02 相对 branch01 有哪些新的提交
+```bash
+$ git log branch01..branch02 --oneline
+34cf81fb9 (HEAD -> branch03) test03
+8c5435155 test02
+eecf45b89 test01
+```
+
+### 查看最下面一个提交所涉及的文件
+```bash
+$ git log develop..HEAD --oneline | tail -n 1 | awk '{print $1}' | xargs git show --name-only
+commit eecf45b892ec8a5250636a30ad7af4ac7cc0e31b
+Author: lx <15521168075@163.com>
+Date:   Fri Jan 3 15:29:04 2025
+
+    modify test code
+
+demo/test.md
+```
+
+### 查看差异倒数第二个提交的文件修改状态
+```bash
+$ git log develop..HEAD --oneline | awk 'NR==2 {print$1}' | xargs git show --name-status
+commit 8c54351552e0267726c82aa7b9f40357a883ee58
+Author: lx <15521168075@163.com>
+Date:   Mon Jan 6 15:10:04 2025
+
+    add test text
+
+M       demo/test.md
 ```
