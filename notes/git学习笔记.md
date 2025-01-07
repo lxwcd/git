@@ -3214,7 +3214,7 @@ git add *.cpp
 2. **不自动合并**：与 `git pull` 不同，`git fetch` 只是下载更新，不会自动合并到你的当前分支。这允许你在合并之前检查远程更改。
 3. **更新远程跟踪分支**：`git fetch` 会更新本地的远程跟踪分支（如 `origin/master`），使其反映远程仓库的当前状态。
 
-`git fetch` 是一个非常重要的 Git 命令，用于从远程仓库获取数据到你的本地仓库。这个命令不会改变你的工作目录，它只是将远程仓库的最新状态下载到你的本地仓库中。以下是 `git fetch` 的详细解释和一些实际使用场景的例子。
+`git fetch` 是一个非常重要的 Git 命令，用于从远程仓库获取数据到你的本地仓库。这个命令不会改变你的工作目录，它只是将远程仓库的最新状态下载到你的本地仓库中。
 
 ## **获取远程仓库的所有分支的最新状态**
 ```bash
@@ -3282,27 +3282,9 @@ git fetch origin develop
   git rebase origin/develop
   ```
 
-## 合并远程分支
-
-1. **合并远程分支到本地分支**：
-   ```bash
-   git fetch origin
-   git merge origin/develop
-   ```
-   首先，使用 `git fetch` 获取 `origin` 远程仓库的所有分支的最新状态，然后使用 `git merge` 将 `origin/develop` 分支合并到当前本地分支。
-
-## 拉取远程分支
-
-1. **拉取远程分支并自动合并**：
-   ```bash
-   git pull origin develop
-   ```
-   `git pull` 命令实际上是 `git fetch` 后跟 `git merge` 的简写。这个命令会获取 `origin/develop` 分支的最新状态，并自动合并到当前本地分支。
-
 ## 使用场景
 
 1. **保持本地分支与远程同步**：
-   假设你正在处理一个特性分支，并且想要确保你的本地分支与远程分支保持最新。
    ```bash
    git fetch origin
    git checkout feature-x
@@ -3311,14 +3293,14 @@ git fetch origin develop
    这个流程确保你在本地 `feature-x` 分支上合并了远程分支的最新更改。
 
 2. **准备拉取最新更改**：
-   在你准备开始工作之前，你可能想要拉取远程仓库的最新更改，以便你的本地仓库包含最新的提交。
+   在准备开始工作之前，拉取远程仓库的最新更改，以便本地仓库包含最新的提交。
    ```bash
    git fetch origin
    ```
    这个命令让你可以看到远程分支的最新状态，但不会自动合并到你的当前分支。
 
 3. **检查远程分支的提交**：
-   如果你想要查看远程分支上有哪些新的提交，但不打算立即合并它们，你可以使用：
+   如果你想要查看远程分支上有哪些新的提交，但不打算立即合并它们：
    ```bash
    git fetch origin
    git log origin/develop..
@@ -3326,12 +3308,12 @@ git fetch origin develop
    这个命令会显示从本地 `develop` 分支落后于远程 `origin/develop` 分支的所有提交。
 
 4. **处理冲突前的准备**：
-   在合并远程分支之前，你可能想要检查是否会有冲突：
+   在合并远程分支之前，检查是否会有冲突：
    ```bash
    git fetch origin
    git diff --name-only origin/develop
    ```
-   这个命令会显示本地 `develop` 分支和远程 `origin/develop` 分支之间的差异，帮助你在合并之前识别潜在的冲突。
+   这个命令会显示本地 `develop` 分支和远程 `origin/develop` 分支之间的差异，帮助在合并之前识别潜在的冲突。
 
 ## 选项
 
@@ -3355,7 +3337,7 @@ git config --global fetch.prune true
    - `git fetch --prune` 命令的功能是获取远程仓库的最新状态，并同步到本地。同时，它会检查本地的远程分支引用，如果远程分支已经被删除，那么对应的本地引用也会被删除。
 
 2. **使用场景**：
-   - 当你在一个团队中工作时，可能会有分支被合并后删除，或者不再需要的分支被移除。使用 `git fetch --prune` 可以确保你的本地仓库不会保留这些已经不存在的远程分支的引用。
+   - 当在一个团队中工作时，可能会有分支被合并后删除，或者不再需要的分支被移除。使用 `git fetch --prune` 可以确保你的本地仓库不会保留这些已经不存在的远程分支的引用。
 
 3. **命令组合**：
    - `git fetch --prune` 实际上等同于先执行 `git fetch --all` 来获取所有远程分支的最新状态，然后执行 `git remote prune origin` 来删除那些在远程仓库中已经不存在的分支的本地引用。
@@ -3381,95 +3363,6 @@ git config --global fetch.prune true
 - **检查远程更改**：在合并远程更改之前，使用 `git fetch` 检查远程仓库的最新状态。
 - **更新远程跟踪分支**：定期使用 `git fetch` 更新本地的远程跟踪分支，以保持与远程仓库的同步。
 - **避免合并冲突**：在合并远程更改之前，使用 `git fetch` 下载更新，然后手动检查和解决潜在的合并冲突。
-
-## 示例
-
-假设你想要从名为 `origin` 的远程仓库获取 `master` 分支的最新更新：
-
-```bash
-git fetch origin master
-```
-
-这个命令会下载 `origin` 仓库中 `master` 分支的最新更改，但不会自动合并到你的当前分支。
-
-## 注意事项
-
-- **不影响当前工作**：`git fetch` 不会改变你的当前工作目录或暂存区，它只是更新远程跟踪分支。
-- **与 `git pull` 的区别**：`git pull` 是 `git fetch` 加上 `git merge` 的组合，它会下载远程更新并自动合并到你的当前分支。
-
-通过 `git fetch`，你可以有效地获取远程仓库的最新更新，而不必立即合并这些更改。这使得 `git fetch` 成为检查远程更改和更新远程跟踪分支的有用工具。
-
-# 切换到远程仓库的新分支
-
-## 1. 获取远程分支列表
-
-首先，你需要获取远程仓库的最新分支列表。这可以通过运行以下命令来完成：
-
-```bash
-git fetch --all
-lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (main)
-$ git fetch --all
-From https://github.com/lxwcd/git_test
- * [new branch]      remote_branch01 -> origin/remote_branch01
-```
-
-这个命令会从所有配置的远程仓库获取更新，但不会自动合并到你的当前分支。它会更新本地的远程跟踪分支，使其反映远程仓库的当前状态。
-
-## 2. 列出远程分支
-
-接下来，你可以列出所有远程分支，以确认新添加的分支名称：
-
-```bash
-lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (main)
-$ git branch -r
-  origin/main
-  origin/remote_branch01
-```
-
-这个命令会显示所有远程跟踪分支的列表。
-
-## 3. 切换到新分支
-
-切换到一个已经存在的远程分支，如果本地没有对应的跟踪分支，Git 会自动创建一个。
-执行这个命令后，你的本地工作目录会切换到指定的远程分支。如果本地没有这个分支的跟踪信息，Git 会自动为你设置一个本地分支来跟踪远程分支。
-
-```bash
-git checkout <new-branch-name>
-```
-
-将 `<new-branch-name>` 替换为远程仓库中新添加的分支名称。
-
-## 4. 创建本地分支（如果需要）
-
-如果你希望在本地创建一个新分支来跟踪远程分支，可以使用以下命令：
-
-```bash
-git checkout -b <local-branch-name> <remote-name>/<new-branch-name>
-```
-
-将 `<local-branch-name>` 替换为你想要的本地分支名称，`<remote-name>` 替换为远程仓库的名称（如 `origin`），`<new-branch-name>` 替换为远程分支的名称。
-执行这个命令后，Git 会在本地创建一个新的分支 <local-branch-name>，并将其设置为跟踪远程分支 <remote-name>/<new-branch-name>。然后，你的工作目录会切换到这个新创建的本地分支。
-
-```bash
-lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (main)
-$ git checkout -b remote_branch01 origin/remote_branch01
-Switched to a new branch 'remote_branch01'
-branch 'remote_branch01' set up to track 'origin/remote_branch01'.
-```
-
-## 5. 确认分支切换
-
-最后，你可以使用 `git branch` 命令确认你已经切换到了正确的分支：
-
-```bash
-lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (remote_branch01)
-$ git branch -a
-  feature01
-  main
-* remote_branch01
-  remotes/origin/main
-  remotes/origin/remote_branch01
-```
 
 # git push
 > [Pushing commits to a remote repository - GitHub Docs](https://docs.github.com/en/get-started/using-git/pushing-commits-to-a-remote-repository) 
@@ -3747,8 +3640,26 @@ git pull
 通过这种方式，`git rebase --onto` 允许你在不合并提交记录的情况下，将一个分支上的更改应用到另一个分支上，使得项目的历史更加清晰和线性。
 
 # git merge
+> [Git - git-merge Documentation](https://git-scm.com/docs/git-merge) 
 
-## git merge --squash
+## --no-commit
+> [Git - git-merge Documentation](https://git-scm.com/docs/git-merge#Documentation/git-merge.txt---no-commit) 
+
+## --ff
+
+## --squash
+
+## --aboart
+
+## --continue
+
+## -X 合并策略
+> [Git - git-merge Documentation](https://git-scm.com/docs/git-merge#_merge_strategies) 
+
+### ort
+
+
+
 
 
 # git prune
@@ -3862,6 +3773,78 @@ git reset 8e041c9 # 这里模式 --soft --mixed --hard 根据实际需求选择
 提交到远程仓库：  
 ```bash  
 git push origin main --force  # brance name 通过 git branch --show-current 查看  
+```
+
+# 切换到远程仓库的新分支
+
+## 1. 获取远程分支列表
+
+获取远程仓库的最新分支列表：
+
+```bash
+git fetch --all
+lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (main)
+$ git fetch --all
+From https://github.com/lxwcd/git_test
+ * [new branch]      remote_branch01 -> origin/remote_branch01
+```
+
+这个命令会从所有配置的远程仓库获取更新，但不会自动合并到你的当前分支。它会更新本地的远程跟踪分支，使其反映远程仓库的当前状态。
+
+## 2. 列出远程分支
+
+接下来，可以列出所有远程分支，以确认新添加的分支名称：
+
+```bash
+lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (main)
+$ git branch -r
+  origin/main
+  origin/remote_branch01
+```
+
+这个命令会显示所有远程跟踪分支的列表。
+
+## 3. 切换到新分支
+
+切换到一个已经存在的远程分支，如果本地没有对应的跟踪分支，Git 会自动创建一个。
+执行这个命令后，你的本地工作目录会切换到指定的远程分支。如果本地没有这个分支的跟踪信息，Git 会自动为你设置一个本地分支来跟踪远程分支。
+
+```bash
+git checkout <new-branch-name>
+```
+
+将 `<new-branch-name>` 替换为远程仓库中新添加的分支名称。
+
+## 4. 创建本地分支（如果需要）
+
+如果你希望在本地创建一个新分支来跟踪远程分支，可以使用以下命令：
+
+```bash
+git checkout -b <local-branch-name> <remote-name>/<new-branch-name>
+```
+
+将 `<local-branch-name>` 替换为你想要的本地分支名称，`<remote-name>` 替换为远程仓库的名称（如 `origin`），`<new-branch-name>` 替换为远程分支的名称。
+执行这个命令后，Git 会在本地创建一个新的分支 <local-branch-name>，并将其设置为跟踪远程分支 <remote-name>/<new-branch-name>。然后，你的工作目录会切换到这个新创建的本地分支。
+
+```bash
+lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (main)
+$ git checkout -b remote_branch01 origin/remote_branch01
+Switched to a new branch 'remote_branch01'
+branch 'remote_branch01' set up to track 'origin/remote_branch01'.
+```
+
+## 5. 确认分支切换
+
+最后，你可以使用 `git branch` 命令确认你已经切换到了正确的分支：
+
+```bash
+lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (remote_branch01)
+$ git branch -a
+  feature01
+  main
+* remote_branch01
+  remotes/origin/main
+  remotes/origin/remote_branch01
 ```
 
 # 合并到错误的分支解决
