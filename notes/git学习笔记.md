@@ -1760,7 +1760,9 @@ git commit -m "Remove example.txt"
 > [Git - Viewing the Commit History](https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History) 
 > [Git Log Command Explained](https://www.freecodecamp.org/news/git-log-command/) 
 
-`git log` 是 Git 中用于查看提交历史的命令。它提供了丰富的选项来查看和过滤提交记录，是理解项目历史和追踪更改的重要工具。
+List commits that are reachable by following the parent links from the given commit(s), but exclude commits that are reachable from the one(s) given with a ^ in front of them. The output is given in reverse chronological order by default.
+
+You can think of this as a set operation. Commits reachable from any of the commits given on the command line form a set, and then commits reachable from any of the ones given with ^ in front are subtracted from that set. The remaining commits are what comes out in the command’s output. Various other options and paths parameters can be used to further limit the result.
 
 1. **查看提交历史**：`git log` 显示项目的提交历史记录，包括提交信息、作者、日期等。
 2. **过滤和格式化**：通过各种选项，可以过滤特定的提交记录、格式化输出内容等。
@@ -1784,52 +1786,108 @@ git commit -m "Remove example.txt"
 - **`--grep`**：过滤包含特定文本的提交信息。
 
 ## **查看所有提交**
-  ```bash
-  git log
-  ```
-  这个命令显示项目的完整提交历史。
+```bash
+git log
+```
+这个命令显示项目的完整提交历史，默认按照时间顺序，从最新的开始显示。
 
 ## **查看特定分支的提交**
-  ```bash
-  git log <branch-name>
-  ```
-  这个命令显示指定分支的提交历史。
+```bash
+git log <branch-name>
+```
+这个命令显示指定分支的提交历史。
+
+## **查看不同分支差异**
+```bash
+$ git log foo bar ^baz
+```
+上面命令查看那些可达于 foo 或 bar 分支最新提交，但不可达于 baz 的提交。即列出那些在 foo 或 bar 分支上存在，但在 baz 分支上不存在的提交。
+
+## **查看一个分支相对于另一个分支的提交差异**
+### git log branch1..branch2
+```bash
+$ git log origin..HEAD --oneline
+```
+HEAD 当前分支最新提交相对于 origin 分支最新提交的提交记录，即 HEAD 有但 origin 没有的提交记录
+和下面命令功能相同：
+```bash
+$ git log HEAD ^origin --oneline
+```
 
 ## **查看特定文件的提交**
-  ```bash
-  git log <file>
-  ```
-  这个命令显示指定文件的提交历史。
-
-## 查看差异（Patch）
-
-使用`-p`或`--patch`参数，可以查看每个提交的具体差异：
+```bash
+git log <file>
+```
+这个命令显示指定文件的提交历史。
 
 ```bash
-$ git log -p
+$ git log -3 --oneline  demo/test.md
+748d2f6b4 modify test.md
+75844c6a5 modify test.md
+d3c488765 modify test.md
 ```
 
-这将显示每个提交的详细差异，包括文件的增删改。
+## **指定输出日志数目**
+```bash
+git log -3
+```
+输出日志显示最新的 3 条
 
-## 限制显示条目
+## **查看提交差异 --patch**
+> [Git - Viewing the Commit History](https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History) 
 
-如果只想看最后两个提交的差异，可以使用`-2`参数：
-
+使用`-p`或`--patch`参数，可以查看每个提交的具体差异，下面是官方文档示例：
 ```bash
 $ git log -p -2
+commit ca82a6dff817ec66f44342007202690a93763949
+Author: Scott Chacon <schacon@gee-mail.com>
+Date:   Mon Mar 17 21:52:11 2008 -0700
+
+    Change version number
+
+diff --git a/Rakefile b/Rakefile
+index a874b73..8f94139 100644
+--- a/Rakefile
++++ b/Rakefile
+@@ -5,7 +5,7 @@ require 'rake/gempackagetask'
+ spec = Gem::Specification.new do |s|
+     s.platform  =   Gem::Platform::RUBY
+     s.name      =   "simplegit"
+-    s.version   =   "0.1.0"
++    s.version   =   "0.1.1"
+     s.author    =   "Scott Chacon"
+     s.email     =   "schacon@gee-mail.com"
+     s.summary   =   "A simple gem for using Git in Ruby code."
+
+commit 085bb3bcb608e1e8451d4b2432f8ecbe6306e7e7
+Author: Scott Chacon <schacon@gee-mail.com>
+Date:   Sat Mar 15 16:40:33 2008 -0700
+
+    Remove unnecessary test
 ```
 
-## 统计信息
+这将显示最新两个提交的详细差异，包括文件的增删改。
+其中 a 表示该提交前的版本，b 表示该提交后的版本。
+`@@` 标记差异的开始，对于提交前的 a 版本，从第 5 行开始的 7 行内容，对于提交后的 b 版本，从第 5 行开始的 7 行内容。
+`-` 表示原始版本中存在但新版本被删除的行，`+` 表示原始版本没有 ，新版本添加的行。
 
-`--stat`参数可以显示每个提交影响的文件和行数：
+## **统计信息 --stat**
 
 ```bash
-$ git log --stat
-```
+$ git log -1 --stat
+commit 740e65b2fd98f0b99f3bcfd8dc8e1b8ad8bb6a3f (HEAD -> feature)
+Author: lxw <15521168075@163.com>
+Date:   Thu Jan 9 13:09:24 2025
 
+    modify test.md
+
+ demo/test.md | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+```
 这将显示每个提交修改的文件列表、文件数量变化以及添加和删除的行数统计。
 
-## 自定义格式
+
+## **自定义格式 --pretty**
 
 使用`--pretty`参数，我们可以自定义日志的显示格式。例如，`oneline`将每个提交显示在一行上：
 
@@ -1845,9 +1903,9 @@ ca82a6dff817ec66f44342007202690a93763949 Change version number
 a11bef06a3f659402fe7563abf99ad00de2209e6 Initial commit
 ```
 
-## 格式化输出
+## **格式化输出 --pretty=format**
 
-`--pretty=format`允许我们自定义输出格式。例如，我们可以这样显示提交的哈希值、作者和提交信息：
+`--pretty=format`允许自定义输出格式。例如，显示提交的哈希值、作者和提交信息：
 
 ```bash
 $ git log --pretty=format:"%h - %an, %ar : %s"
@@ -1861,17 +1919,17 @@ ca82a6d - Scott Chacon, 6 years ago : Change version number
 a11bef0 - Scott Chacon, 6 years ago : Initial commit
 ```
 
-## 分支和合并历史
-
-`--graph`参数可以显示分支和合并历史的ASCII图形：
+## **ASCII 图形显示历史 --graph**
 
 ```bash
-$ git log --pretty=format:"%h %s" --graph
+$ git log --pretty=format:"%h %s" --graph -5
 ```
 
-这将显示一个ASCII图形，展示了分支和合并的历史。
+## 筛选提交历史
+> [Git - git-log Documentation](https://git-scm.com/docs/git-log#_commit_limiting) 
 
-## 时间限制
+
+## **时间限制**
 
 `--since`和`--until`参数可以用来限制显示特定时间范围内的提交：
 
