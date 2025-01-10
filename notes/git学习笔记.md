@@ -1,4 +1,4 @@
-git 学习  
+﻿git 学习  
       
 # 学习资源  
 > 初步了解 git：[廖雪峰 Git 教程](https://www.liaoxuefeng.com/wiki/896043488029600)  
@@ -1886,7 +1886,6 @@ Date:   Thu Jan 9 13:09:24 2025
 ```
 这将显示每个提交修改的文件列表、文件数量变化以及添加和删除的行数统计。
 
-
 ## **自定义格式 --pretty**
 
 使用`--pretty`参数，我们可以自定义日志的显示格式。例如，`oneline`将每个提交显示在一行上：
@@ -1904,6 +1903,7 @@ a11bef06a3f659402fe7563abf99ad00de2209e6 Initial commit
 ```
 
 ## **格式化输出 --pretty=format**
+> [Git - Viewing the Commit History](https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History#pretty_format) 
 
 `--pretty=format`允许自定义输出格式。例如，显示提交的哈希值、作者和提交信息：
 
@@ -1925,11 +1925,37 @@ a11bef0 - Scott Chacon, 6 years ago : Initial commit
 $ git log --pretty=format:"%h %s" --graph -5
 ```
 
-## 筛选提交历史
-> [Git - git-log Documentation](https://git-scm.com/docs/git-log#_commit_limiting) 
+## **显示提交的引用信息 --decorate**
+从 Git 2.10 版本开始，`--decorate` 选项默认是开启的。
+如果你希望关闭 `--decorate` 选项，可以使用 `--no-decorate`：
+```bash
+git log --no-decorate -1
+```
+这个命令会显示最近一次提交的详细信息，但不会显示指向该提交的引用名称。
 
+假设你有以下提交历史：
+```bash
+A -- B -- C -- D -- E
+       \         /
+        F-------G
+```
+执行 `git log --decorate -1`：
+```bash
+commit 9aaa1c654b076de24c529ce46d3c4d95211a2871 (HEAD -> fix_B, branch01)
+Author: lxwcd <15521168075@163.com>
+Date:   Thu Dec 19 21:43:41 2024 +0800
+
+    fix B
+```
+在这个例子中：
+- `9aaa1c654b076de24c529ce46d3c4d95211a2871` 是当前提交的哈希值。
+- `(HEAD -> fix_B, branch01)` 表示：
+  - `HEAD` 指向 `fix_B` 分支。
+  - `fix_B` 分支的最新提交是这个提交。
+  - `branch01` 分支的最新提交也是这个提交。
 
 ## **时间限制**
+> [Git - Viewing the Commit History](https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History#pretty_format) 
 
 `--since`和`--until`参数可以用来限制显示特定时间范围内的提交：
 
@@ -1939,7 +1965,7 @@ $ git log --since="2 weeks ago"
 
 这将显示最近两周内的提交记录。
 
-## 作者和关键词搜索
+## **作者和关键词搜索**
 
 `--author`和`--grep`参数可以用来根据作者或提交信息中的关键词来过滤提交：
 
@@ -1959,21 +1985,37 @@ $ git log -- path/to/file
 
 这将只显示影响`path/to/file`文件的提交记录。
 
-## 指定查看数目
-```bash
-$ git log origin/testBranch02 --oneline --graph --decorate -15
-```
+## **查看特定内容的日志 -S**
+`git log -S` 选项是一个非常有用的过滤器，用于查找那些改变了指定字符串出现次数的提交。这个选项通常被称为 Git 的“pickaxe”选项。
 
-## 查看两个分支之间提交记录的差异
-查看当前分支最新提交相对于 origin/main 分支的提交记录差异 
-```bash
-$ git log --oneline origin/main..HEAD
-```
+- **查找字符串变化**：`-S<string>` 选项用于查找那些添加或删除了指定字符串的提交。这可以帮助你快速定位某个特定代码片段或功能的引入和修改历史。
 
-查看 origin/main 相对于当前分支最新提交记录差异 
 ```bash
-$ git log --oneline HEAD..origin/main
+git log -S "function_name"
 ```
+这个命令会列出所有添加或删除了 `function_name` 这个字符串的提交。
+
+### 注意事项
+- **字符串匹配**：`-S` 选项使用简单的字符串匹配，而不是正则表达式。如果你需要使用正则表达式，可以使用 `-G` 选项。
+- **性能考虑**：对于大型项目，使用 `-S` 选项可能会比较慢，因为它需要检查每个提交中的每个文件。
+
+### 结合其他选项使用
+- **`--pickaxe-regex`**：如果你需要使用正则表达式来匹配字符串，可以结合 `--pickaxe-regex` 选项使用。
+- **`--stat`**：显示每个提交的统计信息，帮助你更好地理解每个提交的影响。
+- **`--graph`**：以图形方式显示提交历史，帮助你理解分支和合并的结构。
+
+## **--first-parent**
+> [Visualize Merge History with git log --graph, --first-parent, and --no-merges](https://redfin.engineering/visualize-merge-history-with-git-log-graph-first-parent-and-no-merges-c6a9b5ff109c)   
+
+`git log --first-parent` 用于查看提交历史时只显示每个提交的第一个父提交。这在处理包含合并提交的历史时特别有用，因为它可以帮助你从“主分支”的角度查看历史，跳过那些来自合并分支的提交。
+
+- **显示第一父提交**：`--first-parent` 选项告诉 `git log` 只显示每个提交的第一个父提交。这对于理解主分支（如 `main` 或 `master`）的线性历史非常有帮助，因为它会忽略那些通过合并操作引入的分支提交。
+- **应用场景**：当你想要查看主分支的清晰历史，而不被合并操作引入的复杂分支历史干扰时，这个选项非常有用。例如，如果你遵循一个严格的分支策略，其中所有功能分支最终都合并回主分支，`--first-parent` 可以帮助你只看到主分支上的关键提交。
+
+## **排除合并信息 --no-merges****
+`--no-merges` 选项用于排除合并信息。当使用 `--no-merges` 选项时，`git log` 只显示那些没有合并操作的提交。
+- **排除合并信息**：`--no-merges` 选项告诉 `git log` 只显示那些没有合并操作的提交。这在处理包含合并提交的历史时特别有用，因为它可以避免看到那些通过合并操作引入的分支提交。
+- **应用场景**：当你想要查看主分支的线性历史，而不被合并操作引入的复杂分支历史干扰时，这个选项非常有用。例如，如果你遵循一个严格的分支策略，其中所有功能分支最终都合并回主分支，`--no-merges` 可以帮助你只看到主分支上的关键提交。
 
 ## 注意事项
 
