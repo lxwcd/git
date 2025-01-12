@@ -1,4 +1,4 @@
-git 学习  
+﻿git 学习  
       
 # 学习资源  
 > 初步了解 git：[廖雪峰 Git 教程](https://www.liaoxuefeng.com/wiki/896043488029600)  
@@ -733,6 +733,61 @@ git clone https://github.com/lxwcd/learnVim.git /usr/local/src/new_folder
 git clone https://github.com/lxwcd/learnVim.git /usr/local/src/1/2/3/new_folder  
 ```
 
+## 克隆本地仓库
+```bash
+git clone /path/to/source/repo /path/to/new/repo
+```
+
+这条命令会将 `/path/to/source/repo` 仓库的内容克隆到 `/path/to/new/repo` 目录中。
+
+- **`git clone <source> <destination>`**：
+  - `<source>`：源仓库的路径。
+  - `<destination>`：目标仓库的路径。如果目标路径已经存在，Git 会报错。如果目标路径不存在，Git 会自动创建该目录。
+
+### **浅克隆只包含最新的提交**
+这条命令会创建一个只包含最新提交的浅克隆，不包含完整的提交历史。
+
+```bash
+lx@LAPTOP-VB238NKA MINGW64 /d/Documents
+$ git clone --depth=1 file:///d/Documents/git_test /d/Documents/git_test_03
+Cloning into 'D:/Documents/git_test_03'...
+remote: Enumerating objects: 5, done.
+remote: Counting objects: 100% (5/5), done.
+remote: Compressing objects: 100% (2/2), done.
+remote: Total 5 (delta 0), reused 0 (delta 0), pack-reused 0 (from 0)
+Receiving objects: 100% (5/5), done.
+```
+本地克隆默认使用文件系统路径，而不是通过网络协议（如 http 或 git）进行克隆。
+
+## **file 协议克隆**
+在 Git 中，`file` 协议用于通过本地文件系统路径克隆或访问仓库。`file` 协议的使用方式与通过网络协议（如 `http`、`https`、`git`）克隆仓库类似，但它专门用于本地文件系统。下面详细讲解 `file` 协议的使用方法和注意事项。
+
+```bash
+file:///path/to/repo
+```
+- **`file://`**：这是协议前缀，表示使用文件系统路径。
+- **`/`**：在 Unix-like 系统中，路径从根目录开始，因此使用三个斜杠 `///`。
+- **`/path/to/repo`**：这是仓库的路径。
+
+### **克隆本地仓库**
+```bash
+git clone file:///d/Documents/git_test /d/Documents/git_test_03
+```
+- 源路径：`file:///d/Documents/git_test`，表示 `D:/Documents/git_test` 仓库。
+- 目标路径：`/d/Documents/git_test_03`，表示克隆到 `D:/Documents/git_test_03` 目录。
+
+### **添加本地远程仓库**
+```bash
+git remote add local-origin file:///d/Documents/git_test
+```
+- 将 `D:/Documents/git_test` 仓库添加为远程仓库，别名为 `local-origin`。
+
+### 注意事项
+`file://` 协议不支持相对路径。如果需要使用相对路径，可以直接使用本地文件系统路径。
+```bash
+git clone /d/Documents/git_test /d/Documents/git_test_03
+```
+
 # git init 初始化仓库
 > [Git - git-init Documentation](https://git-scm.com/docs/git-init) 
 
@@ -1062,9 +1117,41 @@ node_modules/
 
 ## 将已跟踪的文件加入 .gitignore
 
+# git merge-base 查找分支的共同祖先
+> [Git - git-merge-base Documentation](https://git-scm.com/docs/git-merge-base) 
+
+## 两个分支的共同祖先
+Given two commits A and B, git merge-base A B will output a commit which is reachable from both A and B through the parent relationship.
+
+For example, with this topology:
+
+	 o---o---o---B
+	/
+---o---1---o---o---o---A
+the merge base between A and B is 1.
+
+## 多个分支的共同祖先
+Given three commits A, B, and C, git merge-base A B C will compute the merge base between A and a hypothetical commit M, which is a merge between B and C. For example, with this topology:
+
+       o---o---o---o---C
+      /
+     /   o---o---o---B
+    /   /
+---2---1---o---o---o---A
+the result of git merge-base A B C is 1. This is because the equivalent topology with a merge commit M between B and C is:
+
+       o---o---o---o---o
+      /                 \
+     /   o---o---o---o---M
+    /   /
+---2---1---o---o---o---A
+and the result of git merge-base A M is 1. Commit 2 is also a common ancestor between A and M, but 1 is a better common ancestor, because 2 is an ancestor of 1. Hence, 2 is not a merge base.
+
+The result of git merge-base --octopus A B C is 2, because 2 is the best common ancestor of all commits.
 
 # git diff 查看文件差异
 > [Git - git-diff Documentation](https://git-scm.com/docs/git-diff)   
+> [git diff - Comparing Changes in Git | Refine](https://refine.dev/blog/git-diff-command/#basic-example) 
 
 `git diff` 是 Git 中用于显示文件差异的命令。它可以帮助你查看自上次提交以来文件发生了哪些更改，或者比较不同分支、标签或提交之间的差异。
 
@@ -1093,72 +1180,370 @@ node_modules/
 - **行号**：显示差异行的行号。
 - **差异内容**：显示具体的差异内容。
 
-## **查看未暂存的更改**
-  ```bash
-  git diff
-  ```
-  这个命令显示自上次提交以来未暂存的更改。
+## **比较工作区和暂存区的差异**
+> [Git - git-diff Documentation](https://git-scm.com/docs/git-diff#Documentation/git-diff.txt-codegitdiffcode) 
+> [git diff - Comparing Changes in Git | Refine](https://refine.dev/blog/git-diff-command/#basic-example) 
 
-## **查看已暂存的更改**
-  ```bash
-  git diff --cached
-  ```
-  或者
-  ```bash
-  git diff --staged
-  ```
-  这些命令显示已暂存的更改与上次提交的差异。
+```bash
+git diff
+```
+这个命令显示自上次提交以来未暂存的更改。
+不包括没有被跟踪的文件。
+如果文件已暂存，不会查看到。
+
+```bash
+lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (fix_B)
+$ git diff
+warning: in the working copy of 'test01.txt', LF will be replaced by CRLF the next time Git touches it
+diff --git a/test01.txt b/test01.txt
+index cd7fb11..a821b44 100644
+--- a/test01.txt
++++ b/test01.txt
+@@ -4,3 +4,4 @@ local modify test01.txt
+ A
+ b
+ C
++001
+```
+上面 a 表示最新提交的版本，即旧的版本，b 表示当前工作目录的版本，即新的版本。
+`100` 表示文件类型为普通文件，`644` 表示文件权限，可以通过 `ll` 查看：
+```bash
+lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (fix_B)
+$ ll test01.txt
+-rw-r--r-- 1 lx 197121 56 12月 21 22:10 test01.txt
+```
+
+## **比较已暂存的文件和最新提交的差异**
+```bash
+git diff --cached
+```
+或者
+```bash
+git diff --staged
+```
+这些命令显示已暂存的更改与上次提交的差异。
+不会查看到没有暂存的文件差异。
+
+将工作目录的修改 add 到暂存区后，查看：
+```bash
+lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (fix_B)
+$ git status
+On branch fix_B
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+        modified:   test01.txt
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        test05.txt
+
+
+lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (fix_B)
+$ git diff
+
+lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (fix_B)
+$ git diff --cached
+diff --git a/test01.txt b/test01.txt
+index cd7fb11..a821b44 100644
+--- a/test01.txt
++++ b/test01.txt
+@@ -4,3 +4,4 @@ local modify test01.txt
+ A
+ b
+ C
++001
+```
+a 表示最新的提交版本，旧的版本； b 表示暂存区的版本，新的版本。
+
+## **比较工作区和最新提交的差异**
+```bash
+lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (fix_B)
+$ git diff HEAD
+warning: in the working copy of 'test02.txt', LF will be replaced by CRLF the next time Git touches it
+diff --git a/test01.txt b/test01.txt
+index cd7fb11..a821b44 100644
+--- a/test01.txt
++++ b/test01.txt
+@@ -4,3 +4,4 @@ local modify test01.txt
+ A
+ b
+ C
++001
+diff --git a/test02.txt b/test02.txt
+index 8de02e1..98bbcac 100644
+--- a/test02.txt
++++ b/test02.txt
+@@ -1,2 +1,3 @@
+ test02
+-local git rebase
+\ No newline at end of file
++local git rebase002
++002
+```
+
+工作区中跟踪的文件，已暂存和未暂存的文件和最新提交的差异都能看到。
+a 表示最新的提交版本，旧的版本； b 表示工作目录的版本，新的版本。
+`+001` 表示 a 中不存在， b 中新增的内容。
+
+## **比较当前工作目录中特定文件和暂存区的差异**
+```bash
+lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (fix_B)
+$ git diff HEAD -- test01.txt
+diff --git a/test01.txt b/test01.txt
+index cd7fb11..a821b44 100644
+--- a/test01.txt
++++ b/test01.txt
+@@ -4,3 +4,4 @@ local modify test01.txt
+ A
+ b
+ C
++001
+```
+
+指定当前工作目录，即 b 版本的 test01.txt 文件和 HEAD 的差异。
+
+## **比较当前工作目录和任意提交的差异** 
+```bash
+lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (fix_B)
+$ git diff 332de10
+warning: in the working copy of 'test02.txt', LF will be replaced by CRLF the next time Git touches it
+diff --git a/test01.txt b/test01.txt
+index 4c19859..a821b44 100644
+--- a/test01.txt
++++ b/test01.txt
+@@ -1 +1,7 @@
+ test01
++git pull
++local modify test01.txt
++A
++b
++C
++001
+diff --git a/test02.txt b/test02.txt
+index 4c19859..98bbcac 100644
+--- a/test02.txt
++++ b/test02.txt
+@@ -1 +1,3 @@
+-test01
++test02
++local git rebase002
++002
+diff --git a/test03.txt b/test03.txt
+new file mode 100644
+index 0000000..23bc844
+--- /dev/null
++++ b/test03.txt
+@@ -0,0 +1 @@
++test03
+```
+a 为指定的提交版本，b 为当前工作目录，包括为暂存的修改，不包括未跟踪的文件。
+
+## **比较当前已暂存和任意提交的差异** 
+```bash
+$ git diff 332de10 --cached
+diff --git a/test01.txt b/test01.txt
+index 4c19859..a821b44 100644
+--- a/test01.txt
++++ b/test01.txt
+@@ -1 +1,7 @@
+ test01
++git pull
++local modify test01.txt
++A
++b
++C
++001
+diff --git a/test02.txt b/test02.txt
+index 4c19859..8de02e1 100644
+--- a/test02.txt
++++ b/test02.txt
+@@ -1 +1,2 @@
+-test01
++test02
++local git rebase
+\ No newline at end of file
+diff --git a/test03.txt b/test03.txt
+new file mode 100644
+index 0000000..23bc844
+--- /dev/null
++++ b/test03.txt
+@@ -0,0 +1 @@
++test03
+```
+a 为指定的提交版本，b 为当前工作目录已暂存的文件修改，不包括为暂存的修改，不包括未跟踪的文件。
 
 ## **比较两个提交**
-  ```bash
-  git diff <commit1> <commit2>
-  ```
-  这个命令比较两个提交之间的差异。
-
-## **比较分支**
-  ```bash
-  git diff <branch1> <branch2>
-  ```
-  这个命令比较两个分支之间的差异。
-
-## 查看两个分支文件差异
-查看 test 分支相对当前分支最新提交的文件名的修改
 ```bash
-$ git diff HEAD...test --name-only
+git diff <commit1> <commit2>
 ```
+这个命令比较两个提交之间的差异。顺序不同则结果不同。
 
-## 查看特定文件和 stash 内容的差异
 ```bash
-lxw@NEU-20240403OIC MINGW64 /e/doc/git (main)
-$ git diff stash@{0} -- a.txt
-diff --git a/a.txt b/a.txt
+lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (fix_B)
+$ git diff 332de10 HEAD
+diff --git a/test01.txt b/test01.txt
+index 4c19859..cd7fb11 100644
+--- a/test01.txt
++++ b/test01.txt
+@@ -1 +1,6 @@
+ test01
++git pull
++local modify test01.txt
++A
++b
++C
+diff --git a/test02.txt b/test02.txt
+index 4c19859..8de02e1 100644
+--- a/test02.txt
++++ b/test02.txt
+@@ -1 +1,2 @@
+-test01
++test02
++local git rebase
+\ No newline at end of file
+diff --git a/test03.txt b/test03.txt
+new file mode 100644
+index 0000000..23bc844
+--- /dev/null
++++ b/test03.txt
+@@ -0,0 +1 @@
++test03
+```
+a 为 332de10 提交版本，b 为当前分支最新提交。
+
+如果调换顺序：
+```bash
+lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (fix_B)
+$ git diff HEAD 332de10
+diff --git a/test01.txt b/test01.txt
+index cd7fb11..4c19859 100644
+--- a/test01.txt
++++ b/test01.txt
+@@ -1,6 +1 @@
+ test01
+-git pull
+-local modify test01.txt
+-A
+-b
+-C
+diff --git a/test02.txt b/test02.txt
+index 8de02e1..4c19859 100644
+--- a/test02.txt
++++ b/test02.txt
+@@ -1,2 +1 @@
+-test02
+-local git rebase
+\ No newline at end of file
++test01
+diff --git a/test03.txt b/test03.txt
 deleted file mode 100644
-index d00491f..0000000
---- a/a.txt
+index 23bc844..0000000
+--- a/test03.txt
 +++ /dev/null
 @@ -1 +0,0 @@
--1
+-test03
 ```
+b 为 332de10 提交版本，a 为当前分支最新提交。
+则相当于 332de10 相对于 HEAD 的变化，因此 HEAD 中增加的内容前面为 -，表示需要减去这些内容才能和 a 的版本一致。
 
-## 查看当前工作目录和 stash 的差异
+## **比较当前最新提交和上一次提交的差异**
 ```bash
-lxw@NEU-20240403OIC MINGW64 /e/doc/git (main)
-$ git diff stash@{0} --name-status
-D       11.txt
-D       a.txt
-M       notes/git学习笔记.md
+lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (fix_B)
+$ git diff HEAD^ HEAD
+diff --git a/test01.txt b/test01.txt
+index 5c232c3..cd7fb11 100644
+--- a/test01.txt
++++ b/test01.txt
+@@ -2,5 +2,5 @@ test01
+ git pull
+ local modify test01.txt
+ A
+-B
++b
+ C
+```
+a 为 HEAD^ 上一次提交版本，b 为 HEAD 最新提交版本。
+
+## **比较两个分支最新提交的差异**
+> [git diff - Comparing Changes in Git | Refine](https://refine.dev/blog/git-diff-command/#git-diff-between-two-branches-two-dots-method) 
+
+```bash
+git diff <branch1> <branch2>
+```
+或者等价于：
+```bash
+git diff <branch1>..<branch2>
+```
+这个顺序则 a 为 branch1 版本，b 为 branch2。 
+查看的是两个分支的最新提交的差异。
+
+如果调换顺序，则 a 和 b 的版本也调换：
+```bash
+git diff <branch2> <branch1>
+```
+这个顺序则 a 为 branch2 版本，b 为 branch1。
+
+## **比较一个分支相对于另一个分支的差异**
+> [git diff - Comparing Changes in Git | Refine](https://refine.dev/blog/git-diff-command/#git-diff-between-two-branches-three-dots-method) 
+
+```bash
+git diff <branch1>...<branch2>
+```
+这个命令显示从 `branch1` 和 `branch2` 的共同祖先到 `branch2` 的所有差异。
+即从两个分支开始分叉后，branch2 上所有的提交内容相对共同祖先的差异。
+查看差异中 a 为两个分支共同的祖先，b 为 branch2 最新提交。
+
+注意和 ```git diff <branch1>..<branch2>``` 的区别，两个点号表示两个分支最新提交的差异。
+
+## **查看差异的文件名**
+```bash
+$ git diff --name-only
 ```
 
-这个命令比较的是最新的 stash（`stash@{0}`）和工作目录（包括索引）中的内容。具体来说，它显示的是 stash 中的文件和当前工作目录中相同文件的差异。这包括了工作目录中的任何未提交更改。
+## **比较工作目录和 stash 中特定文件差别**
+```bash
+lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (main)
+$ echo "000 modify after stash test01" >> test01.txt
 
-如果查看差异的详细内容，用 git difftool
+lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (main)
+$ git diff stash@{0} -- test01.txt
+warning: in the working copy of 'test01.txt', LF will be replaced by CRLF the next time Git touches it
+diff --git a/test01.txt b/test01.txt
+index d494af0..86e607d 100644
+--- a/test01.txt
++++ b/test01.txt
+@@ -4,4 +4,4 @@ local modify test01.txt
+ A
+ B
+ add main test01.txt
+-stash test01.txt
++000 modify after stash test01
+```
 
-## 查看当前最新提交和 stash 的差异
+a 为 stash@{0} 的版本，b 为当前工作目录`。
+`-` 那行表示 a 中的版本存在，b 不存在，需要 - 去改行才能将 a 版本变成 b 版本。
+`+` 那行则是 a 中不存在，需要加上才能变成 b 版本。
+
+## **比较暂存区和 stash 中特定文件差别**
+```bash
+lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (main)
+$ git diff stash@{0} --cached -- test01.txt
+diff --git a/test01.txt b/test01.txt
+index d494af0..9d86808 100644
+--- a/test01.txt
++++ b/test01.txt
+@@ -4,4 +4,3 @@ local modify test01.txt
+ A
+ B
+ add main test01.txt
+-stash test01.txt
+```
+a 为 stash@{0}，b 为暂存区。
+
+## **查看当前最新提交和 stash 的差异**
 `git diff stash@{0} HEAD`
 
-这个命令不考虑工作目录中的任何未提交更改。
-
-## 查看两个分支某个文件的差异
+## **查看两个分支某个文件的差异**
 ```bash
 git diff <branch1> <branch2> -- <file-path>
 ```
@@ -1168,30 +1553,230 @@ git diff <branch1> <branch2> -- <file-path>
 git diff <branch1> <branch2> -- <folder-path>
 ```
 
-## **查看特定文件的差异**
-  ```bash
-  git diff <file>
-  ```
-
-## **比较分支与当前工作目录**
-  ```bash
-  git diff <branch>
-  ```
-  这个命令比较指定分支与当前工作目录的差异。
-
 ## **比较标签**
-  ```bash
-  git diff <tag1> <tag2>
-  ```
-  这个命令比较两个标签之间的差异。
+```bash
+git diff <tag1> <tag2>
+```
+这个命令比较两个标签之间的差异。
 
-## 注意事项
+## **git diff --base` 比较合并冲突中的文件版本**
+> [git diff - Comparing Changes in Git | Refine](https://refine.dev/blog/git-diff-command/#using---base-with-git-diff) 
 
-- **未跟踪的文件**：`git diff` 不显示未跟踪的文件。要查看这些文件，请使用 `git status`。
-- **合并冲突**：在合并冲突时，`git diff` 可以帮助你查看冲突的详细内容。
-- **差异工具**：你可以使用外部差异工具（如 `meld`、`kdiff3` 等）来查看差异，通过配置 Git 使用这些工具。
+`git diff --base` 命令用于比较合并冲突中的文件版本。具体来说，`--base` 选项用于显示合并冲突中基线版本（即合并前的共同祖先版本）与当前工作目录中的版本之间的差异。
 
-通过使用 `git diff`，你可以详细查看文件的更改内容，这在代码审查、调试和提交前检查时非常有用。它是一个强大的工具，可以帮助你理解和管理代码的更改。
+通过使用 `git diff --base`，你可以查看合并冲突中基线版本与当前工作目录中的版本之间的差异。
+
+```bash
+git diff --base <file>
+```
+这条命令会显示文件 `<file>` 的基线版本与当前工作目录中的版本之间的差异。
+
+假设你有一个文件 `example.py`，在合并过程中出现了冲突。你可以使用 `git diff --base` 来查看基线版本与当前工作目录中的版本之间的差异。
+
+## **git diff 导出补丁文件**
+```bash
+lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (fix_B)
+$ git diff HEAD^ HEAD -- test01.txt
+diff --git a/test01.txt b/test01.txt
+index cd7fb11..a821b44 100644
+--- a/test01.txt
++++ b/test01.txt
+@@ -4,3 +4,4 @@ local modify test01.txt
+ A
+ b
+ C
++001
+
+lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (fix_B)
+$ git diff HEAD^ HEAD -- test01.txt > ../test01.patch
+```
+将一个仓库中的某个文件的最新修改生产补丁文件。
+
+在另一个仓库应用该补丁文件：
+```bash
+lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test_02 (fix_B)
+$ cat test01.txt
+test01
+git pull
+local modify test01.txt
+A
+b
+C
+
+lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test_02 (fix_B)
+$ git apply ../test01.patch
+```
+
+# git format-patch 生成补丁文件
+> [Git - git-format-patch Documentation](https://git-scm.com/docs/git-format-patch) 
+
+`git format-patch` 命令用于将一个或多个提交转换成补丁文件。这些补丁文件以邮件格式输出，包含提交的作者、日期和提交信息等元数据，可以方便地通过邮件发送给其他人。补丁文件中除了代码更改外，还包含提交的元数据，如作者、日期和提交信息等。
+
+## **生成最近一次提交的补丁文件**
+
+```bash
+lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (fix_B)
+$ git format-patch HEAD^
+0001-update-fix_B.patch
+```
+
+## **生成最近两次提交的补丁文件**
+
+```bash
+lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (fix_B)
+$ git log --oneline -2
+51da54a (HEAD -> fix_B) update fix_B
+9aaa1c6 (branch01) fix B
+```
+
+```bash
+lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (fix_B)
+$ git format-patch HEAD^^
+0001-fix-B.patch
+0002-update-fix_B.patch
+```
+
+## **生成指定提交范围的补丁文件**
+
+```bash
+git format-patch <start-commit>..<end-commit>
+```
+
+这条命令会生成从 `<start-commit>` 到 `<end-commit>` 之间的所有提交的补丁文件。例如，生成从 `abc123` 到 `def456` 之间的所有提交的补丁文件：
+
+```bash
+git format-patch abc123..def456
+```
+
+## **生成某个提交以来的所有补丁文件**
+
+```bash
+git format-patch <commit>
+```
+
+这条命令会生成从指定提交以来的所有提交的补丁文件，但不包括指定的提交。例如，生成从 `abc123` 以来的所有提交的补丁文件：
+
+```bash
+git format-patch abc123
+```
+
+## **生成从根到某个提交的所有补丁文件**
+
+```bash
+git format-patch --root <commit>
+```
+
+这条命令会生成从仓库的根到指定提交的所有补丁文件。例如，生成从根到 `abc123` 的所有补丁文件：
+
+```bash
+git format-patch --root abc123
+```
+
+## 输出格式选项
+
+### **输出到标准输出**
+
+```bash
+git format-patch --stdout <commit> > output.patch
+```
+
+这条命令会将补丁文件输出到标准输出，并重定向到 `output.patch` 文件中。
+
+### **以 mbox 格式输出**
+
+```bash
+git format-patch --mbox <commit>
+```
+
+这条命令会以 mbox 格式输出补丁文件，适合通过电子邮件发送。
+
+### **以原始格式输出**
+
+```bash
+git format-patch --raw <commit>
+```
+
+这条命令会以原始格式输出补丁文件，适合向非 Git 存储库应用补丁。
+
+### **按顺序编号补丁**
+
+```bash
+git format-patch --numbered <commit>
+```
+
+### **使用 --subject-prefix 自定义补丁文件前缀**
+
+`--subject-prefix` 选项可以自定义补丁文件名的前缀。默认前缀是 `[PATCH]`，但你可以通过这个选项更改它。
+
+**命令**：
+```bash
+git format-patch --subject-prefix="MY_PATCH" <commit>
+```
+
+这条命令会生成补丁文件，文件名前缀为 `MY_PATCH`。例如，生成的文件名可能是 `0001-MY_PATCH-commit-message.patch`。
+
+### **使用 --output-directory 自定补丁文件目录*
+
+`--output-directory` 选项可以指定生成的补丁文件的保存目录。
+
+```bash
+git format-patch --output-directory=/path/to/patches <commit>
+```
+
+这条命令会将生成的补丁文件保存到 `/path/to/patches` 目录中。
+
+### **使用 --numbered-files 生成仅包含数字的文件名**
+
+`--numbered-files` 选项可以生成仅包含数字的文件名，不包含提交信息。
+
+```bash
+git format-patch --numbered-files <commit>
+```
+
+这条命令会生成补丁文件，文件名仅为数字，例如 `0001.patch`、`0002.patch` 等。
+
+### **使用 --suffix 指定补丁文件后缀**
+
+`--suffix` 选项可以自定义补丁文件的后缀名。默认后缀名是 `.patch`，但你可以通过这个选项更改它。
+
+```bash
+git format-patch --suffix=.txt <commit>
+```
+
+这条命令会生成补丁文件，文件名后缀为 `.txt`，例如 `0001-commit-message.txt`。
+
+### 示例
+
+假设你有一个本地仓库，并且已经对其中一个文件作了一些更改并提交了。你可以使用以下命令生成自定义补丁文件：
+
+```bash
+git format-patch --subject-prefix="MY_PATCH" --output-directory=/path/to/patches --suffix=.txt HEAD^
+```
+
+这条命令会生成从 `HEAD^` 到 `HEAD` 之间的所有提交的补丁文件，文件名前缀为 `MY_PATCH`，后缀为 `.txt`，并保存到 `/path/to/patches` 目录中。生成的文件名可能是 `0001-MY_PATCH-commit-message.txt`。
+
+# 应用补丁文件
+
+## **git apply 应用补丁文件**
+
+```bash
+git apply /path/to/mypatch.patch
+```
+
+这条命令会将 `mypatch.patch` 文件中的更改应用到当前工作目录中。如果应用成功，你会看到提示信息。如果应用失败，Git 会提示哪些更改无法应用，并给出相应的错误信息。
+
+##  **git am 应用补丁文件**
+
+```bash
+git am /path/to/mypatch.patch
+```
+
+这条命令会将 `mypatch.patch` 文件作为新的提交应用到当前分支中。如果补丁文件应用成功，Git 会自动创建一个新的提交，其中包含补丁中的更改。如果应用失败，Git 会提示哪些更改无法应用，并给出相应的错误信息。
+
+# git blame 查看文件每行的最新提交信息
+> [Git - git-blame Documentation](https://git-scm.com/docs/git-blame) 
+> [git diff - Comparing Changes in Git | Refine](https://refine.dev/blog/git-diff-command/#using-git-diff-with-other-git-commands) 
+
 
 # 分支
 > [Git - Basic Branching and Merging](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging) 
@@ -2998,24 +3583,9 @@ git branch --no-merged
 ```bash
 git branch -dr <remote/branch>
 ```
-这个命令会删除远程跟踪分支。
+这条命令会删除本地的远程跟踪分支。但并不会直接删除远程仓库中的分支，只是删除了本地对远程分支的跟踪信息。
 
-## **包含已合并/未合并信息**
-```bash
-git branch --merged
-git branch --no-merged
-```
-这些命令分别列出所有已经合并到当前分支的分支和所有未合并到当前分支的分支。
-
-## **删除远程跟踪分支**
-```bash
-git branch -dr <remote/branch>
-```
-这个命令会删除远程跟踪分支。
-
-`git branch` 命令是 Git 分支管理的核心，它允许你灵活地创建、管理和发展不同的代码线。通过熟练使用这个命令，你可以更有效地利用 Git 的分支功能来管理你的项目。
-
-# 本地分支的上游分支 
+# **本地分支的上游分支** 
 在 Git 中，每个本地分支可以设置一个对应的上游分支（也称为远程跟踪分支），这样当你执行 `git push` 或 `git pull` 时，Git 会自动知道要与哪个远程分支交互。
 
 ## 设置本地分支的上游分支
