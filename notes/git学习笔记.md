@@ -1,4 +1,4 @@
-﻿git 学习  
+git 学习  
       
 # 学习资源  
 > 初步了解 git：[廖雪峰 Git 教程](https://www.liaoxuefeng.com/wiki/896043488029600)  
@@ -1643,9 +1643,15 @@ git format-patch <start-commit>..<end-commit>
 ```
 
 这条命令会生成从 `<start-commit>` 到 `<end-commit>` 之间的所有提交的补丁文件。例如，生成从 `abc123` 到 `def456` 之间的所有提交的补丁文件：
+但不包括 start-commit 那个提交。
 
+入果希望包括起点和终点两个提交，则如下：
 ```bash
-git format-patch abc123..def456
+lx@LAPTOP-VB238NKA MINGW64 /e/src_git/demo (develop)
+$ git format-patch --output-directory=../patch c433384cd^..910b59afe
+../patch/0001-modify-test01.md.patch
+../patch/0002-modify-test02.patch
+../patch/0003-modify-test03.patch
 ```
 
 ## **生成某个提交以来的所有补丁文件**
@@ -1720,10 +1726,10 @@ git format-patch --subject-prefix="MY_PATCH" <commit>
 `--output-directory` 选项可以指定生成的补丁文件的保存目录。
 
 ```bash
-git format-patch --output-directory=/path/to/patches <commit>
+git format-patch --subject-prefix="MY_PATCH" --output-directory=/path/to/patches --suffix=.txt HEAD^
 ```
 
-这条命令会将生成的补丁文件保存到 `/path/to/patches` 目录中。
+这条命令会生成从 `HEAD^` 到 `HEAD` 之间的所有提交的补丁文件，文件名前缀为 `MY_PATCH`，后缀为 `.txt`，并保存到 `/path/to/patches` 目录中。生成的文件名可能是 `0001-MY_PATCH-commit-message.txt`。
 
 ### **使用 --numbered-files 生成仅包含数字的文件名**
 
@@ -1745,16 +1751,6 @@ git format-patch --suffix=.txt <commit>
 
 这条命令会生成补丁文件，文件名后缀为 `.txt`，例如 `0001-commit-message.txt`。
 
-### 示例
-
-假设你有一个本地仓库，并且已经对其中一个文件作了一些更改并提交了。你可以使用以下命令生成自定义补丁文件：
-
-```bash
-git format-patch --subject-prefix="MY_PATCH" --output-directory=/path/to/patches --suffix=.txt HEAD^
-```
-
-这条命令会生成从 `HEAD^` 到 `HEAD` 之间的所有提交的补丁文件，文件名前缀为 `MY_PATCH`，后缀为 `.txt`，并保存到 `/path/to/patches` 目录中。生成的文件名可能是 `0001-MY_PATCH-commit-message.txt`。
-
 # 应用补丁文件
 
 ## **git apply 应用补丁文件**
@@ -1764,6 +1760,13 @@ git apply /path/to/mypatch.patch
 ```
 
 这条命令会将 `mypatch.patch` 文件中的更改应用到当前工作目录中。如果应用成功，你会看到提示信息。如果应用失败，Git 会提示哪些更改无法应用，并给出相应的错误信息。
+
+注意如果补丁文件有多个，在一个目录中，应用时不能指定目录，需要遍历里面的文件来应用：
+```bash
+for patch in ../patch/*.patch; do
+    git apply "$patch"
+done
+```
 
 ##  **git am 应用补丁文件**
 
@@ -1911,6 +1914,8 @@ git checkout <tag-name>
 
 # git switch 
 `git switch` 是 Git 2.23 版本引入的命令，用于切换分支。这个命令的作用与 `git checkout` 类似，但提供了更清晰的语义和错误检查。
+
+如果工作目录中有未被跟踪的文件，可以切换，未被跟踪的文件也会出现在切换后的分支上。
 
 ## **切换到已存在的分支**
 ```bash
@@ -3676,50 +3681,155 @@ git apply --index patchfile.diff
 这会将补丁应用到索引中，而不仅仅是工作目录中的文件。
 
 # git stash
+> [Git - git-stash Documentation](https://git-scm.com/docs/git-stash) 
+> [git stash - Saving Changes | Atlassian Git Tutorial](https://www.atlassian.com/git/tutorials/saving-changes/git-stash)   
+> [A practical guide to using the git stash command](https://opensource.com/article/21/4/git-stash) 
 
-`git stash` 是 Git 中一个非常有用的命令，它允许你临时保存工作目录中的修改，以便你可以在不提交这些修改的情况下切换分支或返回到一个干净的工作状态。
+`git stash` 是 Git 中一个非常有用的命令，它允许临时保存工作目录中的修改，以便你可以在不提交这些修改的情况下切换分支或返回到一个干净的工作状态。
 
-## 功能
+> By default, running git stash will stash:
+> changes that have been added to your index (staged changes)
+> changes made to files that are currently tracked by Git (unstaged changes)
+> 
+> But it will not stash:
+> new files in your working copy that have not yet been staged
+> files that have been ignored
 
 - **保存当前工作状态**：当你的工作目录中有未提交的更改，而这些更改可能阻碍你切换分支或执行其他操作时，`git stash` 可以让你保存这些更改，以便稍后恢复。
 - **保持工作目录干净**：使用 `git stash` 可以清理工作目录，让你可以在一个干净的状态下来执行其他 Git 操作，比如拉取最新的代码或切换分支。
 - **恢复工作状态**：你可以在任何时候恢复之前保存的工作状态，无论是在同一个分支还是不同的分支上。
 
-## 基本用法
+## git stash 存放位置
 
-- **保存工作状态**：
-  ```bash
-  git stash save "optional message"
-  ```
-  这个命令会保存当前的工作状态到一个 stash 中，并清理工作目录。如果省略 `"optional message"`，Git 会自动生成一个消息。
+> The latest stash you created is stored in refs/stash; older stashes are found in the reflog of this reference and can be named using the usual reflog syntax (e.g. stash@{0} is the most recently created stash, stash@{1} is the one before it, stash@{2.hours.ago} is also possible). Stashes may also be referenced by specifying just the stash index (e.g. the integer n is equivalent to stash@{n}).
 
-- **列出所有 stash**：
-  ```bash
-  git stash list
-  ```
-  这个命令会列出所有的 stash，每个 stash 前面都有一个标识符，如 `stash@{0}`。
+```bash
+$ cat .git/refs/stash
+07929627e841f63c9c306a647df4e84c32ae6de2
 
-- **应用 stash**：
-  ```bash
-  git stash apply
-  ```
-  这个命令会应用最近的 stash 到当前工作目录。你也可以指定一个 stash 来应用：
-  ```bash
-  git stash apply stash@{n}
-  ```
-  其中 `n` 是 stash 的索引号，最新的 stash 编号为 0，编号最大的为最先 stash 的内容。
+$ git stash list
+stash@{0}: modify test.md
+stash@{1}: modify 1.md
+stash@{2}: modify 2.md
+stash@{3}: modify 3.md
+```
 
-- **删除 stash**：
-  ```bash
-  git stash drop stash@{n}
-  ```
-  这个命令会删除指定的 stash。
+## git stash push 保存工作状态
+git stash 和 git stash push 效果相同。
 
-- **应用 stash 并删除**：
-  ```bash
-  git stash pop
-  ```
-  这个命令会应用最近的 stash 并从 stash 列表中删除它。
+> Save your local modifications to a new stash entry and roll them back to HEAD (in the working tree and in the index). The <message> part is optional and gives the description along with the stashed state.
+
+不会保存没有被跟踪的文件。
+
+### `-m` 或 `--message`
+这个选项允许你为 stash 添加一个描述性的信息，便于后续查看和管理。
+
+```bash
+git stash push -m "WIP: Implement login feature"
+```
+这个命令会将修改保存到 stash 中，并给该 stash 加上一个标记 `“WIP: Implement login feature”`。
+
+### `-p` 或 `--patch`
+这个选项允许交互式地选择要存储的文件块。这对于大型文件的部分修改非常有用。
+
+```bash
+git stash push -p
+```
+执行该命令后，Git 会进入交互模式，让你选择哪些修改要保存到 stash 中。
+
+### `-k` 或 `--keep-index`
+这个选项会告诉 Git 在执行 stash 之前保留暂存区的更改。换句话说，它只会将工作区的更改保存到 stash 中，而暂存区的更改将被保留。
+
+```bash
+git stash push -k
+```
+假设已经使用 `git add` 将一些修改添加到暂存区，使用这个选项后，这些暂存区的更改不会被 stash，而工作区的其他更改会被保存到 stash 中。
+
+### `-u` 或 `--include-untracked`
+这个选项会包含未被 Git 跟踪的文件的更改。默认情况下，`git stash push` 只会保存已被追踪的文件的更改。
+
+### `-a` 或 `--all`
+这个选项会保存所有文件的更改，包括未跟踪的文件和被 `.gitignore` 忽略的文件。
+
+```bash
+git stash push -a
+```
+使用这个选项后，所有文件的更改都会被保存到 stash 中，无论这些文件是否被 Git 跟踪或被 `.gitignore` 忽略。
+
+### `-q` 或 `--quiet`
+这个选项会静默执行命令，压制反馈信息。
+
+```bash
+git stash push -q
+```
+使用这个选项后，命令执行时不会输出任何信息。
+
+### `--pathspec-from-file=<file>`
+这个选项允许从文件中读取路径规范，而不是从命令行参数中读取。如果文件内容是 `-`，则从标准输入读取。
+
+```bash
+git stash push --pathspec-from-file=pathspecs.txt
+```
+假设 `pathspecs.txt` 文件中包含要 stash 的文件路径，使用这个选项后，这些文件的更改会被保存到 stash 中。
+
+### `--pathspec-file-nul`
+这个选项只在使用 `--pathspec-from-file` 时有意义，指定路径元素用 NUL 字符分隔，所有其他字符都按字面意思表示。
+
+```bash
+git stash push --pathspec-from-file=pathspecs.txt --pathspec-file-nul
+```
+假设 `pathspecs.txt` 文件中包含用 NUL 字符分隔的路径规范，使用这个选项后，这些文件的更改会被保存到 stash 中。
+
+### `--`
+这个选项用于消除歧义，将路径规范与选项分开。
+
+```bash
+git stash push -- path/to/file
+```
+使用这个选项后，`path/to/file` 会被视为路径规范，而不是选项。
+
+### `<路径规范>…​`
+这个选项允许你指定要 stash 的文件或目录。
+
+```bash
+git stash push path/to/file1 path/to/file2
+```
+使用这个选项后，只有 `path/to/file1` 和 `path/to/file2` 的更改会被保存到 stash 中。
+
+## git stash save
+```bash
+git stash save "optional message"
+```
+这个命令会保存当前的工作状态到一个 stash 中，并清理工作目录。如果省略 `"optional message"`，Git 会自动生成一个消息。
+不会保存未被跟踪的文件。
+
+## git stash list 列出所有 stash
+```bash
+git stash list
+```
+这个命令会列出所有的 stash，每个 stash 前面都有一个标识符，如 `stash@{0}`。
+
+## git stash apply 应用 stash
+```bash
+git stash apply
+```
+这个命令会应用最近的 stash 到当前工作目录。也可以指定一个 stash 来应用：
+```bash
+git stash apply stash@{n}
+```
+其中 `n` 是 stash 的索引号，最新的 stash 编号为 0，编号最大的为最先 stash 的内容。
+
+## git stash drop 删除 stash
+```bash
+git stash drop stash@{n}
+```
+这个命令会删除指定的 stash。
+
+## git stash pop 应用 stash 并删除
+```bash
+git stash pop
+```
+这个命令会应用最近的 stash 并从 stash 列表中删除它。
 
 ## 查看 stash 的内容
 1. **查看 stash 列表**：
@@ -3733,12 +3843,6 @@ git apply --index patchfile.diff
 
 4. **查看 stash 的变更文件列表**：
    如果你只想查看某个 stash 的变更文件列表，可以使用 `git stash show --name-only stash@{n}` 命令。这个命令会显示该 stash 中所有修改的文件名。
-
-通过这些命令，你可以查看 stash 的内容，并且对于有冲突的 stash，可以使用 `git stash show -p` 来查看与当前分支的差异，从而更好地决定如何应用 stash。这些方法可以帮助你管理和恢复工作目录中的更改。
-
-## git stash push
-
-## git stash save
 
 ## 应用特定文件
 `git checkout stash@{n} -- <file-path>`
