@@ -1457,7 +1457,7 @@ index 5c232c3..cd7fb11 100644
 @@ -2,5 +2,5 @@ test01
  git pull
  local modify test01.txt
- A
++A 
 -B
 +b
  C
