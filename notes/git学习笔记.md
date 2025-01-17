@@ -45,10 +45,125 @@ git 学习
 ## Windows 安装  
 官网下载地址：[Download for Windows](https://git-scm.com/download/win)  
       
+# git bash 配置
+## 配置主题字体
+右键选择 option 进行配置，配置完成后保存即可
+
+## 修改时区
+
+先查看当前时间是否正确：
+```bash
+lxw@NEU-20240403OIC MINGW64 /e/src_git/IND400_trunk (develop)
+$ date
+Fri Jan 17 06:41:27 GMT 2025
+```
+
+修改 `TZ` 变量，注意这里时区设置和 linux 中格式有区别 (linux 中国时区为 `Asia/Shanghai`)
+
+在 Windows 的 Git Bash 中，TZ 环境变量的格式通常为：
+```bash
+TZ=<标准时间>-<UTC偏移量><夏令时时间>-<夏令时UTC偏移量>
+```
+要设置中国时区（东八区），可以使用以下命令：
+```bash
+export TZ="CST-8"
+```
+
+永久修改则在配置文件中修改，如当前用户修改可在 `~/.bashrc` 中设置
+修改完后 `. ~/.bashrc` 时期生效，再用 date 命令查看，时区已修改成功：
+```bash
+lxw@NEU-20240403OIC MINGW64 /e/src_git/IND400_trunk (develop)
+$ date
+Fri Jan 17 14:46:31 CST 2025
+```
+
+## vim 配置
+输入 vim 后，输入 `:verion` 查看配置文件的路径，如：
+```bash
+  system vimrc file: "/etc/vimrc"
+     user vimrc file: "$HOME/.vimrc"
+ 2nd user vimrc file: "~/.vim/vimrc"
+ 3rd user vimrc file: "~/.config/vim/vimrc"
+      user exrc file: "$HOME/.exrc"
+       defaults file: "$VIMRUNTIME/defaults.vim"
+  fall-back for $VIM: "/etc"
+ f-b for $VIMRUNTIME: "/usr/share/vim/vim91"
+```
+
+在 Git Bash 和其他类 Unix 环境中，`/etc/vimrc` 是 Vim 编辑器的系统级配置文件的传统路径。这个路径源自 Unix 和 Linux 系统，其中 `/etc` 是用于存储系统级配置文件的目录。然而，在 Windows 系统中，并没有 `/etc` 这样的目录，这是一个 Unix 和 Linux 特有的目录结构。
+
+在 Git Bash 中，`/etc/vimrc` 的路径是一个模拟的路径，它映射到 Windows 系统中的一个实际位置。这样做是为了保持与 Unix 和 Linux 环境的兼容性，使得 Unix 和 Linux 用户能够在 Windows 上的 Git Bash 中使用他们熟悉的 Vim 配置。
+
+最后两行的意思是：
+
+1. **fall-back for $VIM: "/etc"**
+   - 这行表示如果环境变量 `$VIM` 没有设置，Git Bash 会回退到 "/etc" 目录来查找 Vim 相关的配置和文件。这是一个备用方案，以防 `$VIM` 环境变量未定义。
+
+2. **f-b for $VIMRUNTIME: "/usr/share/vim/vim91"**
+   - `$VIMRUNTIME` 是另一个环境变量，它指向 Vim 的运行时文件，包括语法文件、脚本等。这行表示如果 `$VIMRUNTIME` 没有设置，Git Bash 会使用 "/usr/share/vim/vim91" 作为默认路径。这里的 "vim91" 可能指的是 Vim 的某个特定版本，例如 8.1 版本。
+
+下载 [vimrc 文件](https://github.com/lxwcd/learnVim/blob/main/vimrc.local) 重命名到 `$HOME/.vimrc`，退出后重新进入即可生效。
+
+修改配置文件的路径：
+```bash
+" 设置全局自定义配置文件的路径变量
+let $MYVIMRC = "$HOME/.vimrc"
+```
+
+git bash 中用 ls 查看有 /etc/vimrc 文件，可以在最后加上一个自己的 vimrc 文件配置：
+```bash
+" Source a global configuration file if available
+if filereadable("$HOME/.vimrc")
+  source $HOME/.vimrc
+endif
+```
+
+## 设置别名
+希望全局配置，可以在 `/etc/profile.d/aliases.sh` 中添加。
+针对当前用户配置，在 `$HOME/.bashrc` 中添加。
+
+```bash
+alias stashsimulator='git diff --name-only | grep -E "\.(suo|bin)$" | xargs git stash push -m ".suo and .bin files" '
+alias restoresimulator='git status --porcelain | cut -d" " -f3- |  grep -E "\.(suo|bin)$" | xargs git restore -- '
+alias addCppAndHFiles='git diff --name-only | grep -E "\.(cpp|h)$" | xargs git add -- '
+alias checkSkipWorktree=' git ls-files -v | grep "^S"'
+```
+
+### 修改 vim 中光标样式
+```bash
+" modify cursor style
+if &term =~ "xterm\\|rxvt"
+  " 设置插入模式下的光标样式为竖线
+  let &t_SI .= "\<Esc>[5 q"  " SI = INSERT mode
+  " 设置替换模式下的光标样式为竖线
+  let &t_SR .= "\<Esc>[5 q"  " SR = REPLACE mode
+  " 设置普通模式下的光标样式为块状
+  let &t_EI .= "\<Esc>[2 q"  " EI = NORMAL mode (ELSE)
+endif
+```
+### 复制到系统剪贴板
+选中后使用 `"+ y` 复制内容，即复制到系统剪贴板。
+```bash
+set clipboard=unnamedplus
+```
+`set clipboard=unnamedplus` 是 Vim 中的一个配置选项，用于指定 Vim 如何与系统剪贴板交互。下面是这个配置选项的详细解释：
+
+- Vim 的 `clipboard` 选项控制 Vim 如何使用系统剪贴板。通过设置这个选项，你可以让 Vim 的复制（yank）和粘贴（paste）操作直接与系统剪贴板进行交互。
+- `unnamedplus` 是 `clipboard` 选项的一个值，它告诉 Vim 使用系统剪贴板作为复制和粘贴操作的存储。在 Vim 中，`"+` 寄存器通常与系统剪贴板相关联，而 `unnamedplus` 使得这个寄存器的行为与系统剪贴板一致。
+- 当设置了 `set clipboard=unnamedplus`，Vim 会将复制（yank）操作的内容存储到 `"+` 寄存器，这个寄存器与系统剪贴板同步。因此，当你在 Vim 中复制文本时，它也会出现在系统剪贴板上，你可以在其他程序中粘贴。
+- 从系统剪贴板粘贴（paste）文本到 Vim 中时，Vim 会从 `"+` 寄存器读取内容。
+- 可以使用 `vim --version | grep clipboard` 命令来检查你的 Vim 是否支持剪贴板功能。如果输出中包含 `+clipboard`，则表示支持。
+
 # Git config 配置Git  
 > [Git Config](https://www.gitkraken.com/learn/git/git-config)  
 > [配置 git config](https://tsejx.github.io/devops-guidebook/code/git/config/)  
 > [Git - git-config Documentation](https://git-scm.com/docs/git-config) 
+
+```bash
+lxw@NEU-20240403OIC MINGW64 /e/doc/git_test (main)
+$ git config
+edit             get              list             remove-section   rename-section   set              unset
+```
 
 ## system level
 `git config --system` 是一个用于设置系统级 Git 配置的命令选项。系统级配置影响当前操作系统上的所有 Git 用户和仓库。
@@ -68,7 +183,7 @@ git 学习
 - **全局默认设置**：当你想要为整个系统设置统一的 Git 配置时（例如，统一的用户名、电子邮件地址或别名），使用 `--system` 是合适的。
 - **多用户环境**：在多用户环境中，`--system` 配置确保所有用户都遵循相同的 Git 行为和规则。
 
-### 示例命令
+### 示例
 
 - **设置系统级配置**：
   ```bash
@@ -122,13 +237,28 @@ git 学习
 
 ## 查看全局配置信息  
 ```bash  
-git config --global --list  
+$ git config list --global
+```
+
+## 获取某个配置的信息
+```bash
+lxw@NEU-20240403OIC MINGW64 /e/doc/git_test (main)
+$ git config get --global diff.tool
+vimdiff
+```
+
+## 取消某个配置
+```bash
+lxw@NEU-20240403OIC MINGW64 /e/doc/git_test (main)
+$ git config unset --global diff.date
 ```
 
 ## 修改配置文件的路径
 修改 Git 配置文件的路径通常涉及到更改 Git 查找配置文件的位置。Git 配置文件有三个主要层级：系统级（system）、全局级（global）和项目级（local）。每个层级的配置文件路径可以通过环境变量或 Git 命令进行修改。
 
-### 1. 修改全局配置文件路径
+确保新的配置文件路径是可访问的，并且 Git 有权限读取和写入这些文件。
+
+### 修改全局配置文件路径
 
 全局配置文件默认位于用户的主目录下，名为 `.gitconfig`。可以通过设置环境变量 `GIT_CONFIG_GLOBAL` 来修改全局配置文件的路径。
 
@@ -144,7 +274,7 @@ git config --global --list
   source ~/.bashrc
   ```
 
-### 2. 修改系统配置文件路径
+### 修改系统配置文件路径
 > [bash 配置文件介绍](https://github.com/lxwcd/linux/blob/main/notes/shell学习笔记.md#bash-环境配置文件的用途说明) 
 
 系统配置文件默认位于 `/etc/gitconfig`。你可以通过设置环境变量 `GIT_CONFIG_SYSTEM` 来修改系统配置文件的路径。
@@ -161,7 +291,7 @@ git config --global --list
   source ~/.bashrc
   ```
 
-### 3. 修改项目配置文件路径
+### 修改项目配置文件路径
 
 项目配置文件位于每个 Git 仓库的 `.git/config` 文件中。如果你想为特定项目指定不同的配置文件路径，可以使用 `git config` 命令的 `--file` 选项。
 
@@ -169,10 +299,6 @@ git config --global --list
   ```bash
   git config --file /path/to/your/project/config --get core.editor
   ```
-
-### 注意事项
-- 确保新的配置文件路径是可访问的，并且 Git 有权限读取和写入这些文件。
-
       
 ## 设置用户名和电子邮件  
 ```bash  
@@ -185,11 +311,12 @@ root@ubuntu2204c12:~# git config --global user.email "email@163.com"
 sudo git config --system init.defaultBranch main
 ```
 
-## 修改时区
+git config --global diff.date format:'%Y-%m-%d %H:%M:%S'
+
+## 修改 log 格式和时区
+修改时区以便用 git log 查看日志时的时间和系统时间处于一个时区：
 ```bash
-user.timezone=Asia/Shanghai
-diff.date=+date: '%Y-%m-%d %H:%M:%S'
-log.date=local
+git config --global log.date=local
 ```
 
 ## 配置换行符
@@ -201,6 +328,7 @@ log.date=local
 这些设置的主要目的是在不同操作系统之间协作时，确保文件的换行符保持一致，从而避免因换行符不一致导致的合并冲突和其他问题。
 
 windows 上配置后有点问题，暂未使用。
+
 ### 对于 Unix/Mac 用户
 
 1. **`git config --global core.autocrlf input`**：
@@ -253,118 +381,24 @@ git config --global https.proxy https://192.168.0.119:7890
 
 ## 显示配置项的来源
 ```cpp
-git config --global --list --show-origin
+lxw@NEU-20240403OIC MINGW64 /e/doc/git_test (main)
+$ git config list --global --show-origin
+file:C:/Users/lxw/.gitconfig    user.name=li-736
+file:C:/Users/lxw/.gitconfig    user.email=xiaowan.li@mt.com
+file:C:/Users/lxw/.gitconfig    diff.tool=vimdiff
+file:C:/Users/lxw/.gitconfig    log.date=local
+file:C:/Users/lxw/.gitconfig    core.pager=less
+file:C:/Users/lxw/.gitconfig    core.quotepath=false
+file:C:/Users/lxw/.gitconfig    gui.encoding=utf-8
+file:C:/Users/lxw/.gitconfig    i18n.commitencoding=utf-8
+file:C:/Users/lxw/.gitconfig    i18n.logoutputencoding=utf-8
 ```
+
 `git config --show-origin` 是一个非常有用的命令，它允许你查看 Git 配置项及其来源文件。这个命令可以帮助你理解每个配置项是从哪个配置文件中读取的。
 
 - **显示配置来源**：`--show-origin` 选项用于显示每个配置项的来源，即配置项是从哪个文件中读取的。这包括文件路径、标准输入、blob 或命令行等来源。
-
 - **调试配置问题**：当你不确定某个配置项是从哪个文件中读取时，使用 `--show-origin` 可以帮助你找到答案。
 - **查看配置文件路径**：通过显示配置项的来源，你可以快速找到相关的配置文件路径。
-
-1. **查看所有配置及其来源**：
-   ```bash
-   git config --list --show-origin
-   ```
-   这个命令会列出所有 Git 配置项及其来源文件路径。
-
-2. **查看特定配置项的来源**：
-   ```bash
-   git config --show-origin --get <key>
-   ```
-   这个命令用于获取指定键的配置值以及它们所在的配置文件路径。
-
-# git bash 配置
-## 配置主题字体
-右键选择 option 进行配置，配置完成后保存即可
-
-## vim 配置
-输入 vim 后，输入 `:verion` 查看配置文件的路径，如：
-```bash
-  system vimrc file: "/etc/vimrc"
-     user vimrc file: "$HOME/.vimrc"
- 2nd user vimrc file: "~/.vim/vimrc"
- 3rd user vimrc file: "~/.config/vim/vimrc"
-      user exrc file: "$HOME/.exrc"
-       defaults file: "$VIMRUNTIME/defaults.vim"
-  fall-back for $VIM: "/etc"
- f-b for $VIMRUNTIME: "/usr/share/vim/vim91"
-```
-
-在 Git Bash 和其他类 Unix 环境中，`/etc/vimrc` 是 Vim 编辑器的系统级配置文件的传统路径。这个路径源自 Unix 和 Linux 系统，其中 `/etc` 是用于存储系统级配置文件的目录。然而，在 Windows 系统中，并没有 `/etc` 这样的目录，这是一个 Unix 和 Linux 特有的目录结构。
-
-在 Git Bash 中，`/etc/vimrc` 的路径是一个模拟的路径，它映射到 Windows 系统中的一个实际位置。这样做是为了保持与 Unix 和 Linux 环境的兼容性，使得 Unix 和 Linux 用户能够在 Windows 上的 Git Bash 中使用他们熟悉的 Vim 配置。
-
-最后两行的意思是：
-
-1. **fall-back for $VIM: "/etc"**
-   - 这行表示如果环境变量 `$VIM` 没有设置，Git Bash 会回退到 "/etc" 目录来查找 Vim 相关的配置和文件。这是一个备用方案，以防 `$VIM` 环境变量未定义。
-
-2. **f-b for $VIMRUNTIME: "/usr/share/vim/vim91"**
-   - `$VIMRUNTIME` 是另一个环境变量，它指向 Vim 的运行时文件，包括语法文件、脚本等。这行表示如果 `$VIMRUNTIME` 没有设置，Git Bash 会使用 "/usr/share/vim/vim91" 作为默认路径。这里的 "vim91" 可能指的是 Vim 的某个特定版本，例如 8.1 版本。
-
-下载 [vimrc 文件](https://github.com/lxwcd/learnVim/blob/main/vimrc.local) 重命名到 `$HOME/.vimrc`，退出后重新进入即可生效。
-
-修改配置文件的路径：
-```bash
-" 设置全局自定义配置文件的路径变量
-let $MYVIMRC = "$HOME/.vimrc"
-```
-
-git bash 中用 ls 查看有 /etc/vimrc 文件，可以在最后加上一个自己的 vimrc 文件配置：
-```bash
-" Source a global configuration file if available
-if filereadable("$HOME/.vimrc")
-  source $HOME/.vimrc
-endif
-```
-
-## 设置别名
-希望全局配置，可以在 `/etc/profile.d/aliases.sh` 中添加。
-针对当前用户配置，在 `$HOME/.bashrc` 中添加。
-
-```bash
-export TZ='Asia/Shanghai'
-alias stashsimulator='git diff --name-only | grep -E "\.(suo|bin)$" | xargs git stash push -m ".suo and .bin files" '
-alias restoresimulator='git status --porcelain | cut -d" " -f3- |  grep -E "\.(suo|bin)$" | xargs git restore -- '
-alias addCppAndHFiles='git diff --name-only | grep -E "\.(cpp|h)$" | xargs git add -- '
-alias checkSkipWorktree=' git ls-files -v | grep "^S"'
-```
-
-### 修改 vim 中光标样式
-```bash
-" modify cursor style
-if &term =~ "xterm\\|rxvt"
-  " 设置插入模式下的光标样式为竖线
-  let &t_SI .= "\<Esc>[5 q"  " SI = INSERT mode
-  " 设置替换模式下的光标样式为竖线
-  let &t_SR .= "\<Esc>[5 q"  " SR = REPLACE mode
-  " 设置普通模式下的光标样式为块状
-  let &t_EI .= "\<Esc>[2 q"  " EI = NORMAL mode (ELSE)
-endif
-```
-### 复制到系统剪贴板
-选中后使用 `"+ y` 复制内容，即复制到系统剪贴板。
-```bash
-set clipboard=unnamedplus
-```
-`set clipboard=unnamedplus` 是 Vim 中的一个配置选项，用于指定 Vim 如何与系统剪贴板交互。下面是这个配置选项的详细解释：
-
-1. **`clipboard` 选项**：
-   - Vim 的 `clipboard` 选项控制 Vim 如何使用系统剪贴板。通过设置这个选项，你可以让 Vim 的复制（yank）和粘贴（paste）操作直接与系统剪贴板进行交互。
-
-2. **`unnamedplus` 的含义**：
-   - `unnamedplus` 是 `clipboard` 选项的一个值，它告诉 Vim 使用系统剪贴板作为复制和粘贴操作的存储。在 Vim 中，`"+` 寄存器通常与系统剪贴板相关联，而 `unnamedplus` 使得这个寄存器的行为与系统剪贴板一致。
-
-3. **如何工作**：
-   - 当你设置了 `set clipboard=unnamedplus`，Vim 会将复制（yank）操作的内容存储到 `"+` 寄存器，这个寄存器与系统剪贴板同步。因此，当你在 Vim 中复制文本时，它也会出现在系统剪贴板上，你可以在其他程序中粘贴。
-   - 同样地，从系统剪贴板粘贴（paste）文本到 Vim 中时，Vim 会从 `"+` 寄存器读取内容。
-
-4. **在 Linux 中的配置**：
-   - 这个配置同样适用于 Linux 系统。在 Linux 系统中，`"+` 寄存器可能与 X11 的 CLIPBOARD 选区相关联，这取决于你的桌面环境和配置。在大多数现代 Linux 发行版中，`"+` 寄存器用于系统剪贴板操作。
-
-5. **检查 Vim 是否支持剪贴板**：
-   - 可以使用 `vim --version | grep clipboard` 命令来检查你的 Vim 是否支持剪贴板功能。如果输出中包含 `+clipboard`，则表示支持。
 
 # Git 存储数据方式  
 > [Git Internals Part 2: How does Git store your data?](https://www.developernation.net/blog/git-internals-how-does-git-store-your-data)  
