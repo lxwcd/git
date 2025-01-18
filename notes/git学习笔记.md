@@ -1,4 +1,4 @@
-git 学习  
+﻿git 学习  
       
 # 学习资源  
 > 初步了解 git：[廖雪峰 Git 教程](https://www.liaoxuefeng.com/wiki/896043488029600)  
@@ -313,7 +313,7 @@ sudo git config --system init.defaultBranch main
 
 git config --global diff.date format:'%Y-%m-%d %H:%M:%S'
 
-## 修改 log 格式和时区
+## 修改 log 时区
 修改时区以便用 git log 查看日志时的时间和系统时间处于一个时区：
 ```bash
 git config --global log.date=local
@@ -512,6 +512,19 @@ git push origin ':refs/heads/feature'
 
 3. **Git 服务**：裸仓库可以作为 Git 服务运行，比如 Git 服务器或 CI/CD 系统，它们需要处理多个项目的推送和拉取操作。
 
+## 创建裸仓库
+
+```bash
+git init --bare myproject.git
+```
+
+这将创建一个名为 `myproject.git` 的目录，其中包含一个裸仓库。
+
+## 使用裸仓库
+
+- **推送和拉取**：开发者可以将本地更改推送到裸仓库，或者从裸仓库拉取更改到本地。
+- **克隆裸仓库**：如果你想从裸仓库开始本地开发，需要克隆裸仓库以创建一个包含工作目录的常规仓库。
+
 ## `git clone --mirror` 命令
 
 当使用 `git clone --mirror` 克隆一个仓库时，你实际上是在创建一个裸仓库。这个命令会复制所有的引用（refs），包括分支、标签和远程引用，并且设置特殊的 refspec，使得所有这些引用在目标仓库中都会被覆盖。这意味着任何推送到这个镜像仓库的更改都会反映到所有相关的引用上。
@@ -524,13 +537,10 @@ git push origin ':refs/heads/feature'
 
 3. **创建裸仓库**：创建的仓库没有工作目录，只有 `.git` 目录。
 
-## 示例
-
 ```bash
 git clone --mirror https://github.com/user/repo.git
 ```
-
-这个命令会创建一个名为 `repo.git` 的裸仓库，其中包含了 `https://github.com/user/repo.git` 仓库的所有引用。你可以使用这个裸仓库来推送更新到远程服务器，或者作为其他仓库的备份。
+这个命令会创建一个名为 `repo.git` 的裸仓库，其中包含了 `https://github.com/user/repo.git` 仓库的所有引用。可以使用这个裸仓库来推送更新到远程服务器，或者作为其他仓库的备份。
 
 # 子模块
 > [Git - git-submodule Documentation](https://git-scm.com/docs/git-submodule) 
@@ -626,51 +636,92 @@ Git 子模块（Submodule）是一种将一个 Git 仓库嵌入到另一个 Git 
 # git clone
 > [Git - git-clone Documentation](https://git-scm.com/docs/git-clone)   
 
-## **克隆默认分支**
-   ```bash
-   git clone https://github.com/user/repo.git
-   ```
-   这将克隆 `user/repo` 仓库的默认分支（通常是 `master` 或 `main`）到本地目录 `repo`。
+## 克隆默认分支
+```bash
+git clone https://github.com/user/repo.git
+```
+这将克隆 `user/repo` 仓库的默认分支（通常是 `master` 或 `main`）到本地。
 
-## **克隆特定分支**
-   ```bash
-   git clone -b develop https://github.com/user/repo.git
-   ```
-   这将克隆 `user/repo` 仓库的 `develop` 分支。
+## 克隆远程仓库的特定分支
+```bash
+git clone -b develop https://github.com/user/repo.git
+```
+这将克隆 `user/repo` 仓库的 `develop` 分支，这个分支必须是远程仓库已经存在的分支。
+克隆完后本地会创建一个和远程 `develop` 对应的分支，同时也会克隆远程仓库的其他分支。
 
-## **克隆不包含标签**
-   ```bash
-   git clone --no-tags https://github.com/user/repo.git
-   ```
-   这将克隆仓库，但不包括任何标签。
+```bash
+lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test03
+$ git clone -b tb01 https://github.com/lxwcd/git_test.git .
+Cloning into '.'...
+remote: Enumerating objects: 33, done.
+remote: Counting objects: 100% (33/33), done.
+remote: Compressing objects: 100% (22/22), done.
+remote: Total 33 (delta 2), reused 29 (delta 1), pack-reused 0 (from 0)
+Receiving objects: 100% (33/33), 4.15 KiB | 1.38 MiB/s, done.
+Resolving deltas: 100% (2/2), done.
 
-## **浅克隆**
-   ```bash
-   git clone --depth 1 https://github.com/user/repo.git
-   ```
-   这将创建一个浅克隆，只包含最新的提交（即最近一次提交的历史）。
+lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test03 (tb01)
+$ git branch -vv
+* tb01 f9e71d6 [origin/tb01] Update test01.txt
 
-## **克隆并指定分支名称**
-   ```bash
-   git clone --branch new-branch --single-branch https://github.com/user/repo.git
-   ```
-   这将克隆 `user/repo` 仓库，并检查出 `new-branch` 分支。
-   `git clone --branch new-branch --single-branch https://github.com/user/repo.git` 这个命令包含了两个参数：`--branch` 和 `--single-branch`。
+lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test03 (tb01)
+$ git branch -a
+* tb01
+  remotes/origin/HEAD -> origin/main
+  remotes/origin/branch01
+  remotes/origin/main
+  remotes/origin/tb01
+```
 
-1. **--branch <name>**：
-   这个参数后面跟的是你想要克隆的分支名称。在这个例子中，`<name>` 被替换成了 `new-branch`，意味着你想要克隆远程仓库中名为 `new-branch` 的分支。
+## 克隆不包含标签
+```bash
+git clone --no-tags https://github.com/user/repo.git
+```
+这将克隆仓库，但不包括任何标签。
 
-2. **--single-branch**：
-   这个参数告诉 Git 你只想要克隆一个分支，而不是整个仓库的所有分支。当你使用 `--branch` 参数指定了一个分支后，`--single-branch` 会确保 Git 只克隆那个特定的分支，而不是克隆整个仓库的所有分支。
+## 浅克隆
+```bash
+git clone --depth 1 https://github.com/user/repo.git
+```
+这将创建一个浅克隆，只包含最新的提交（即最近一次提交的历史）。
 
-这个命令特别有用在你只对远程仓库中的某个特定分支感兴趣，而不需要整个仓库的所有分支和标签时。这样可以减少克隆操作所需的时间和带宽，因为你只获取了你感兴趣的那部分代码。
+## 仅克隆远程仓库指定分支
+```bash
+git clone --branch new-branch --single-branch https://github.com/user/repo.git
+```
+这将克隆 `user/repo` 仓库，并检查出 `new-branch` 分支，本地看不到远程仓库的其他分支。
 
-## **克隆并初始化所有子模块**
-   ```bash
-   git clone --recurse-submodules https://github.com/user/repo.git
-   ```
-   这将克隆仓库以及所有子模块。
-   `git clone --recurse-submodules https://github.com/user/repo.git` 这个命令用于克隆一个包含子模块的 Git 仓库，并且初始化并克隆所有的子模块。
+```bash
+lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test02
+$ git clone -b tb01 --single-branch https://github.com/lxwcd/git_test.git
+Cloning into '.'...
+remote: Enumerating objects: 18, done.
+remote: Counting objects: 100% (18/18), done.
+remote: Compressing objects: 100% (11/11), done.
+remote: Total 18 (delta 1), reused 15 (delta 1), pack-reused 0 (from 0)
+Receiving objects: 100% (18/18), done.
+Resolving deltas: 100% (1/1), done.
+
+lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test02 (tb01)
+$ ls -a
+./  ../  .git/  test01.txt  test02.txt  test03.txt  test04.txt
+
+lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test02 (tb01)
+$ git branch -a
+* tb01
+  remotes/origin/tb01
+
+lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test02 (tb01)
+$ git branch -vv
+* tb01 f9e71d6 [origin/tb01] Update test01.txt
+```
+
+## 克隆并初始化所有子模块
+```bash
+git clone --recurse-submodules https://github.com/user/repo.git
+```
+这将克隆仓库以及所有子模块。
+`git clone --recurse-submodules https://github.com/user/repo.git` 这个命令用于克隆一个包含子模块的 Git 仓库，并且初始化并克隆所有的子模块。
 
 1. **git clone**：
    这是 Git 的克隆命令，用于从一个远程仓库复制代码到本地。
@@ -690,34 +741,41 @@ Git 子模块（Submodule）是一种将一个 Git 仓库嵌入到另一个 Git 
 
 这个命令特别有用在你想要克隆一个复杂的项目时，这个项目包含了多个依赖的子项目（子模块）。使用 `--recurse-submodules` 参数可以确保你不仅克隆了主项目，还克隆了所有需要的子模块，这样可以保证项目的完整性和可构建性。
 
-## **创建裸仓库**
-   ```bash
-   git clone --mirror https://github.com/user/repo.git
-   ```
-   这将创建一个裸仓库，即没有工作目录的仓库，通常用于作为其他仓库的镜像。
+## 创建裸仓库
+```bash
+git clone --bare https://github.com/user/repo.git
+```
+这将创建一个裸仓库，即没有工作目录的仓库，通常用于作为其他仓库的镜像。
 
-## **使用模板克隆**
-   ```bash
-   git clone --template=/path/to/template https://github.com/user/repo.git
-   ```
-   这将使用指定的模板目录来初始化新仓库。
+> Make a bare Git repository. That is, instead of creating <directory> and placing the administrative files in <directory>/.git, make the <directory> itself the $GIT_DIR. This obviously implies the --no-checkout because there is nowhere to check out the working tree. Also the branch heads at the remote are copied directly to corresponding local branch heads, without mapping them to refs/remotes/origin/. When this option is used, neither remote-tracking branches nor the related configuration variables are created.
 
-## **设置配置变量**
-   ```bash
-   git clone --config user.name="Your Name" https://github.com/user/repo.git
-   ```
-   这将在克隆时设置仓库的用户名称。
+## 创建镜像仓库
+```bash
+git clone --mirror https://github.com/user/repo.git
+```
+和创建裸仓库类似，但还包含远程分支的引用。
 
-## **不检出 HEAD**
-    ```bash
-    git clone --no-checkout https://github.com/user/repo.git
-    ```
+> Set up a mirror of the source repository. This implies --bare. Compared to --bare, --mirror not only maps local branches of the source to local branches of the target, it maps all refs (including remote-tracking branches, notes etc.) and sets up a refspec configuration such that all these refs are overwritten by a git remote update in the target repository.
+
+## 不检出 HEAD
+```bash
+git clone --no-checkout https://github.com/user/repo.git
+```
 这将克隆仓库，但不会检出 HEAD 对应的工作目录。
-`git clone --no-checkout` 是一个 Git 命令的选项，它用于克隆远程仓库但不检出代码。
 
 `git clone --no-checkout <repository-url>` 命令会从 `<repository-url>` 指定的远程仓库克隆一个空目录，其中包含远程仓库的所有分支和标签的引用，但不包含任何工作目录中的文件。
 
-- `--no-checkout`：这个选项告诉 Git 在克隆过程中不要检出 HEAD 或任何其他分支的最新提交。这意味着在克隆完成后，你将得到一个空的工作目录。
+## 使用模板克隆
+```bash
+git clone --template=/path/to/template https://github.com/user/repo.git
+```
+这将使用指定的模板目录来初始化新仓库。
+
+## 设置配置变量
+```bash
+git clone --config user.name="Your Name" https://github.com/user/repo.git
+```
+这将在克隆时设置仓库的用户名称。
 
 ### 使用场景
 
@@ -734,29 +792,26 @@ Git 子模块（Submodule）是一种将一个 Git 仓库嵌入到另一个 Git 
 - 如果你想要检出远程分支的最新提交，可以先执行 `git fetch`，然后使用 `git checkout -b <branch-name> origin/<branch-name>`。
 - 使用 `--no-checkout` 克隆的仓库将不会包含任何文件，直到你显式地检出分支或提交。
 
-## **稀疏检出**
-    ```bash
-    git clone --sparse https://github.com/user/repo.git
-    ```
-    这将使用稀疏检出克隆仓库，只检出顶级目录中的文件。
+## 稀疏检出
+```bash
+git clone --sparse https://github.com/user/repo.git
+```
+这将使用稀疏检出克隆仓库，只检出顶级目录中的文件。
 
-## **部分克隆**
-    ```bash
-    git clone --filter=blob:none https://github.com/user/repo.git
-    ```
-    这将创建一个不包含任何二进制文件的克隆。
+## 部分克隆
+> [Git - git-clone Documentation](https://git-scm.com/docs/git-clone#Documentation/git-clone.txt-code--filterltfilter-specgtcode) 
 
-这些示例展示了如何根据不同的需求使用 `git clone` 命令的参数。在实际使用中，你可以根据需要组合这些参数来实现更复杂的克隆操作。
+```bash
+git clone --filter=blob:none https://github.com/user/repo.git
+```
 
-## 克隆仓库到新目录  
-如果远程仓库地址为：https://github.com/lxwcd/learnVim.git，直接用 git clone url 会将远程仓库克隆到当前目录  
-当前目录下会包含远程仓库的目录
-
+## 仅克隆仓库中的文件
 如果不想远程仓库的目录，只将目录内的文件克隆到本地当前目录下，则如下：
 ```bash     
 git clone https://github.com/lxwcd/cpp.git .
 ```
       
+## 克隆仓库到新目录  
 将远程仓库克隆到指定目录并且修改仓库名字为 `new_folder`：  
 ```bash  
 git clone https://github.com/lxwcd/learnVim.git /usr/local/src/new_folder  
@@ -767,34 +822,8 @@ git clone https://github.com/lxwcd/learnVim.git /usr/local/src/new_folder
 git clone https://github.com/lxwcd/learnVim.git /usr/local/src/1/2/3/new_folder  
 ```
 
-## 克隆本地仓库
-```bash
-git clone /path/to/source/repo /path/to/new/repo
-```
-
-这条命令会将 `/path/to/source/repo` 仓库的内容克隆到 `/path/to/new/repo` 目录中。
-
-- **`git clone <source> <destination>`**：
-  - `<source>`：源仓库的路径。
-  - `<destination>`：目标仓库的路径。如果目标路径已经存在，Git 会报错。如果目标路径不存在，Git 会自动创建该目录。
-
-### **浅克隆只包含最新的提交**
-这条命令会创建一个只包含最新提交的浅克隆，不包含完整的提交历史。
-
-```bash
-lx@LAPTOP-VB238NKA MINGW64 /d/Documents
-$ git clone --depth=1 file:///d/Documents/git_test /d/Documents/git_test_03
-Cloning into 'D:/Documents/git_test_03'...
-remote: Enumerating objects: 5, done.
-remote: Counting objects: 100% (5/5), done.
-remote: Compressing objects: 100% (2/2), done.
-remote: Total 5 (delta 0), reused 0 (delta 0), pack-reused 0 (from 0)
-Receiving objects: 100% (5/5), done.
-```
-本地克隆默认使用文件系统路径，而不是通过网络协议（如 http 或 git）进行克隆。
-
-## **file 协议克隆**
-在 Git 中，`file` 协议用于通过本地文件系统路径克隆或访问仓库。`file` 协议的使用方式与通过网络协议（如 `http`、`https`、`git`）克隆仓库类似，但它专门用于本地文件系统。下面详细讲解 `file` 协议的使用方法和注意事项。
+## file 协议克隆
+在 Git 中，`file` 协议用于通过本地文件系统路径克隆或访问仓库。`file` 协议的使用方式与通过网络协议（如 `http`、`https`、`git`）克隆仓库类似，但它专门用于本地文件系统。
 
 ```bash
 file:///path/to/repo
@@ -803,24 +832,14 @@ file:///path/to/repo
 - **`/`**：在 Unix-like 系统中，路径从根目录开始，因此使用三个斜杠 `///`。
 - **`/path/to/repo`**：这是仓库的路径。
 
-### **克隆本地仓库**
+## 克隆本地仓库
 ```bash
 git clone file:///d/Documents/git_test /d/Documents/git_test_03
 ```
 - 源路径：`file:///d/Documents/git_test`，表示 `D:/Documents/git_test` 仓库。
 - 目标路径：`/d/Documents/git_test_03`，表示克隆到 `D:/Documents/git_test_03` 目录。
 
-### **添加本地远程仓库**
-```bash
-git remote add local-origin file:///d/Documents/git_test
-```
-- 将 `D:/Documents/git_test` 仓库添加为远程仓库，别名为 `local-origin`。
-
-### 注意事项
-`file://` 协议不支持相对路径。如果需要使用相对路径，可以直接使用本地文件系统路径。
-```bash
-git clone /d/Documents/git_test /d/Documents/git_test_03
-```
+本地克隆默认使用文件系统路径，而不是通过网络协议（如 http 或 git）进行克隆。
 
 # git init 初始化仓库
 > [Git - git-init Documentation](https://git-scm.com/docs/git-init) 
@@ -832,41 +851,13 @@ git clone /d/Documents/git_test /d/Documents/git_test_03
 
 ## 使用场景
 
-- **开始新项目**：当你开始一个新项目并希望使用 Git 进行版本控制时，`git init` 是第一步。
-- **将现有项目转换为 Git 仓库**：如果你有一个未使用 Git 版本控制的现有项目，`git init` 可以将其转换为 Git 仓库。
+- **开始新项目**：当开始一个新项目并希望使用 Git 进行版本控制时，`git init` 是第一步。
+- **将现有项目转换为 Git 仓库**：如果有一个未使用 Git 版本控制的现有项目，`git init` 可以将其转换为 Git 仓库。
 
-## 基本使用
-
-- **初始化当前目录**：
-  ```bash
-  git init
-  ```
-  这个命令将当前目录初始化为一个 Git 仓库。
-
-- **初始化指定目录**：
-  ```bash
-  git init <directory>
-  ```
-  这个命令将指定目录初始化为一个 Git 仓库。如果目录不存在，Git 会尝试创建它。
-
-## 选项
-
-- **`--bare`**：创建一个裸仓库（bare repository），这种仓库没有工作目录，通常用于服务器上的中央仓库。
-  ```bash
-  git init --bare
-  ```
-
-- **`--template=<template_directory>`**：指定一个模板目录，Git 将从该目录复制文件到新仓库的 `.git` 目录。
-  ```bash
-  git init --template=/path/to/template
-  ```
-
-- **`--separate-git-dir=<git_dir>`**：将 Git 仓库目录（`.git`）与工作目录分开，指定一个单独的路径来存储 Git 仓库文件。
-  ```bash
-  git init --separate-git-dir=/path/to/gitdir
-  ```
-
-## 结果
+## 初始化当前目录
+```bash
+git init
+```
 
 执行 `git init` 后，当前目录（或指定目录）将包含一个新的 `.git` 目录，其中包含以下内容：
 
@@ -875,50 +866,17 @@ git clone /d/Documents/git_test /d/Documents/git_test_03
 - **`objects`**：存储 Git 对象的目录。
 - **`refs`**：存储分支和标签引用的目录。
 
-## 后续步骤
-
-初始化仓库后，你可以开始使用 Git 进行版本控制：
-
-1. **添加文件**：使用 `git add` 将文件添加到暂存区。
-2. **首次提交**：使用 `git commit` 创建初始提交。
-3. **添加远程仓库**：使用 `git remote add` 添加远程仓库，以便与他人协作。
-
-## 注意事项
-
-- **空目录**：`git init` 通常在空目录中执行，但也可以在非空目录中执行，Git 会将目录中的文件视为未跟踪文件。
-- **裸仓库**：裸仓库不包含工作目录，通常用于集中式版本控制。
-
-## 裸仓库
-想象一下，你有一个 Git 仓库，里面有很多文件和文件夹，这些文件和文件夹是你项目的实际内容。在普通的 Git 仓库中，这些文件和文件夹是可见的，并且你可以直接编辑它们。这种仓库被称为“非裸仓库”或“常规仓库”。
-
-现在，想象一下一个只有 Git 版本控制数据（如提交历史、分支信息等），但没有任何实际项目文件的仓库。这种仓库就是“裸仓库”。它只包含 `.git` 目录，而没有工作目录（即没有你项目的文件和文件夹）。
-
-1. **没有工作目录**：裸仓库没有工作目录，这意味着你不能在裸仓库中直接查看或编辑文件。
-
-2. **只包含版本控制数据**：裸仓库只包含版本控制数据（如提交、分支、标签等），这些数据都存储在 `.git` 目录中。
-
-3. **用于远程仓库**：裸仓库通常用作远程仓库，用于集中式版本控制和协作。开发者可以将本地更改推送到裸仓库，或者从裸仓库拉取更改到本地。
-
-### 为什么使用裸仓库？
-
-- **集中式协作**：裸仓库作为中央仓库，允许多个开发者协作。每个开发者可以克隆中央裸仓库，进行本地开发，然后将更改推送到中央仓库。
-- **存储效率**：由于不包含工作目录，裸仓库通常比常规仓库更小，因为它们只存储版本控制的元数据，而不存储实际的工作文件。
-- **安全性**：裸仓库不允许直接在服务器上修改文件，这可以防止未经授权的更改。
-
-### 创建裸仓库
-
-你可以使用以下命令创建一个裸仓库：
-
+## 初始化指定目录
 ```bash
-git init --bare myproject.git
+git init <directory>
 ```
+这个命令将指定目录初始化为一个 Git 仓库。如果目录不存在，Git 会尝试创建它。
 
-这将创建一个名为 `myproject.git` 的目录，其中包含一个裸仓库。
-
-### 使用裸仓库
-
-- **推送和拉取**：开发者可以将本地更改推送到裸仓库，或者从裸仓库拉取更改到本地。
-- **克隆裸仓库**：如果你想从裸仓库开始本地开发，需要克隆裸仓库以创建一个包含工作目录的常规仓库。
+## 创建裸仓库
+```bash
+git init --bare
+```
+创建一个裸仓库（bare repository），这种仓库没有工作目录，通常用于服务器上的中央仓库。
 
 # git status 检查文件状态
 > [Git - git-status Documentation](https://git-scm.com/docs/git-status) 
@@ -3438,6 +3396,12 @@ git restore [<options>] [--source=<tree>] [--staged] [--worktree] [--] <pathspec
 - **`remove`**：删除远程仓库引用。
 - **`rename`**：重命名远程仓库。
 - **`set-url`**：更改远程仓库的 URL。
+
+## 添加本地远程仓库
+```bash
+git remote add local-origin file:///d/Documents/git_test
+```
+- 将 `D:/Documents/git_test` 仓库添加为远程仓库，别名为 `local-origin`。
 
 ## 使用场景
 
