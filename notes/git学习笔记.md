@@ -3200,62 +3200,11 @@ git diff main@{0} main@{1.day.ago}
 # Undo things
 > [Git - Undoing Things](https://git-scm.com/book/en/v2/Git-Basics-Undoing-Things) 
 
-## 修改提交 git commit --amend
-`git commit --amend` 是 Git 中用于修改最近一次提交的命令。这个命令允许你更改最后一次提交的内容，包括提交信息和提交内容。
+## 修改本地的最新提交 git commit --amend
+- 仅针对本地最新的提交
+- 最新提交还未推送到远程
 
-1. **修改提交信息**：如果你在提交后发现提交信息有误或需要补充，`git commit --amend` 可以让你编辑提交信息。
-2. **添加遗漏的更改**：如果你在提交后发现遗漏了一些更改，可以使用 `git commit --amend` 将这些更改添加到最近一次提交中。
-3. **更新提交内容**：如果你在提交后对文件进行了修改，可以使用 `git commit --amend` 将这些修改包含在最近一次提交中。
-
-### 使用场景
-
-- **修正提交信息**：当你提交后发现提交信息有错别字或不够清晰时。
-- **补充遗漏的文件**：当你提交后发现有文件忘记添加时。
-- **更新文件内容**：当你提交后对文件进行了修改，并希望这些修改作为最后一次提交的一部分。
-- Only amend commits that are still local and have not been pushed somewhere.
-
-### 基本使用
-
-- **修改提交信息**：
-  ```bash
-  git commit --amend
-  ```
-  这个命令会打开一个文本编辑器，编辑最近一次提交的信息。
-
-- **添加遗漏的更改**：
-  ```bash
-  git add <file>
-  git commit --amend
-  ```
-  这个命令序列将遗漏的文件添加到暂存区，然后使用 `git commit --amend` 将这些更改包含在最近一次提交中。
-
-### 选项
-
-- **`-m`**：指定新的提交信息。例如：
-  ```bash
-  git commit --amend -m "New commit message"
-  ```
-  这个命令直接指定新的提交信息，而不会打开编辑器。
-
-### 注意事项
-
-- **本地提交**：`git commit --amend` 只能用于修改本地仓库中的提交。如果你已经将提交推送到远程仓库，修改本地提交后需要使用 `git push --force` 来覆盖远程仓库中的提交。
-- **影响协作**：如果你已经将提交推送到远程仓库，修改提交后可能会对协作产生影响。确保在修改提交之前与团队成员沟通。
-- **撤销更改**：如果你在 `git commit --amend` 后想要撤销更改，可以使用 `git reflog` 查找原始提交的引用，然后使用 `git reset` 恢复到原始状态。
-
-### 示例
-
-假设提交了一个更改，但忘记添加一个文件：
-
-```bash
-git commit -m "Initial commit"
-git add forgotten_file
-git commit --amend
-```
-
-这个过程将创建一个新的提交，包含所有之前的更改和新添加的文件，原始提交将被替换。
-
-## git reset - Unstaging a Staged File
+## 撤销本地多个提交 git reset
 > [Git - Reset Demystified](https://git-scm.com/book/en/v2/Git-Tools-Reset-Demystified#_git_reset) 
 > [Git - git-reset Documentation](https://git-scm.com/docs/git-reset) 
 > [Git - git-reset Documentation](https://git-scm.com/docs/git-reset#_discussion) 
@@ -3265,6 +3214,16 @@ git commit --amend
 1. **撤销提交**：`git reset` 可以将当前分支的 HEAD 指针移动到指定的状态，但不影响工作目录。
 2. **重置暂存区**：它可以将暂存区的内容重置为特定提交的状态。
 3. **恢复工作目录**：`git reset` 还可以用来恢复工作目录中的文件到特定提交的状态。
+
+撤销最新的提交：
+```bash
+git reset --soft HEAD^
+```
+
+撤销最近的三次提交：
+```bash
+git reset --soft HEAD~3
+```
 
 ### 使用场景
 
@@ -3302,109 +3261,125 @@ git commit --amend
 - **结果**：这允许你切换到不同的分支并保留所有更改。
 - **使用场景**：当你想要切换到不同的分支并保留所有更改时，可以使用 `--keep`。
 
-### undo add
-git add 文件后可以 git reset 撤回 add 或者 git restore --staged 
-```bash
-lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (main)
-$ git status
-On branch main
-Changes to be committed:
-  (use "git restore --staged <file>..." to unstage)
-        new file:   test04.txt
+### 显示被撤销的提交
+执行 `git reset --soft HEAD^` 后查看被撤销的上次提交，直接用 `git log` 无法查看之前被撤销的提交。
 
+#### 使用 `ORIG_HEAD`
 
-lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (main)
-$ git reset
-
-lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (main)
-$ git status
-On branch main
-Untracked files:
-  (use "git add <file>..." to include in what will be committed)
-        test04.txt
-```
-### undo a commit 
-新建一个提交，然后 git reset 移动 HEAD 到上一个提交，此时 git log 查看最新的提交看不到被撤销的提交。
-```bash
-lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (main)
-$ git commit -m "1"
-[main 235d5b0] 1
- 1 file changed, 1 insertion(+)
-
-lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (main)
-$ git log
-commit 235d5b0252a039e0edc53048fa55e5a4fff72a0b (HEAD -> main)
-Author: lxwcd <15521168075@163.com>
-Date:   Sun Dec 15 20:46:50 2024 +0800
-
-    1
-
-lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (main)
-$ git reset --soft HEAD^
-```
-
-#### 显示被撤销的提交
-执行 `git reset --soft HEAD^` 后，`HEAD` 指针确实指向了上一次提交。要查看被撤销的上次提交，你可以使用以下方法：
-
-1. 使用 `ORIG_HEAD`
-
-当你执行 `git reset` 时，Git 会自动创建一个名为 `ORIG_HEAD` 的引用，指向原始的 `HEAD` 位置。因此，你可以使用 `ORIG_HEAD` 来查看被撤销的提交：
+当执行 `git reset` 时，Git 会自动创建一个名为 `ORIG_HEAD` 的引用，指向原始的 `HEAD` 位置。
 
 ```bash
-git log ORIG_HEAD
-```
-```bash
-lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (main)
-$ git log ORIG_HEAD
-commit 235d5b0252a039e0edc53048fa55e5a4fff72a0b
-Author: lxwcd <15521168075@163.com>
-Date:   Sun Dec 15 20:46:50 2024 +0800
+lx@lx MINGW64 /d/Documents/git_test03 (main)
+$ git log ORIG_HEAD --oneline -2
+fc003e8 rename 1.txt to 11.txt:wq
+e43f274 (HEAD -> main) Merge branch 'branch01'
 
-    1
-```
-这个命令会显示被撤销的提交的详细信息。
-
-2. 使用 `HEAD@{1}`
-
-Git 的 reflog 功能记录了 `HEAD` 的每次更新。你可以使用 `HEAD@{1}` 来引用 `HEAD` 的上一个位置：
-
-```bash
-git log HEAD@{1}
+lx@lx MINGW64 /d/Documents/git_test03 (main)
+$ git log --oneline -2
+e43f274 (HEAD -> main) Merge branch 'branch01'
+03d14ae (origin/main, origin/HEAD) update main test01.txt
 ```
 
-这个命令会显示 `HEAD` 在上一次更新时指向的提交。
-
-3. 使用 `git reflog`
+#### 使用 `git reflog`
 
 `git reflog` 显示 `HEAD` 的更新历史，你可以通过它找到被撤销的提交：
 
 ```bash
-git reflog
+lx@lx MINGW64 /d/Documents/git_test03 (main)
+$ git log --oneline -3
+36c7d37 (HEAD -> main) update new
+e43f274 Merge branch 'branch01'
+03d14ae (origin/main, origin/HEAD) update main test01.txt
 ```
-
-在输出中，找到对应的操作（通常是 `reset` 操作），并查看该操作之前的 `HEAD` 位置。
-
-4. 使用 `git log` 的范围功能
-
-如果你知道被撤销提交的哈希值，可以直接使用 `git log` 的范围功能来查看该提交：
 
 ```bash
-git log <commit-hash>
+lx@lx MINGW64 /d/Documents/git_test03 (main)
+$ git reflog -4
+36c7d37 (HEAD -> main) HEAD@{0}: commit: update new
+e43f274 HEAD@{1}: reset: moving to HEAD^
+5e51d74 HEAD@{2}: commit: update
+e43f274 HEAD@{3}: reset: moving to HEAD^
 ```
 
-将 `<commit-hash>` 替换为被撤销提交的实际哈希值。
+可以看见在 `5e51d74` 提交后，进行 reset，因此 HEAD 又变成 `e43f274`，然后又继续有新的提交。
 
-### undo a commit and switch branch
+# 撤销暂存区的添加 git restor --staged
+撤销后修改会存在工作目录，但处于未暂存的状态。
+
 ```bash
-$ git branch topic/wip          (1)
-$ git reset --hard HEAD~3       (2)
-$ git switch topic/wip          (3)
+lx@lx MINGW64 /d/Documents/git_test03 (main)
+$ git status
+On branch main
+Your branch is ahead of 'origin/main' by 5 commits.
+  (use "git push" to publish your local commits)
+
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+        modified:   test02.txt
+        modified:   test03.txt
+
+
+lx@lx MINGW64 /d/Documents/git_test03 (main)
+$ git restore --staged .
+
+lx@lx MINGW64 /d/Documents/git_test03 (main)
+$ git status
+On branch main
+Your branch is ahead of 'origin/main' by 5 commits.
+  (use "git push" to publish your local commits)
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   test02.txt
+        modified:   test03.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
 ```
-You have made some commits, but realize they were premature to be in the master branch. You want to continue polishing them in a topic branch, so create topic/wip branch off of the current HEAD.
 
-Rewind the master branch to get rid of those three commits.
+# 撤销未暂存的修改 git restore
 
-Switch to topic/wip branch and keep working.
+仅撤销未暂存的修改，不影响已暂存的修改。
+```bash
+lx@lx MINGW64 /d/Documents/git_test03 (main)
+$ git status
+On branch main
+Your branch is ahead of 'origin/main' by 5 commits.
+  (use "git push" to publish your local commits)
+
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+        modified:   test02.txt
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   test03.txt
+```
+
+```bash
+lx@lx MINGW64 /d/Documents/git_test03 (main)
+$ git restore .
+```
+
+```bash
+lx@lx MINGW64 /d/Documents/git_test03 (main)
+$ git status
+On branch main
+Your branch is ahead of 'origin/main' by 5 commits.
+  (use "git push" to publish your local commits)
+
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+        modified:   test02.txt
+```
+
+## 撤销工作目录全部修改 git reset
+
+让工作目录和 HEAD 一致
+```bash
+git reset --hard HEAD
+```
 
 ### Reset a single file in the index
 > [Git - git-reset Documentation](https://git-scm.com/docs/git-reset#Documentation/git-reset.txt-Resetasinglefileintheindex) 
@@ -3415,42 +3390,34 @@ Switch to topic/wip branch and keep working.
 ### Split a commit apart into a sequence of commits
 > [Git - git-reset Documentation](https://git-scm.com/docs/git-reset#Documentation/git-reset.txt-Splitacommitapartintoasequenceofcommits) 
 
-### 撤销远程的提交
-本地提交后 Push 到远程，本地用 git reset --soft HEAD^ 撤销了最近一次提交，如果远程该分支只有自己用，可以 git push --force 覆盖远程提交记录。
+### 撤销远程的提交 git revert
+本地提交后 Push 到远程，本地用 git reset --soft HEAD^ 撤销了最近一次提交，如果远程该分支只有自己用，且远程没有比本地更新的提交，则可以 git push --force 覆盖远程提交记录。
 
-### **撤销最后一次提交**
-  ```bash
-  git reset --soft HEAD~1
-  ```
-  这个命令将 HEAD 指针移动到上一次提交，但保留工作目录和暂存区的状态。
+如果远程有更新的提交记录，则可以用 `git revert HEAD^`，会新建一个撤销上次提交的提交记录，因此不会和远程冲突。
 
-### **撤销最后一次提交并重置暂存区**
-  ```bash
-  git reset --mixed HEAD~1
-  ```
-  或者
-  ```bash
-  git reset HEAD~1
-  ```
-  这些命令将 HEAD 指针移动到上一次提交，并重置暂存区，但保留工作目录的状态。
+```bash
+lx@lx MINGW64 /d/Documents/git_test03 (main)
+$ git log --oneline -3
+36c7d37 (HEAD -> main) update new
+e43f274 Merge branch 'branch01'
+03d14ae (origin/main, origin/HEAD) update main test01.txt
+```
 
-### **撤销最后一次提交并恢复工作目录**
-  ```bash
-  git reset --hard HEAD~1
-  ```
-  这个命令将 HEAD 指针移动到上一次提交，并重置暂存区和工作目录的状态。
+撤销最新一次提交
+```bash
+git revert HEAD
+```
 
-### 注意事项
+查看历史记录，发现过去的历史没有改变，只是新增了撤销的记录：
+```bash
+lx@lx MINGW64 /d/Documents/git_test03 (main)
+$ git log --oneline -3
+fabbb86 (HEAD -> main) Revert "update new"
+36c7d37 update new
+e43f274 Merge branch 'branch01'
+```
 
-- **数据丢失风险**：`git reset --hard` 会丢失所有未提交的更改，使用时需谨慎。
-- **撤销已推送的提交**：如果你已经将提交推送到远程仓库，使用 `git reset` 撤销提交后，需要使用 `git push --force` 来更新远程仓库。
-- **与 `git checkout` 的区别**：`git reset` 用于重置当前分支的 HEAD 和暂存区，而 `git checkout` 用于切换分支或将文件恢复到最后一次提交的状态。
-
-### 选项
-
-- **`--soft`**：重置 HEAD 到指定状态，但保留工作目录和暂存区的状态。这允许你重新提交。
-- **`--mixed`**（默认）：重置 HEAD 和暂存区到指定状态，但保留工作目录的状态。这允许你重新暂存更改。
-- **`--hard`**：重置 HEAD、暂存区和工作目录到指定状态。这将丢失所有未提交的更改。
+撤销后可以用 `git push` 推送到远程仓库。
 
 ## git restore
 > [Git - git-restore Documentation](https://git-scm.com/docs/git-restore) 
