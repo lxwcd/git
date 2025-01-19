@@ -6,7 +6,6 @@
 > git 命令官方文档：[git](https://git-scm.com/docs/)  
 > git book：[Pro Git book](https://git-scm.com/book/en/v2)  
 > [Learn Git Branching](https://learngitbranching.js.org/?locale=zh_CN) 
-> [Git 教程 - Rebase](https://www.delftstack.com/zh/tutorial/git/git-rebase/) 
 > [Learn Git and GitHub](https://roadmap.sh/git-github) 
       
 # git 介绍
@@ -633,6 +632,299 @@ Git 子模块（Submodule）是一种将一个 Git 仓库嵌入到另一个 Git 
 
 通过使用子模块，你可以保持项目的清晰结构，同时管理复杂的依赖关系。子模块提供了一种灵活的方式来集成外部代码，同时保持项目的独立性和可维护性。
 
+# Ignoring files
+> [Learn Git and GitHub](https://roadmap.sh/git-github) 
+> [Git - gitignore Documentation](https://git-scm.com/docs/gitignore) 
+> [GitHub - github/gitignore: A collection of useful .gitignore templates](https://github.com/github/gitignore) 
+> [.gitignore file - ignoring files in Git | Atlassian Git Tutorial](https://www.atlassian.com/git/tutorials/saving-changes/gitignore) 
+
+`.gitignore` 是一个在 Git 仓库中使用的特殊文件，用于指定 Git 应该忽略的文件和目录。这个文件帮助你防止不小心提交不需要版本控制的文件，比如编译产物、日志文件、个人配置文件等。
+
+不影响已被跟踪的文件。
+
+可以写到多个位置，如果忽略文件只针对本地仓库，将忽略的文件放到 `$GIT_DIR/info/exclude` 中，即仓库根目录的 `.git` 目录中。
+
+## 作用
+
+- **指定忽略规则**：`.gitignore` 文件包含一系列的模式（pattern），用于匹配文件和目录路径。Git 会根据这些模式决定哪些文件不需要版本控制。
+- **保持仓库清洁**：通过忽略不必要的文件，`.gitignore` 帮助保持仓库的清洁和组织。
+
+## 本地仓库忽略
+放在下面文件中
+```bash
+.git/info/excluede
+```
+
+## 忽略规则
+
+- **模式匹配**：`.gitignore` 文件中的每一行都是一个模式，用于匹配文件路径。模式可以使用通配符，如 `*`、`?`、`[` 和 `]`。
+- **注释和空行**：以 `#` 开头的行被视为注释，空行会被忽略。
+
+## 常用模式
+
+- `*`：匹配任意数量的字符。
+- `?`：匹配任意单个字符。
+- `[abc]`：匹配括号内的任意字符（在这个例子中是 `a`、`b` 或 `c`）。
+- `**`：匹配任意数量的目录层级。
+
+### 双星号 `**`
+1. **双星号（`**`）在模式匹配中的特殊含义：**
+   - 当双星号（`**`）出现在模式中，并且与完整路径名进行匹配时，它们具有特殊的含义。
+
+2. **双星号后跟斜杠（`/`）表示在所有目录中匹配：**
+   - 如果模式以双星号（`**`）开始，并且后面紧跟着一个斜杠（`/`），这意味着在所有目录中进行匹配。例如，`**/foo`会匹配任何地方的文件或目录`foo`，这与模式`foo`相同。`**/foo/bar`会匹配任何直接位于目录`foo`下的文件或目录`bar`。
+
+3. **斜杠后跟双星号（`/**`）表示匹配目录内的所有内容：**
+   - 如果模式以斜杠（`/`）开始，后面紧跟着双星号（`/**`），这意味着匹配目录内的所有内容。例如，`abc/**`会匹配`abc`目录内的所有文件，相对于`.gitignore`文件的位置，匹配深度是无限的。
+
+4. **斜杠后跟双星号再跟斜杠表示匹配零个或多个目录：**
+   - 如果模式中包含斜杠（`/`）后跟双星号（`**`），然后再跟一个斜杠（`/`），这意味着匹配零个或多个目录。例如，`a/**/b`会匹配`a/b`、`a/x/b`、`a/x/y/b`等。
+
+5. **其他连续的星号被视为普通星号，并根据之前的规则进行匹配：**
+   - 如果模式中出现其他连续的星号（`*`），它们将被视为普通的星号，并根据之前提到的规则进行匹配。
+
+### 忽略文件夹
+`folder` 和 `folder/` 都会忽略该目录下的子目录
+
+## 示例
+
+```bash
+# 忽略所有 .log 文件
+*.log
+
+# 忽略 build 目录
+build/
+
+# 忽略所有 .tmp 文件，但不忽略子目录中的 .tmp 文件
+*.tmp
+!*.subdir/*.tmp
+
+# 忽略 node_modules 目录
+node_modules/
+
+# 忽略 .env 文件
+.env
+
+# 忽略所有 .DS_Store 文件
+.DS_Store
+```
+
+## 特殊规则
+
+- **排除特定文件**：使用感叹号 `!` 可以排除特定的文件或模式，使其不被忽略。
+- **目录分隔符**：如果模式以 `/` 结尾，表示匹配的是目录。
+
+## 应用 `.gitignore` 规则
+
+- **现有文件**：如果文件已经被跟踪（即已经提交过），那么即使后来在 `.gitignore` 中添加了匹配的规则，这些文件仍然会被跟踪。要停止跟踪这些文件，需要先从仓库中删除它们。
+- **新文件**：对于尚未被跟踪的文件，`.gitignore` 规则会立即生效。
+
+# 分支
+> [Git - Basic Branching and Merging](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging) 
+> [Git Branches Tutorial](https://www.youtube.com/watch?v=e2IbNHi4uCI&ab_channel=freeCodeCamp.org) 
+
+# HEAD 
+> [Git - Reset Demystified](https://git-scm.com/book/en/v2/Git-Tools-Reset-Demystified#_git_reset)      
+
+HEAD is the pointer to the current branch reference, which is in turn a pointer to the last commit made on that branch. That means HEAD will be the parent of the next commit that is created. It’s generally simplest to think of HEAD as the snapshot of your last commit on that branch.
+
+## `HEAD` 的作用
+
+1. **指向当前分支**：`HEAD` 通常指向当前分支的引用，比如 `master` 或 `feature`。当你检出（checkout）一个分支时，`HEAD` 会更新为指向该分支的最新提交。
+2. **确定工作目录**：`HEAD` 指向的提交决定了你的工作目录的内容。当你检出不同的提交时，工作目录会更新以反映该提交时的文件状态。
+3. **暂存区的基础**：`HEAD` 也用作暂存区（staging area）的基础。当你添加（add）更改到暂存区时，这些更改是相对于 `HEAD` 指向的提交进行的。
+
+## `HEAD` 的工作方式
+
+- **引用文件**：在 `.git` 目录中，`HEAD` 是一个文件，通常包含对当前分支的引用。例如，`HEAD` 文件可能包含 `ref: refs/heads/master`，表示 `HEAD` 指向 `master` 分支。
+- **更新 `HEAD`**：当你执行 `git checkout <branch>` 或 `git commit` 等命令时，`HEAD` 会更新为指向新的分支或新的提交。
+
+### 使用 `HEAD`
+
+- **查看 `HEAD`**：
+  ```bash
+  cat .git/HEAD
+  ```
+  这个命令显示 `HEAD` 文件的内容，通常是一个指向当前分支的引用。
+
+- **检出 `HEAD`**：
+  ```bash
+  git checkout HEAD
+  ```
+  这个命令将工作目录恢复到 `HEAD` 指向的提交状态。
+
+- **比较 `HEAD`**：
+  ```bash
+  git diff HEAD
+  ```
+  这个命令显示自 `HEAD` 指向的提交以来工作目录中的更改。
+
+## 查看当前分支的 `HEAD` 
+### 1. 使用 `git log`
+
+运行以下命令来查看当前分支的最新提交，这通常是 `HEAD` 指向的提交：
+
+```bash
+git log -1
+```
+
+这个命令显示最近一次提交的详细信息，包括提交哈希、作者、日期和提交信息。
+
+### 2. 使用 `git show`
+
+如果你想查看 `HEAD` 指向的提交的详细内容，可以使用：
+
+```bash
+git show HEAD
+```
+
+这个命令显示 `HEAD` 指向的提交的详细信息，包括更改的内容。
+
+### 3. 使用 `git rev-parse`
+
+要获取 `HEAD` 指向的提交的哈希值，可以使用：
+
+```bash
+git rev-parse HEAD
+```
+
+这个命令输出 `HEAD` 指向的提交的哈希值。
+
+### 4. 查看 `.git/HEAD` 文件
+
+如果你想直接查看 `HEAD` 文件的内容，可以使用：
+
+```bash
+cat .git/HEAD
+```
+
+这个命令显示 `HEAD` 文件的内容，通常是一个指向当前分支的引用，如 `ref: refs/heads/main`。
+
+### 5. 使用 `git status`
+
+运行以下命令来查看当前分支的状态，包括 `HEAD` 指向的提交：
+
+```bash
+git status
+```
+
+这个命令显示当前分支的状态，包括 `HEAD` 指向的提交和任何未提交的更改。
+
+## HEAD^
+
+- **定义**：`HEAD^`（读作 "HEAD caret"）引用 `HEAD` 指向的提交的父提交。如果有多个父提交（例如，在合并提交中），`HEAD^` 引用第一个父提交。
+- **用途**：用于指定 `HEAD` 的直接父提交。这在查看提交历史或执行需要指定特定提交的操作时非常有用。
+- **示例**：`git log HEAD^` 会显示 `HEAD` 的父提交的详细信息。
+
+## HEAD~
+
+- **定义**：`HEAD~`（读作 "HEAD tilde"）是 `HEAD` 的简写形式，通常用于指定 `HEAD` 指向的提交的父提交。`HEAD~` 与 `HEAD^` 在大多数情况下是等效的。
+- **用途**：用于指定 `HEAD` 的父提交，特别是在需要简洁引用时。
+- **示例**：`git log HEAD~` 会显示 `HEAD` 的父提交的详细信息。
+
+### HEAD~n
+
+- **定义**：`HEAD~n`（其中 `n` 是一个正整数）引用 `HEAD` 指向的提交的第 `n` 个父提交。例如，`HEAD~3` 引用 `HEAD` 的第三个父提交。
+- **用途**：用于指定 `HEAD` 的祖先提交。这在查看提交历史或执行需要指定特定提交的操作时非常有用。
+- **示例**：`git log HEAD~3` 会显示 `HEAD` 的第三个父提交的详细信息。
+
+## 使用场景
+
+- **查看提交历史**：使用 `git log HEAD^` 或 `git log HEAD~` 查看 `HEAD` 的父提交的历史。
+- **比较提交**：使用 `git diff HEAD^` 或 `git diff HEAD~` 比较 `HEAD` 和其父提交之间的差异。
+- **撤销提交**：使用 `git reset --soft HEAD^` 撤销最后一次提交，但保留工作目录和暂存区的状态。
+在 Git 中，`HEAD` 是一个非常重要的概念，它指向当前分支的最新提交。`HEAD` 及其相关语法（如 `HEAD~3`）用于引用特定的提交。以下是关于 `HEAD` 及其语法的详细讲解：
+
+### 总结
+
+`HEAD`、`HEAD^`、`HEAD~` 和 `HEAD~n` 是 Git 中用于引用提交的强大工具。它们帮助你指定和操作特定的提交及其关系。理解这些概念对于有效使用 Git 进行版本控制和历史管理至关重要。
+
+
+## `HEAD` 的重要性
+
+
+- **版本控制的基础**：`HEAD` 是 Git 版本控制的核心，它决定了你正在工作的版本和状态。
+- **分支和合并**：在分支和合并操作中，`HEAD` 用于确定当前的工作基础和合并的目标。
+
+## 注意事项
+
+- **`HEAD` 与 `ORIG_HEAD`**：在某些操作（如合并冲突解决）中，Git 会创建一个 `ORIG_HEAD` 引用，以保存原始 `HEAD` 的状态，以便在需要时可以恢复。
+- **`HEAD` 与 `FETCH_HEAD`**：`FETCH_HEAD` 用于记录 `git fetch` 操作的结果，与 `HEAD` 不同，它通常用于比较和合并操作。
+
+# Index
+> [Git - Reset Demystified](https://git-scm.com/book/en/v2/Git-Tools-Reset-Demystified#_git_reset)      
+
+在 Git 中，"index"（索引）是一个非常重要的概念，它通常被称为 "staging area"（暂存区）。索引是 Git 用来准备下一次提交的文件列表。
+
+The index is your proposed next commit. We’ve also been referring to this concept as Git’s “Staging Area” as this is what Git looks at when you run git commit.
+
+## 索引的作用
+
+1. **暂存更改**：索引用于暂存（stage）你想要在下一次提交中包含的更改。你可以将更改的文件添加到索引中，然后一次性提交所有暂存的更改。
+2. **准备提交**：当你执行 `git add` 命令时，更改的文件会被添加到索引中。这些文件将在下一次 `git commit` 时被提交。
+3. **跟踪更改**：索引跟踪你对文件所做的更改，直到这些更改被提交。
+
+## 索引的工作方式
+
+- **索引文件**：在 `.git` 目录中，索引是一个名为 `index` 的文件，它包含了当前暂存的文件列表。
+- **更新索引**：当你使用 `git add` 添加文件时，索引文件会被更新以反映这些更改。
+- **重置索引**：你可以使用 `git reset` 命令来重置索引，移除暂存的文件或将索引恢复到特定状态。
+
+## 使用索引
+
+- **添加文件到索引**：
+  ```bash
+  git add <file>
+  ```
+  这个命令将指定文件的更改添加到索引中。
+
+- **查看索引内容**：
+  ```bash
+  git ls-files --stage
+  ```
+  这个命令显示索引中的文件及其状态。
+
+- **重置索引**：
+  ```bash
+  git reset <file>
+  ```
+  这个命令将指定文件从索引中移除，但保留工作目录中的更改。
+
+- **清空索引**：
+  ```bash
+  git reset
+  ```
+  这个命令清空索引，移除所有暂存的更改。
+
+## 索引与工作目录
+
+- **工作目录**：工作目录是你当前工作的文件夹，包含了项目的文件。
+- **索引与工作目录的关系**：索引是从工作目录中选择的更改的集合，这些更改将在下一次提交时被记录。
+
+## 注意事项
+
+- **索引状态**：使用 `git status` 命令可以查看索引的状态，了解哪些文件已被暂存以及哪些文件尚未暂存。
+- **索引与提交**：索引中的文件将在下一次提交时被提交。确保你已经将所有想要提交的更改添加到索引中。
+- **索引与分支**：当你切换分支时，索引会被更新以反映新分支的状态。
+
+# The Working Directory
+> [Git - Reset Demystified](https://git-scm.com/book/en/v2/Git-Tools-Reset-Demystified#_git_reset)      
+
+you have your working directory (also commonly referred to as the “working tree”).
+
+在 Git 中，"working directory"（工作目录）和 "working tree"（工作树）是两个密切相关但略有不同的概念。它们都涉及到你在本地检出的文件和目录，但它们的含义和用途有所不同。以下是关于这两个概念的详细讲解：
+
+1. **定义**：工作目录是指你当前正在工作的目录，它是你检出的文件和目录的集合。当你克隆一个仓库或检出一个分支时，Git 会在你的本地文件系统中创建一个工作目录。
+2. **内容**：工作目录包含了项目的文件和目录，这些文件和目录是你从 Git 仓库中检出的。你可以在这个目录中编辑文件、添加新文件或删除文件。
+3. **更改跟踪**：当你在工作目录中进行更改时，这些更改不会立即被 Git 跟踪。你需要使用 `git add` 将更改添加到暂存区（索引），然后使用 `git commit` 提交这些更改。
+
+- **检出分支或提交**：使用 `git checkout <branch>` 或 `git checkout <commit>` 检出不同的分支或提交，Git 会更新工作目录和工作树以反映所检出的状态。
+- **查看状态**：使用 `git status` 查看工作目录和工作树的状态，了解哪些文件已被修改但尚未提交。
+- **添加更改**：使用 `git add <file>` 将工作目录或工作树中的更改添加到暂存区。
+- **提交更改**：使用 `git commit` 提交暂存区中的更改，更新工作目录和工作树的状态。
+
+# workflow
+> [Git - Reset Demystified](https://git-scm.com/book/en/v2/Git-Tools-Reset-Demystified#_git_reset)      
 # git clone
 > [Git - git-clone Documentation](https://git-scm.com/docs/git-clone)   
 
@@ -881,7 +1173,7 @@ git init --bare
 # git status 检查文件状态
 > [Git - git-status Documentation](https://git-scm.com/docs/git-status) 
 
-`git status` 是 Git 中一个非常常用的命令，用于显示当前仓库的状态。这个命令提供了关于工作目录和暂存区的详细信息，帮助用户了解哪些文件被修改、哪些文件已暂存、哪些文件尚未跟踪等。以下是对 `git status` 命令的详细讲解：
+`git status` 是 Git 中一个非常常用的命令，用于显示当前仓库的状态。这个命令提供了关于工作目录和暂存区的详细信息，帮助用户了解哪些文件被修改、哪些文件已暂存、哪些文件尚未跟踪等。
 
 1. **显示工作目录的状态**：`git status` 显示当前工作目录中的文件状态，包括已修改、已暂存、未跟踪的文件。
 2. **显示分支信息**：命令输出当前分支的名称，以及与远程分支的同步状态。
@@ -905,209 +1197,668 @@ git init --bare
 4. **提交建议**：
    - 根据当前状态，`git status` 可能会提供提交建议，如使用 `git add` 暂存文件或使用 `git commit` 提交更改。
 
-## 参数详解
+```bash
+lx@lx MINGW64 /d/Documents/git_test (fix_B)
+$ git --version
+git version 2.47.1.windows.1
 
-1. **-s, --short**
-   - 显示简短的状态信息，不显示文件的具体更改内容。
-   ```bash
-   git status -s
-   ```
+lx@lx MINGW64 /d/Documents/git_test (fix_B)
+$ git status
+On branch fix_B
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+        new file:   git.md
 
-2. **-b, --branch**
-   - 显示当前分支的信息以及与上游分支的差异。
-   ```bash
-   git status -b
-   ```
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   git.md
+        modified:   test01.txt
 
-3. **-u, --untracked-files[=<mode>]**
-   - 显示未跟踪的文件。`<mode>` 可以是 `no`, `normal`, 或 `all`。
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        0001-commit-B.patch
+        0001-fix-B.patch
+        0001-update-fix_B.patch
+        0002-commit-C.patch
+        0002-update-fix_B.patch
+        1.patch
+```
+
+## -s, --short 显示简短的状态信息
+不显示文件的具体更改内容。
+
+```bash
+lx@lx MINGW64 /d/Documents/git_test (fix_B)
+$ git status -s
+A  git.md
+ M test01.txt
+?? 0001-commit-B.patch
+?? 0001-fix-B.patch
+?? 0001-update-fix_B.patch
+?? 0002-commit-C.patch
+?? 0002-update-fix_B.patch
+?? 1.patch
+```
+
+## -u, --untracked-files[=<mode>] 显示未跟踪的文件
+`<mode>` 可以是 `no`, `normal`, 或 `all`
      - `no`：不显示未跟踪的文件。
      - `normal`：显示未跟踪的文件，但排除那些在 `.gitignore` 中指定的文件。
      - `all`：显示所有未跟踪的文件，包括那些在 `.gitignore` 中指定的文件。
-   ```bash
-   git status -u
-   git status -uno
-   git status -uall
-   ```
-
-4. **--ignored**
-   - 只显示被 `.gitignore` 忽略的文件。
-   ```bash
-   git status --ignored
-   ```
-
-5. **--porcelain**
-   - 机器可读格式输出，便于脚本处理。
-   ```bash
-   git status --porcelain
-   ```
-
-6. **-z, --null**
-   - 分隔输出字段，字段之间用 `\0` 分隔，用于脚本处理。
-   ```bash
-   git status -z
-   ```
-
-7. **---ahead-behind**
-   - 显示当前分支与上游分支的领先或落后的提交数。
-   ```bash
-   git status --ahead-behind
-   ```
-
-8. **--branch --ahead-behind**
-   - 显示当前分支与上游分支的详细领先或落后信息。
-   ```bash
-   git status --branch --ahead-behind
-   ```
-
-9. **--untracked-files=no**
-   - 不显示未跟踪的文件。
-   ```bash
-   git status --untracked-files=no
-   ```
-
-10. **--ignore-submodules**
-    - 忽略子模块的变化。
-    ```bash
-    git status --ignore-submodules
-    ```
-
-假设你有一个名为 `project` 的 Git 仓库，并且你进行了以下操作：
-
-1. 修改了 `file1.txt` 并且已经暂存。
-2. 修改了 `file2.txt` 但还没有暂存。
-3. 添加了 `file3.txt` 但还没有暂存。
 
 ```bash
-# 显示完整的仓库状态
-git status
+lx@lx MINGW64 /d/Documents/git_test (fix_B)
+$ git status --short --untracked-files=no
+A  git.md
+ M test01.txt
 
-# 显示简短的状态信息
-git status -s
-
-# 显示未跟踪的文件
-git status -u
-
-# 显示被 .gitignore 忽略的文件
-echo "file3.txt" >> .gitignore
-git status --ignored
-
-# 显示机器可读格式的输出
-git status --porcelain
-
-# 使用 \0 分隔输出字段
-git status -z
+lx@lx MINGW64 /d/Documents/git_test (fix_B)
+$ git status --short
+A  git.md
+ M test01.txt
+?? 0001-commit-B.patch
+?? 0001-fix-B.patch
+?? 0001-update-fix_B.patch
+?? 0002-commit-C.patch
+?? 0002-update-fix_B.patch
+?? 1.patch
 ```
 
-## 注意事项
+## --ignored 显示被忽略的文件
+> [Git - git-status Documentation](https://git-scm.com/docs/git-status#Documentation/git-status.txt---ignoredltmodegt) 
 
-- **查看详细信息**：如果你想查看更详细的信息，可以使用 `git status --verbose` 或 `git status -vv`。
-- **忽略文件**：`git status` 会显示未跟踪的文件，但你可以通过 `.gitignore` 文件指定要忽略的文件模式。
-- **分支同步**：`git status` 显示的分支同步状态基于远程分支的最新已知状态，可能需要 `git fetch` 来更新。
 
-# Ignoring files
-> [Learn Git and GitHub](https://roadmap.sh/git-github) 
-> [Git - gitignore Documentation](https://git-scm.com/docs/gitignore) 
-> [GitHub - github/gitignore: A collection of useful .gitignore templates](https://github.com/github/gitignore) 
-> [.gitignore file - ignoring files in Git | Atlassian Git Tutorial](https://www.atlassian.com/git/tutorials/saving-changes/gitignore) 
+## --porcelain 便于脚本处理的输出
 
-`.gitignore` 是一个在 Git 仓库中使用的特殊文件，用于指定 Git 应该忽略的文件和目录。这个文件帮助你防止不小心提交不需要版本控制的文件，比如编译产物、日志文件、个人配置文件等。
-
-不影响已被跟踪的文件。
-
-可以写到多个位置，如果忽略文件只针对本地仓库，将忽略的文件放到 `$GIT_DIR/info/exclude` 中，即仓库根目录的 `.git` 目录中。
-
-## 作用
-
-- **指定忽略规则**：`.gitignore` 文件包含一系列的模式（pattern），用于匹配文件和目录路径。Git 会根据这些模式决定哪些文件不需要版本控制。
-- **保持仓库清洁**：通过忽略不必要的文件，`.gitignore` 帮助保持仓库的清洁和组织。
-
-## 文件位置
-
-- **项目根目录**：通常，`.gitignore` 文件位于 Git 仓库的根目录。
-- **多个 `.gitignore` 文件**：可以在子目录中创建 `.gitignore` 文件，这些文件会影响其所在目录及其子目录。
-
-## 本地仓库忽略
-放在下面文件中
+和 --short 输出类似：
 ```bash
-.git/info/excluede
+lx@lx MINGW64 /d/Documents/git_test (fix_B)
+$ git status --porcelain
+A  git.md
+ M test01.txt
+?? 0001-commit-B.patch
+?? 0001-fix-B.patch
+?? 0001-update-fix_B.patch
+?? 0002-commit-C.patch
+?? 0002-update-fix_B.patch
+?? 1.patch
 ```
 
-## 忽略规则
+## 输出未被跟踪的文件名
+```bash
+lx@lx MINGW64 /d/Documents/git_test (fix_B)
+$ git status -s
+AM git.md
+ M test01.txt
+?? .gitignore
+?? 0001-commit-B.patch
+?? 0001-fix-B.patch
+?? 0001-update-fix_B.patch
+?? 0002-commit-C.patch
+?? 0002-update-fix_B.patch
+?? 1.patch
+?? 2.txt
 
-- **模式匹配**：`.gitignore` 文件中的每一行都是一个模式，用于匹配文件路径。模式可以使用通配符，如 `*`、`?`、`[` 和 `]`。
-- **注释和空行**：以 `#` 开头的行被视为注释，空行会被忽略。
+lx@lx MINGW64 /d/Documents/git_test (fix_B)
+$ git status -s |  grep "??" | cut -d" " -f2
+.gitignore
+0001-commit-B.patch
+0001-fix-B.patch
+0001-update-fix_B.patch
+0002-commit-C.patch
+0002-update-fix_B.patch
+1.patch
+2.txt
+```
 
-## 常用模式
+# git log 查看日志
+> [Git - git-log Documentation](https://git-scm.com/docs/git-log) 
+> [Git - Viewing the Commit History](https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History) 
+> [Git Log Command Explained](https://www.freecodecamp.org/news/git-log-command/) 
 
-- `*`：匹配任意数量的字符。
-- `?`：匹配任意单个字符。
-- `[abc]`：匹配括号内的任意字符（在这个例子中是 `a`、`b` 或 `c`）。
-- `**`：匹配任意数量的目录层级。
+List commits that are reachable by following the parent links from the given commit(s), but exclude commits that are reachable from the one(s) given with a ^ in front of them. The output is given in reverse chronological order by default.
 
-### 双星号 `**`
-1. **双星号（`**`）在模式匹配中的特殊含义：**
-   - 当双星号（`**`）出现在模式中，并且与完整路径名进行匹配时，它们具有特殊的含义。
+You can think of this as a set operation. Commits reachable from any of the commits given on the command line form a set, and then commits reachable from any of the ones given with ^ in front are subtracted from that set. The remaining commits are what comes out in the command’s output. Various other options and paths parameters can be used to further limit the result.
 
-2. **双星号后跟斜杠（`/`）表示在所有目录中匹配：**
-   - 如果模式以双星号（`**`）开始，并且后面紧跟着一个斜杠（`/`），这意味着在所有目录中进行匹配。例如，`**/foo`会匹配任何地方的文件或目录`foo`，这与模式`foo`相同。`**/foo/bar`会匹配任何直接位于目录`foo`下的文件或目录`bar`。
+1. **查看提交历史**：`git log` 显示项目的提交历史记录，包括提交信息、作者、日期等。
+2. **过滤和格式化**：通过各种选项，可以过滤特定的提交记录、格式化输出内容等。
 
-3. **斜杠后跟双星号（`/**`）表示匹配目录内的所有内容：**
-   - 如果模式以斜杠（`/`）开始，后面紧跟着双星号（`/**`），这意味着匹配目录内的所有内容。例如，`abc/**`会匹配`abc`目录内的所有文件，相对于`.gitignore`文件的位置，匹配深度是无限的。
+## 选项
 
-4. **斜杠后跟双星号再跟斜杠表示匹配零个或多个目录：**
-   - 如果模式中包含斜杠（`/`）后跟双星号（`**`），然后再跟一个斜杠（`/`），这意味着匹配零个或多个目录。例如，`a/**/b`会匹配`a/b`、`a/x/b`、`a/x/y/b`等。
+- **`--summary`**：显示每个提交的简要总结。
+- **`--stat`**：显示每个提交的统计信息，包括文件更改数量。
+- **`--shortstat`**：以更简洁的格式显示统计信息。
+- **`--name-only`**：仅显示提交中更改的文件名。
+- **`--name-status`**：显示文件名及其更改状态（如 A 表示添加，M 表示修改）。
+- **`--pretty=format:"<format>"`**：自定义输出格式。例如：
+  ```bash
+  git log --pretty=format:"%h - %an, %ar : %s"
+  ```
+  这个命令自定义输出格式，显示提交哈希、作者、日期和提交信息。
+- **`--oneline`**：每个提交显示为一行，包含提交哈希和提交信息。
+- **`--graph`**：以图形方式显示提交历史，帮助理解分支和合并关系。
+- **`--since` 和 `--until`**：过滤自指定日期以来的提交记录。
+- **`--author`**：过滤指定作者的提交记录。
+- **`--grep`**：过滤包含特定文本的提交信息。
 
-5. **其他连续的星号被视为普通星号，并根据之前的规则进行匹配：**
-   - 如果模式中出现其他连续的星号（`*`），它们将被视为普通的星号，并根据之前提到的规则进行匹配。
+## 查看当前分支所有提交
+```bash
+git log
+```
+默认按照时间顺序，从最新的开始显示。
 
-### 忽略文件夹
-`folder` 和 `folder/` 都会忽略该目录下的子目录
+## 查看特定分支的提交
+```bash
+git log <branch-name>
+```
+这个命令显示指定分支的提交历史。
 
-## 示例内容
+## 指定输出日志数目
+```bash
+git log -3
+```
+输出日志显示最新的 3 条
+
+## 查看提交差异 --patch
+> [Git - Viewing the Commit History](https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History) 
+
+使用`-p`或`--patch`参数，可以查看每个提交的具体差异：
+```bash
+lx@lx MINGW64 /d/Documents/git_test (fix_B)
+$ git log -p -1
+commit 51da54a57cdc95263072173726d187a544725289 (HEAD -> fix_B)
+Author: lxwcd <15521168075@163.com>
+Date:   Sun Jan 12 21:22:45 2025 +0800
+
+    update fix_B
+
+diff --git a/test01.txt b/test01.txt
+index cd7fb11..a821b44 100644
+--- a/test01.txt
++++ b/test01.txt
+@@ -4,3 +4,4 @@ local modify test01.txt
+ A
+ b
+ C
++001
+diff --git a/test02.txt b/test02.txt
+index 8de02e1..98bbcac 100644
+--- a/test02.txt
++++ b/test02.txt
+@@ -1,2 +1,3 @@
+ test02
+-local git rebase
+\ No newline at end of file
++local git rebase002
++002
+diff --git a/test05.txt b/test05.txt
+new file mode 100644
+index 0000000..7ed6ff8
+--- /dev/null
++++ b/test05.txt
+@@ -0,0 +1 @@
++5
+```
+
+这将显示最新两个提交的详细差异，包括文件的增删改。
+其中 a 表示该提交前的版本，b 表示该提交后的版本。
+`@@` 标记差异的开始，如 `@@ -4,3 +4,4 @@ local modify test01.txt` 表示对于 a 版本从第 4 行开始的 3 行内容，对于 b 版本从第 4 行开始的 4 行内容，有差异。
+`-` 表示原始版本中存在但新版本被删除的行，`+` 表示原始版本没有 ，新版本添加的行，即状态表示从 a 版本到 b 版本需要进行的添加、删除等操作。
+
+## 统计信息 --stat
 
 ```bash
-# 忽略所有 .log 文件
-*.log
+$ git log -1 --stat
+commit 740e65b2fd98f0b99f3bcfd8dc8e1b8ad8bb6a3f (HEAD -> feature)
+Author: lxw <15521168075@163.com>
+Date:   Thu Jan 9 13:09:24 2025
 
-# 忽略 build 目录
-build/
+    modify test.md
 
-# 忽略所有 .tmp 文件，但不忽略子目录中的 .tmp 文件
-*.tmp
-!*.subdir/*.tmp
+ demo/test.md | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+```
+这将显示每个提交修改的文件列表、文件数量变化以及添加和删除的行数统计。
 
-# 忽略 node_modules 目录
-node_modules/
+## 简短 stat 信息
+> Display only the changed/insertions/deletions line from the --stat command.
 
-# 忽略 .env 文件
-.env
+```bash
+lx@lx MINGW64 /d/Documents/git_test (fix_B)
+$ git log --shortstat -1
+commit 51da54a57cdc95263072173726d187a544725289 (HEAD -> fix_B)
+Author: lxwcd <15521168075@163.com>
+Date:   Sun Jan 12 21:22:45 2025 +0800
 
-# 忽略所有 .DS_Store 文件
-.DS_Store
+    update fix_B
+
+ 3 files changed, 4 insertions(+), 1 deletion(-)
 ```
 
-## 特殊规则
+## 自定义格式 --pretty
+> [Git - Viewing the Commit History](https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History#pretty_format) 
 
-- **排除特定文件**：使用感叹号 `!` 可以排除特定的文件或模式，使其不被忽略。
-- **目录分隔符**：如果模式以 `/` 结尾，表示匹配的是目录。
+使用`--pretty`参数，可以自定义日志的显示格式。
 
-## 应用 `.gitignore` 规则
+### 哈希值 - 作者，相对日期 : message
+```bash
+$ git log --pretty=format:"%h - %an, %ar : %s"
+```
+```bash
+lx@lx MINGW64 /d/Documents/git_test (fix_B)
+$ git log --pretty=format:"%h - %an, %ar : %s" -1
+51da54a - lxwcd, 7 days ago : update fix_B
+```
 
-- **现有文件**：如果文件已经被跟踪（即已经提交过），那么即使后来在 `.gitignore` 中添加了匹配的规则，这些文件仍然会被跟踪。要停止跟踪这些文件，需要先从仓库中删除它们。
-- **新文件**：对于尚未被跟踪的文件，`.gitignore` 规则会立即生效。
+### 哈希值 - 作者，绝对日期 : message
+```bash
+lx@lx MINGW64 /d/Documents/git_test (fix_B)
+$ git log --pretty=format:"%h - %an, %ad : %s" -1
+51da54a - lxwcd, Sun Jan 12 21:22:45 2025 +0800 : update fix_B
+```
 
-## 生成 `.gitignore` 文件
+## ASCII 图形显示历史 --graph
 
-- **手动创建**：你可以手动创建 `.gitignore` 文件并编辑它。
-- **使用模板**：许多项目和编程语言有通用的 `.gitignore` 模板，你可以从这些模板开始，然后根据需要进行调整。
+官方示例：
+```bash
+$ git log --pretty=format:"%h %s" --graph
+* 2d3acf9 Ignore errors from SIGCHLD on trap
+*  5e3ee11 Merge branch 'master' of https://github.com/dustin/grit.git
+|\
+| * 420eac9 Add method for getting the current branch
+* | 30e367c Timeout code and tests
+* | 5a09431 Add timeout protection to grit
+* | e1193f8 Support for heads with slashes in them
+|/
+* d6016bc Require time for xmlschema
+*  11d191e Merge branch 'defunkt' into local
+```
 
-## 工具和资源
+## 显示提交的引用信息 --decorate
+从 Git 2.10 版本开始，`--decorate` 选项默认是开启的。
+```bash
+lx@lx MINGW64 /d/Documents/git_test (fix_B)
+$ git log --oneline -1
+51da54a (HEAD -> fix_B) update fix_B
+```
 
-- **`.gitignore` 模板**：GitHub 提供了许多预定义的 `.gitignore` 模板，你可以根据你的项目类型选择合适的模板。
-- **在线生成器**：有些在线工具可以帮助你生成 `.gitignore` 文件，例如 `gitignore.io`。
+如果希望关闭 `--decorate` 选项，可以使用 `--no-decorate`：
+```bash
+lx@lx MINGW64 /d/Documents/git_test (fix_B)
+$ git log --oneline --no-decorate -1
+51da54a update fix_B
+```
+这个命令会显示最近一次提交的详细信息，但不会显示指向该提交的引用名称。
 
-## 将已跟踪的文件加入 .gitignore
+假设有以下提交历史：
+```bash
+A -- B -- C -- D -- E
+       \         /
+        F-------G
+```
+执行 `git log --decorate -1`：
+```bash
+commit 9aaa1c654b076de24c529ce46d3c4d95211a2871 (HEAD -> fix_B, branch01)
+Author: lxwcd <15521168075@163.com>
+Date:   Thu Dec 19 21:43:41 2024 +0800
+
+    fix B
+```
+
+在这个例子中：
+- `9aaa1c654b076de24c529ce46d3c4d95211a2871` 是当前提交的哈希值。
+- `(HEAD -> fix_B, branch01)` 表示：
+  - `HEAD` 指向 `fix_B` 分支。
+  - `fix_B` 分支的最新提交是这个提交。
+  - `branch01` 分支的最新提交也是这个提交。
+
+## 时间限制
+> [Git - Viewing the Commit History](https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History#pretty_format) 
+
+`--since`和`--until`参数可以用来限制显示特定时间范围内的提交：
+
+```bash
+$ git log --since="2 weeks ago"
+```
+
+### 绝对时间
+```bash
+git log --since="2024-12-01" --until="2024-12-31"
+git log --since="2024-12-01 00:00:00" --until="2024-12-31 23:59:59"
+```
+
+### 相对时间
+
+```bash
+git log --since="1 week ago"
+git log --until="yesterday"
+git log --since="2 days ago"
+git log --since="1 hour ago"
+git log --since="1 minute ago"
+git log --since="2 weeks ago" --until="1 week ago"
+git log --since="yesterday" --until="today"
+```
+
+## 作者和关键词搜索
+
+`--author`和`--grep`参数可以用来根据作者或提交信息中的关键词来过滤提交：
+
+```bash
+$ git log --author="Scott Chacon" --grep="version"
+```
+
+这将显示所有作者为“Scott Chacon”且提交信息中包含“version”的提交。
+
+## 文件路径过滤
+
+可以通过文件路径来限制显示特定文件的提交历史：
+
+```bash
+lx@lx MINGW64 /d/Documents/git_test (fix_B)
+$ git log --oneline  -- test02.txt
+51da54a (HEAD -> fix_B) update fix_B
+b3852e1 (origin/branch01) local git rebase  test test02.txt
+e67a0f3 add test02.txt and test03.txt
+332de10 update file
+```
+
+## 查看特定内容的日志 -S
+`git log -S` 选项是一个非常有用的过滤器，用于查找那些改变了指定字符串出现次数的提交。
+这个选项通常被称为 Git 的“pickaxe”选项。
+
+`-S<string>` 选项用于查找那些添加或删除了指定字符串的提交。这可以帮助你快速定位某个特定代码片段或功能的引入和修改历史。
+`-S` 选项使用简单的字符串匹配，而不是正则表达式。
+对于大型项目，使用 `-S` 选项可能会比较慢，因为它需要检查每个提交中的每个文件。
+
+```bash
+$ git log --oneline -S "function_name"
+8ef1913 local modify test01.txt
+e67a0f3 add test02.txt and test03.txt
+332de10 update file
+470dcf0 add files
+```
+
+这个命令会列出所有添加或删除了 `function_name` 这个字符串的提交。
+
+## 正则表达式筛选特定内容的日志
+> [Git - git-log Documentation](https://git-scm.com/docs/git-log#Documentation/git-log.txt-code-Gltregexgtcode) 
+
+```bash
+git log -G"frotz\(nitfol"
+```
+
+> While git log -G"frotz\(nitfol" will show this commit, git log -S"frotz\(nitfol" --pickaxe-regex will not (because the number of occurrences of that string did not change).
+
+## 显示第一个父提交 --first-parent
+> [Visualize Merge History with git log --graph, --first-parent, and --no-merges](https://redfin.engineering/visualize-merge-history-with-git-log-graph-first-parent-and-no-merges-c6a9b5ff109c)   
+
+`git log --first-parent` 用于查看提交历史时只显示每个提交的第一个父提交。这在处理包含合并提交的历史时特别有用，因为它可以从“主分支”的角度查看历史，跳过那些来自合并分支的提交。
+
+- **显示第一父提交**：`--first-parent` 选项告诉 `git log` 只显示每个提交的第一个父提交。这对于理解主分支（如 `main` 或 `master`）的线性历史非常有帮助，因为它会忽略那些通过合并操作引入的分支提交。
+- **应用场景**：当你想要查看主分支的清晰历史，而不被合并操作引入的复杂分支历史干扰时，这个选项非常有用。例如，如果你遵循一个严格的分支策略，其中所有功能分支最终都合并回主分支，`--first-parent` 可以帮助你只看到主分支上的关键提交。
+
+对于有多个分支的项目，如果其他分支用 `git merge` 合并到主分支，后，合并到主分支上最终会产生一个合并的提交记录，该合并的提交有两个父提交，当前分支所在的合并前的最新提交为 first parent，而另一个分支的最新提交为 second parent。
+```bash
+lx@lx MINGW64 /d/Documents/git_test (main)
+$ git log --oneline --graph -15
+*   a00fc7a (HEAD -> main) Merge branch 'fix_B'
+|\
+| * 099b5e1 (fix_B) update test files' '
+| * 51da54a update fix_B
+| * 9aaa1c6 (branch01) fix B
+| * 09035ad commit C
+| * e8867c1 commit B
+| * 0b4aed3 commit A
+| * b3852e1 (origin/branch01) local git rebase  test test02.txt
+| * 8ef1913 local modify test01.txt
+| * c8d5a84 Update test01.txt  git pull
+* | 03d14ae (origin/main) update main test01.txt
+* | 737c5b7 commit B
+|/
+* e67a0f3 add test02.txt and test03.txt
+* 332de10 update file
+* 470dcf0 add files
+```
+
+如上面 `a00fc7a` 合并提交，其 first parent 为 `03d14ae`，其 second parent 为 `099b5e`。
+
+如果只显示 first parent，则只会显示 main 分支上的提提交和最终合并到 main 上的提交：
+```bash
+lx@lx MINGW64 /d/Documents/git_test (main)
+$ git log --oneline --graph --first-parent -15
+* a00fc7a (HEAD -> main) Merge branch 'fix_B'
+* 03d14ae (origin/main) update main test01.txt
+* 737c5b7 commit B
+* e67a0f3 add test02.txt and test03.txt
+* 332de10 update file
+* 470dcf0 add files
+```
+
+### 查看合并提交的多个父提交
+```bash
+lx@lx MINGW64 /d/Documents/git_test (main)
+$ git show a00fc7a --shortstat
+commit a00fc7a17f1e55dee84a79f4d16b4e88edb0ba00 (HEAD -> main)
+Merge: 03d14ae 099b5e1
+Author: lxwcd <15521168075@163.com>
+Date:   Sun Jan 19 18:34:59 2025 +0800
+
+    Merge branch 'fix_B'
+
+ 12 files changed, 322 insertions(+)
+```
+
+从 `Merge: 03d14ae 099b5e1` 可以看出，03d14ae 为 first parent, 099b5e1 为 second parent。
+
+## 排除合并信息 --no-merges
+`--no-merges` 选项用于排除合并信息。当使用 `--no-merges` 选项时，`git log` 只显示那些没有合并操作的提交。
+
+所有提交：
+```bash
+lx@lx MINGW64 /d/Documents/git_test (main)
+$ git log --oneline --graph --no-merges -15
+* 099b5e1 (fix_B) update test files' '
+* 51da54a update fix_B
+* 9aaa1c6 (branch01) fix B
+* 09035ad commit C
+* e8867c1 commit B
+* 0b4aed3 commit A
+* b3852e1 (origin/branch01) local git rebase  test test02.txt
+* 8ef1913 local modify test01.txt
+* c8d5a84 Update test01.txt  git pull
+| * 03d14ae (origin/main) update main test01.txt
+| * 737c5b7 commit B
+|/
+* e67a0f3 add test02.txt and test03.txt
+* 332de10 update file
+* 470dcf0 add files
+```
+
+排除合并后的提交：
+```bash
+lx@lx MINGW64 /d/Documents/git_test (main)
+$ git log --oneline --graph -15
+*   a00fc7a (HEAD -> main) Merge branch 'fix_B'
+|\
+| * 099b5e1 (fix_B) update test files' '
+| * 51da54a update fix_B
+| * 9aaa1c6 (branch01) fix B
+| * 09035ad commit C
+| * e8867c1 commit B
+| * 0b4aed3 commit A
+| * b3852e1 (origin/branch01) local git rebase  test test02.txt
+| * 8ef1913 local modify test01.txt
+| * c8d5a84 Update test01.txt  git pull
+* | 03d14ae (origin/main) update main test01.txt
+* | 737c5b7 commit B
+|/
+* e67a0f3 add test02.txt and test03.txt
+* 332de10 update file
+* 470dcf0 add files
+```
+
+## 查看不同分支差异
+
+```bash
+$ git log foo bar ^baz
+```
+
+上面命令查看那些可达于 foo 或 bar 分支，但不可达于 baz 的提交。即列出那些在 foo 或 bar 分支上存在，但在 baz 分支上不存在的提交。
+
+## 查看一个分支相对于另一个分支的提交差异
+
+### git log branch1..branch2
+
+```bash
+$ git log origin..HEAD --oneline
+```
+
+HEAD 当前分支最新提交相对于 origin 分支最新提交的提交记录，即 HEAD 有但 origin 没有的提交记录
+
+和下面命令功能相同：
+```bash
+$ git log HEAD ^origin --oneline
+```
+
+# git show
+> [Git - git-show Documentation](https://git-scm.com/docs/git-show) 
+
+`git show` 用于展示各种 Git 对象的详细内容，包括提交（commit）、标签（tag）和分支（branch）。
+
+> Shows one or more objects (blobs, trees, tags and commits).
+> For commits it shows the log message and textual diff. It also presents the merge commit in a special format as produced by git diff-tree --cc.
+> For tags, it shows the tag message and the referenced objects.
+> For trees, it shows the names (equivalent to git ls-tree with --name-only).
+> For plain blobs, it shows the plain contents.
+> Some options that git log command understands can be used to control how the changes the commit introduces are shown.
+> This manual page describes only the most frequently used options.
+
+## 查看当前分支最新提交的详细信息
+```bash
+git show
+```
+输出最新提交修改的文件内容
+
+## 查看当前分支最新提交的详细信息
+```bash
+lx@lx MINGW64 /d/Documents/git_test (fix_B)
+$ git show main --stat
+commit a00fc7a17f1e55dee84a79f4d16b4e88edb0ba00 (main)
+Merge: 03d14ae 099b5e1
+Author: lxwcd <15521168075@163.com>
+Date:   Sun Jan 19 18:34:59 2025 +0800
+
+    Merge branch 'fix_B'
+
+ .gitignore              |   1 +
+ 0001-commit-B.patch     |  33 ++++++++++++
+ 0001-fix-B.patch        |  23 +++++++++
+ 0001-update-fix_B.patch |  41 +++++++++++++++
+ 0002-commit-C.patch     |  20 ++++++++
+ 0002-update-fix_B.patch |  41 +++++++++++++++
+ 1.patch                 |   1 +
+ 2.txt                   |   1 +
+ git.md                  | 130 ++++++++++++++++++++++++++++++++++++++++++++++++
+ test01.txt              |  28 +++++++++++
+ test02.txt              |   2 +
+ test05.txt              |   1 +
+ 12 files changed, 322 insertions(+)
+```
+
+## 查看特定提交的信息
+```bash
+lx@lx MINGW64 /d/Documents/git_test (fix_B)
+$ git log --oneline -2
+099b5e1 (HEAD -> fix_B) update test files' '
+51da54a update fix_B
+```
+
+查看上面第二个提交的文件名的修改情况：
+```bash
+lx@lx MINGW64 /d/Documents/git_test (fix_B)
+$ git log --oneline -2 | cut -d" " -f1 | tail -n1 | xargs git show --name-status
+commit 51da54a57cdc95263072173726d187a544725289
+Author: lxwcd <15521168075@163.com>
+Date:   Sun Jan 12 21:22:45 2025 +0800
+
+    update fix_B
+
+M       test01.txt
+M       test02.txt
+A       test05.txt
+
+lx@lx MINGW64 /d/Documents/git_test (fix_B)
+$ git log --oneline -2
+099b5e1 (HEAD -> fix_B) update test files' '
+51da54a update fix_B
+```
+
+## --name-only
+仅显示提交中涉及的文件名列表。
+
+```bash
+lx@lx MINGW64 /d/Documents/git_test (fix_B)
+$ git show --name-only
+commit 099b5e1194fcb305b239e1a04d1a8ddac66bdb3d (HEAD -> fix_B)
+Author: lxwcd <15521168075@163.com>
+Date:   Sun Jan 19 18:33:57 2025 +0800
+
+    update test files'
+    '
+
+.gitignore
+0001-commit-B.patch
+0001-fix-B.patch
+0001-update-fix_B.patch
+0002-commit-C.patch
+0002-update-fix_B.patch
+1.patch
+2.txt
+git.md
+test01.txt
+```
+上面显示最新提价涉及的文件名。
+
+## --name-status
+显示提交中涉及的文件名以及它们的状态（新增、修改、删除）。
+
+```bash
+lx@lx MINGW64 /d/Documents/git_test (fix_B)
+$ git show --name-status
+commit 099b5e1194fcb305b239e1a04d1a8ddac66bdb3d (HEAD -> fix_B)
+Author: lxwcd <15521168075@163.com>
+Date:   Sun Jan 19 18:33:57 2025 +0800
+
+    update test files'
+    '
+
+A       .gitignore
+A       0001-commit-B.patch
+A       0001-fix-B.patch
+A       0001-update-fix_B.patch
+A       0002-commit-C.patch
+A       0002-update-fix_B.patch
+A       1.patch
+A       2.txt
+A       git.md
+M       test01.txt
+```
+
+## --stat
+显示提交的统计信息，包括每个文件的增删行数和文件状态。
+
+## --shortstat
+显示提交的简要统计信息，只包括每个文件的增删行数。
+
+## --summary
+显示提交的统计信息摘要，类似于 `--stat`，但不包括每个文件的详细信息。
+
+## --patch
+显示提交的差异（默认选项），展示具体的代码变化。
+
+## --full-index
+显示差异时，显示完整的索引信息。
 
 # git merge-base 查找分支的共同祖先
 > [Git - git-merge-base Documentation](https://git-scm.com/docs/git-merge-base) 
@@ -1116,10 +1867,10 @@ node_modules/
 Given two commits A and B, git merge-base A B will output a commit which is reachable from both A and B through the parent relationship.
 
 For example, with this topology:
-
-	 o---o---o---B
-	/
+         o---o---o---B
+       /
 ---o---1---o---o---o---A
+
 the merge base between A and B is 1.
 
 ## 多个分支的共同祖先
@@ -1172,14 +1923,16 @@ The result of git merge-base --octopus A B C is 2, because 2 is the best common 
 - **行号**：显示差异行的行号。
 - **差异内容**：显示具体的差异内容。
 
-## **比较工作区和暂存区的差异**
+差异内容显示从 a 版本到 b 版本需要做的修改。
+
+## 比较工作区和暂存区的差异
 > [Git - git-diff Documentation](https://git-scm.com/docs/git-diff#Documentation/git-diff.txt-codegitdiffcode) 
 > [git diff - Comparing Changes in Git | Refine](https://refine.dev/blog/git-diff-command/#basic-example) 
 
 ```bash
 git diff
 ```
-这个命令显示自上次提交以来未暂存的更改。
+这个命令显示自上次提交以来**未暂存**的更改。
 不包括没有被跟踪的文件。
 如果文件已暂存，不会查看到。
 
@@ -1197,15 +1950,21 @@ index cd7fb11..a821b44 100644
  C
 +001
 ```
-上面 a 表示最新提交的版本，即旧的版本，b 表示当前工作目录的版本，即新的版本。
-`100` 表示文件类型为普通文件，`644` 表示文件权限，可以通过 `ll` 查看：
+
+- a 最新提交版本
+- b 表示当前工作目录未暂存的版本
+- `100644` 中 `100` 表示文件类型为普通文件，`644` 表示文件权限，可以通过 `ll` 查看：
 ```bash
 lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (fix_B)
 $ ll test01.txt
 -rw-r--r-- 1 lx 197121 56 12月 21 22:10 test01.txt
 ```
+- `@@ -4,3 +4,4 @@ local modify test01.txt` 
+a 版本的修改从第 4 行开始，共 3 行
+b 版本的修改为第 4 行开始，共 4 行
+- `001` 表示 a 版本需要增加改行才能和 b 版本一致
 
-## **比较已暂存的文件和最新提交的差异**
+## 比较已暂存的文件和最新提交的差异
 ```bash
 git diff --cached
 ```
@@ -1245,9 +2004,10 @@ index cd7fb11..a821b44 100644
  C
 +001
 ```
-a 表示最新的提交版本，旧的版本； b 表示暂存区的版本，新的版本。
+a 表示最新的提交版本
+b 表示暂存区的版本
 
-## **比较工作区和最新提交的差异**
+## 比较工作区和最新提交的差异
 ```bash
 lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (fix_B)
 $ git diff HEAD
@@ -1274,10 +2034,10 @@ index 8de02e1..98bbcac 100644
 ```
 
 工作区中跟踪的文件，已暂存和未暂存的文件和最新提交的差异都能看到。
-a 表示最新的提交版本，旧的版本； b 表示工作目录的版本，新的版本。
-`+001` 表示 a 中不存在， b 中新增的内容。
+a 表示最新的提交版本
+b 表示工作目录的版本
 
-## **比较当前工作目录中特定文件和暂存区的差异**
+## 比较当前工作目录中特定文件和最新提交的差异
 ```bash
 lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (fix_B)
 $ git diff HEAD -- test01.txt
@@ -1292,13 +2052,14 @@ index cd7fb11..a821b44 100644
 +001
 ```
 
-指定当前工作目录，即 b 版本的 test01.txt 文件和 HEAD 的差异。
+a 表示最新的提交版本
+b 表示工作目录的版本
+指定查看 test01.txt 文件和 HEAD 的差异。
 
-## **比较当前工作目录和任意提交的差异** 
+## 比较当前工作目录和任意提交的差异
 ```bash
 lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (fix_B)
 $ git diff 332de10
-warning: in the working copy of 'test02.txt', LF will be replaced by CRLF the next time Git touches it
 diff --git a/test01.txt b/test01.txt
 index 4c19859..a821b44 100644
 --- a/test01.txt
@@ -1311,26 +2072,12 @@ index 4c19859..a821b44 100644
 +b
 +C
 +001
-diff --git a/test02.txt b/test02.txt
-index 4c19859..98bbcac 100644
---- a/test02.txt
-+++ b/test02.txt
-@@ -1 +1,3 @@
--test01
-+test02
-+local git rebase002
-+002
-diff --git a/test03.txt b/test03.txt
-new file mode 100644
-index 0000000..23bc844
---- /dev/null
-+++ b/test03.txt
-@@ -0,0 +1 @@
-+test03
 ```
-a 为指定的提交版本，b 为当前工作目录，包括为暂存的修改，不包括未跟踪的文件。
 
-## **比较当前已暂存和任意提交的差异** 
+a 为指定的提交版本
+b 为当前工作目录，包括为暂存的修改，不包括未跟踪的文件
+
+## 比较当前已暂存和任意提交的差异 
 ```bash
 $ git diff 332de10 --cached
 diff --git a/test01.txt b/test01.txt
@@ -1345,26 +2092,12 @@ index 4c19859..a821b44 100644
 +b
 +C
 +001
-diff --git a/test02.txt b/test02.txt
-index 4c19859..8de02e1 100644
---- a/test02.txt
-+++ b/test02.txt
-@@ -1 +1,2 @@
--test01
-+test02
-+local git rebase
-\ No newline at end of file
-diff --git a/test03.txt b/test03.txt
-new file mode 100644
-index 0000000..23bc844
---- /dev/null
-+++ b/test03.txt
-@@ -0,0 +1 @@
-+test03
 ```
-a 为指定的提交版本，b 为当前工作目录已暂存的文件修改，不包括为暂存的修改，不包括未跟踪的文件。
 
-## **比较两个提交**
+a 为指定的提交版本
+b 为当前工作目录已暂存的文件修改
+
+## 比较两个提交
 ```bash
 git diff <commit1> <commit2>
 ```
@@ -1384,24 +2117,10 @@ index 4c19859..cd7fb11 100644
 +A
 +b
 +C
-diff --git a/test02.txt b/test02.txt
-index 4c19859..8de02e1 100644
---- a/test02.txt
-+++ b/test02.txt
-@@ -1 +1,2 @@
--test01
-+test02
-+local git rebase
-\ No newline at end of file
-diff --git a/test03.txt b/test03.txt
-new file mode 100644
-index 0000000..23bc844
---- /dev/null
-+++ b/test03.txt
-@@ -0,0 +1 @@
-+test03
 ```
-a 为 332de10 提交版本，b 为当前分支最新提交。
+
+a 为 332de10 提交版本
+b 为当前分支最新提交。
 
 如果调换顺序：
 ```bash
@@ -1418,27 +2137,13 @@ index cd7fb11..4c19859 100644
 -A
 -b
 -C
-diff --git a/test02.txt b/test02.txt
-index 8de02e1..4c19859 100644
---- a/test02.txt
-+++ b/test02.txt
-@@ -1,2 +1 @@
--test02
--local git rebase
-\ No newline at end of file
-+test01
-diff --git a/test03.txt b/test03.txt
-deleted file mode 100644
-index 23bc844..0000000
---- a/test03.txt
-+++ /dev/null
-@@ -1 +0,0 @@
--test03
 ```
-b 为 332de10 提交版本，a 为当前分支最新提交。
-则相当于 332de10 相对于 HEAD 的变化，因此 HEAD 中增加的内容前面为 -，表示需要减去这些内容才能和 a 的版本一致。
 
-## **比较当前最新提交和上一次提交的差异**
+a 为当前分支最新提交。
+b 为 332de10 提交版本
+相当于 332de10 相对于 HEAD 的变化，因此 HEAD 中增加的内容前面为 -，表示需要减去这些内容才能和 a 的版本一致。
+
+## 比较当前最新提交和上一次提交的差异
 ```bash
 lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (fix_B)
 $ git diff HEAD^ HEAD
@@ -1454,9 +2159,11 @@ index 5c232c3..cd7fb11 100644
 +b
  C
 ```
-a 为 HEAD^ 上一次提交版本，b 为 HEAD 最新提交版本。
 
-## **比较两个分支最新提交的差异**
+a 为 HEAD^ 上一次提交版本
+b 为 HEAD 最新提交版本
+
+## 比较两个分支最新提交的差异
 > [git diff - Comparing Changes in Git | Refine](https://refine.dev/blog/git-diff-command/#git-diff-between-two-branches-two-dots-method) 
 
 ```bash
@@ -1466,6 +2173,7 @@ git diff <branch1> <branch2>
 ```bash
 git diff <branch1>..<branch2>
 ```
+
 这个顺序则 a 为 branch1 版本，b 为 branch2。 
 查看的是两个分支的最新提交的差异。
 
@@ -1475,24 +2183,25 @@ git diff <branch2> <branch1>
 ```
 这个顺序则 a 为 branch2 版本，b 为 branch1。
 
-## **比较一个分支相对于另一个分支的差异**
+## 比较一个分支相对于另一个分支的差异
 > [git diff - Comparing Changes in Git | Refine](https://refine.dev/blog/git-diff-command/#git-diff-between-two-branches-three-dots-method) 
 
 ```bash
 git diff <branch1>...<branch2>
 ```
+
 这个命令显示从 `branch1` 和 `branch2` 的共同祖先到 `branch2` 的所有差异。
 即从两个分支开始分叉后，branch2 上所有的提交内容相对共同祖先的差异。
 查看差异中 a 为两个分支共同的祖先，b 为 branch2 最新提交。
 
 注意和 ```git diff <branch1>..<branch2>``` 的区别，两个点号表示两个分支最新提交的差异。
 
-## **查看差异的文件名**
+## 查看差异的文件名
 ```bash
 $ git diff --name-only
 ```
 
-## **比较工作目录和 stash 中特定文件差别**
+## 比较工作目录和 stash 中特定文件差别
 ```bash
 lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (main)
 $ echo "000 modify after stash test01" >> test01.txt
@@ -1512,11 +2221,10 @@ index d494af0..86e607d 100644
 +000 modify after stash test01
 ```
 
-a 为 stash@{0} 的版本，b 为当前工作目录`。
-`-` 那行表示 a 中的版本存在，b 不存在，需要 - 去改行才能将 a 版本变成 b 版本。
-`+` 那行则是 a 中不存在，需要加上才能变成 b 版本。
+a 为 stash@{0} 的版本
+b 为当前工作目录
 
-## **比较暂存区和 stash 中特定文件差别**
+## 比较暂存区和 stash 中特定文件差别
 ```bash
 lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (main)
 $ git diff stash@{0} --cached -- test01.txt
@@ -1530,42 +2238,47 @@ index d494af0..9d86808 100644
  add main test01.txt
 -stash test01.txt
 ```
-a 为 stash@{0}，b 为暂存区。
 
-## **查看当前最新提交和 stash 的差异**
-`git diff stash@{0} HEAD`
+a 为 stash@{0}
+b 为暂存区
 
-## **查看两个分支某个文件的差异**
+## 查看当前最新提交和 stash 的差异
+```bash
+git diff stash@{0} HEAD
+```
+
+a 为 stash@{0}
+b 为HEAD
+
+## 查看两个分支某个文件的差异
 ```bash
 git diff <branch1> <branch2> -- <file-path>
 ```
 
-要查看两个分支中某个文件夹的差异，你可以使用以下命令：
+要查看两个分支中某个文件夹的差异：
 ```bash
 git diff <branch1> <branch2> -- <folder-path>
 ```
 
-## **比较标签**
+## 比较标签
 ```bash
 git diff <tag1> <tag2>
 ```
 这个命令比较两个标签之间的差异。
 
-## **git diff --base` 比较合并冲突中的文件版本**
+## git diff --base` 比较合并冲突中的文件版本
 > [git diff - Comparing Changes in Git | Refine](https://refine.dev/blog/git-diff-command/#using---base-with-git-diff) 
 
 `git diff --base` 命令用于比较合并冲突中的文件版本。具体来说，`--base` 选项用于显示合并冲突中基线版本（即合并前的共同祖先版本）与当前工作目录中的版本之间的差异。
 
-通过使用 `git diff --base`，你可以查看合并冲突中基线版本与当前工作目录中的版本之间的差异。
+通过使用 `git diff --base`，可以查看合并冲突中基线版本与当前工作目录中的版本之间的差异。
 
 ```bash
 git diff --base <file>
 ```
 这条命令会显示文件 `<file>` 的基线版本与当前工作目录中的版本之间的差异。
 
-假设你有一个文件 `example.py`，在合并过程中出现了冲突。你可以使用 `git diff --base` 来查看基线版本与当前工作目录中的版本之间的差异。
-
-## **git diff 导出补丁文件**
+## git diff 导出补丁文件
 ```bash
 lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (fix_B)
 $ git diff HEAD^ HEAD -- test01.txt
@@ -1604,7 +2317,7 @@ $ git apply ../test01.patch
 
 `git format-patch` 命令用于将一个或多个提交转换成补丁文件。这些补丁文件以邮件格式输出，包含提交的作者、日期和提交信息等元数据，可以方便地通过邮件发送给其他人。补丁文件中除了代码更改外，还包含提交的元数据，如作者、日期和提交信息等。
 
-## **生成最近一次提交的补丁文件**
+## 生成最近一次提交的补丁文件
 
 ```bash
 lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (fix_B)
@@ -1612,7 +2325,7 @@ $ git format-patch HEAD^
 0001-update-fix_B.patch
 ```
 
-## **生成最近两次提交的补丁文件**
+## 生成最近两次提交的补丁文件
 
 ```bash
 lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (fix_B)
@@ -1628,16 +2341,17 @@ $ git format-patch HEAD^^
 0002-update-fix_B.patch
 ```
 
-## **生成指定提交范围的补丁文件**
+## 生成指定提交范围的补丁文件
 
 ```bash
 git format-patch <start-commit>..<end-commit>
 ```
 
-这条命令会生成从 `<start-commit>` 到 `<end-commit>` 之间的所有提交的补丁文件。例如，生成从 `abc123` 到 `def456` 之间的所有提交的补丁文件：
+这条命令会生成从 `<start-commit>` 到 `<end-commit>` 之间的所有提交的补丁文件。
+例如，生成从 `abc123` 到 `def456` 之间的所有提交的补丁文件：
 但不包括 start-commit 那个提交。
 
-入果希望包括起点和终点两个提交，则如下：
+如果希望包括起点和终点两个提交，则如下：
 ```bash
 lx@LAPTOP-VB238NKA MINGW64 /e/src_git/demo (develop)
 $ git format-patch --output-directory=../patch c433384cd^..910b59afe
@@ -1646,33 +2360,25 @@ $ git format-patch --output-directory=../patch c433384cd^..910b59afe
 ../patch/0003-modify-test03.patch
 ```
 
-## **生成某个提交以来的所有补丁文件**
+## 生成某个提交以来的所有补丁文件
 
 ```bash
 git format-patch <commit>
 ```
 
-这条命令会生成从指定提交以来的所有提交的补丁文件，但不包括指定的提交。例如，生成从 `abc123` 以来的所有提交的补丁文件：
+这条命令会生成从指定提交以来的所有提交的补丁文件，但不包括指定的提交。
 
-```bash
-git format-patch abc123
-```
-
-## **生成从根到某个提交的所有补丁文件**
+## 生成从根到某个提交的所有补丁文件
 
 ```bash
 git format-patch --root <commit>
 ```
 
-这条命令会生成从仓库的根到指定提交的所有补丁文件。例如，生成从根到 `abc123` 的所有补丁文件：
-
-```bash
-git format-patch --root abc123
-```
+这条命令会生成从仓库的根到指定提交的所有补丁文件。
 
 ## 输出格式选项
 
-### **输出到标准输出**
+### 输出到标准输出
 
 ```bash
 git format-patch --stdout <commit> > output.patch
@@ -1680,7 +2386,7 @@ git format-patch --stdout <commit> > output.patch
 
 这条命令会将补丁文件输出到标准输出，并重定向到 `output.patch` 文件中。
 
-### **以 mbox 格式输出**
+### 以 mbox 格式输出
 
 ```bash
 git format-patch --mbox <commit>
@@ -1688,7 +2394,7 @@ git format-patch --mbox <commit>
 
 这条命令会以 mbox 格式输出补丁文件，适合通过电子邮件发送。
 
-### **以原始格式输出**
+### 以原始格式输出
 
 ```bash
 git format-patch --raw <commit>
@@ -1696,13 +2402,13 @@ git format-patch --raw <commit>
 
 这条命令会以原始格式输出补丁文件，适合向非 Git 存储库应用补丁。
 
-### **按顺序编号补丁**
+### 按顺序编号补丁
 
 ```bash
 git format-patch --numbered <commit>
 ```
 
-### **使用 --subject-prefix 自定义补丁文件前缀**
+### 使用 --subject-prefix 自定义补丁文件前缀
 
 `--subject-prefix` 选项可以自定义补丁文件名的前缀。默认前缀是 `[PATCH]`，但你可以通过这个选项更改它。
 
@@ -1713,7 +2419,7 @@ git format-patch --subject-prefix="MY_PATCH" <commit>
 
 这条命令会生成补丁文件，文件名前缀为 `MY_PATCH`。例如，生成的文件名可能是 `0001-MY_PATCH-commit-message.patch`。
 
-### **使用 --output-directory 自定补丁文件目录*
+### 使用 --output-directory 自定补丁文件目录
 
 `--output-directory` 选项可以指定生成的补丁文件的保存目录。
 
@@ -1723,7 +2429,7 @@ git format-patch --subject-prefix="MY_PATCH" --output-directory=/path/to/patches
 
 这条命令会生成从 `HEAD^` 到 `HEAD` 之间的所有提交的补丁文件，文件名前缀为 `MY_PATCH`，后缀为 `.txt`，并保存到 `/path/to/patches` 目录中。生成的文件名可能是 `0001-MY_PATCH-commit-message.txt`。
 
-### **使用 --numbered-files 生成仅包含数字的文件名**
+### 使用 --numbered-files 生成仅包含数字的文件名
 
 `--numbered-files` 选项可以生成仅包含数字的文件名，不包含提交信息。
 
@@ -1733,7 +2439,7 @@ git format-patch --numbered-files <commit>
 
 这条命令会生成补丁文件，文件名仅为数字，例如 `0001.patch`、`0002.patch` 等。
 
-### **使用 --suffix 指定补丁文件后缀**
+### 使用 --suffix 指定补丁文件后缀
 
 `--suffix` 选项可以自定义补丁文件的后缀名。默认后缀名是 `.patch`，但你可以通过这个选项更改它。
 
@@ -1745,51 +2451,69 @@ git format-patch --suffix=.txt <commit>
 
 # 应用补丁文件
 
-## **git apply 应用补丁文件**
+## git apply 应用补丁文件
 
 ```bash
 git apply /path/to/mypatch.patch
 ```
 
-这条命令会将 `mypatch.patch` 文件中的更改应用到当前工作目录中。如果应用成功，你会看到提示信息。如果应用失败，Git 会提示哪些更改无法应用，并给出相应的错误信息。
+这条命令会将 `mypatch.patch` 文件中的更改应用到当前工作目录中。
+如果应用成功，会看到提示信息。
+如果应用失败，Git 会提示哪些更改无法应用，并给出相应的错误信息。
 
-注意如果补丁文件有多个，在一个目录中，应用时不能指定目录，需要遍历里面的文件来应用：
+如果补丁文件有多个，在一个目录中，应用时不能指定目录，需要遍历里面的文件来应用：
 ```bash
 for patch in ../patch/*.patch; do
     git apply "$patch"
 done
 ```
 
-##  **git am 应用补丁文件**
+## git am 应用补丁文件
 
 ```bash
 git am /path/to/mypatch.patch
 ```
 
-这条命令会将 `mypatch.patch` 文件作为新的提交应用到当前分支中。如果补丁文件应用成功，Git 会自动创建一个新的提交，其中包含补丁中的更改。如果应用失败，Git 会提示哪些更改无法应用，并给出相应的错误信息。
+这条命令会将 `mypatch.patch` 文件作为新的提交应用到当前分支中。
+如果补丁文件应用成功，Git 会自动创建一个新的提交，其中包含补丁中的更改。
+如果应用失败，Git 会提示哪些更改无法应用，并给出相应的错误信息。
 
 # git blame 查看文件每行的最新提交信息
 > [Git - git-blame Documentation](https://git-scm.com/docs/git-blame) 
 > [git diff - Comparing Changes in Git | Refine](https://refine.dev/blog/git-diff-command/#using-git-diff-with-other-git-commands) 
 
+```bash
+lx@lx MINGW64 /d/Documents/git_test (fix_B)
+$ cat test02.txt
+test02
+local git rebase002
+002
+2
+```
 
-# 分支
-> [Git - Basic Branching and Merging](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging) 
-> [Git Branches Tutorial](https://www.youtube.com/watch?v=e2IbNHi4uCI&ab_channel=freeCodeCamp.org) 
-
+```bash
+lx@lx MINGW64 /d/Documents/git_test (fix_B)
+$ git blame test02.txt
+e67a0f30 (lxwcd             2024-12-15 19:44:40 +0800 1) test02
+51da54a5 (lxwcd             2025-01-12 21:22:45 +0800 2) local git rebase002
+51da54a5 (lxwcd             2025-01-12 21:22:45 +0800 3) 002
+00000000 (Not Committed Yet 2025-01-19 20:18:25 +0800 4) 2
+```
 
 # git checkout
 > [Git - git-checkout Documentation](https://git-scm.com/docs/git-checkout) 
 
 `git checkout` 是 Git 中用于切换分支或检出特定版本的文件到工作目录的命令。
 
-## **切换到已存在的分支**
+## 切换分支
 ```bash
 git checkout <branch-name>
 ```
-这个命令会将 HEAD 移动到指定的分支，并更新工作目录以匹配该分支的状态。
 
-## **创建新分支并切换**
+如果分支已存在，则切换到该分支。
+如果分支不存在，但分支名在远程仓库存在，则创建并切换到该分支，且设置本地该分支跟踪远程对应名字的分支，相当于执行 `git checkout -b <branch-name> origin/<branch-name>`。
+
+## 创建新分支并切换
 ```bash
 git checkout -b <new-branch-name>
 ```
@@ -1799,95 +2523,150 @@ git switch -c <new-branch-name>
 ```
 这些命令会创建一个新的分支，并立即切换到这个分支。
 
-## **基于远程分支创建新分支并切换**
+## 基于远程分支创建新分支并切换
 ```bash
 git checkout -b <new-branch-name> origin/<branch-name>
 ```
 这个命令会创建一个新的分支，并将其设置为跟踪远程分支 `origin/<branch-name>`。
 
-## **检出特定文件到工作目录**
+## 检出特定文件到工作目录
 ```bash
 git checkout <branch-name> -- <file-path>
 ```
 这个命令会从 `<branch-name>` 分支检出 `<file-path>` 文件到当前工作目录，替换本地的文件。
 
-## **检出特定提交到工作目录**
+## 检出特定提交到工作目录
 ```bash
 git checkout <commit-hash> -- <file-path>
 ```
 这个命令会从 `<commit-hash>` 提交检出 `<file-path>` 文件到当前工作目录。
 
-## **检出特定提交到新分支**
+## 检出特定提交到新分支
 ```bash
 git checkout <commit-hash> -b <new-branch-name>
 ```
 这个命令会创建一个新的分支 `<new-branch-name>` 并检出 `<commit-hash>` 提交的内容到这个新分支。
 
-## **恢复已修改但未暂存的文件**
+## 恢复已修改但未暂存的文件
 ```bash
 git checkout -- <file-path>
 ```
 这个命令会将 `<file-path>` 文件恢复到最近一次提交的状态，放弃本地的修改。
+检出最新提交的相应文件替换当前工作目录的文件。
 
-## **恢复已暂存的文件**
+## 恢复已暂存的文件
 ```bash
 git restore --staged -- <file-path>
 ```
-或者使用旧版本的 Git 命令：
+或者：
 ```bash
 git checkout -- <file-path>
 ```
 这些命令会将 `<file-path>` 文件从暂存区取消暂存，恢复到工作目录的状态。
 
-## **检出标签对应的版本**
+## 检出标签对应的版本
 ```bash
 git checkout <tag-name>
 ```
 这个命令会检出包含 `<tag-name>` 标签的提交，通常用于检出某个特定的发布版本。
 
-## **有冲突时使用对方版本**
-1. **识别冲突文件**：
-   合并操作后，使用 `git status` 命令来识别哪些文件存在冲突。
+## 有冲突时指定使用版本
 
-2. **手动选择对方版本**：
-   对于每个存在冲突的文件，你可以手动编辑文件来解决冲突，或者使用以下命令来选择对方的版本：
+两个仓库中的一个分支都修改了文件 2.txt 的相同一行，但修改内容内容不同，一个仓库已经将修改推送到远程仓库，另一个仓库修改后提交到本地，然后 git pull 时提示有冲突：
+```bash
+lx@lx MINGW64 /d/Documents/git_test03 (fix_B)
+$ git pull
+remote: Enumerating objects: 5, done.
+remote: Counting objects: 100% (5/5), done.
+remote: Compressing objects: 100% (1/1), done.
+remote: Total 3 (delta 1), reused 3 (delta 1), pack-reused 0 (from 0)
+Unpacking objects: 100% (3/3), 239 bytes | 9.00 KiB/s, done.
+From https://github.com/lxwcd/git_test
+   15f80f2..f54dd26  fix_B      -> origin/fix_B
+Auto-merging 2.txt
+CONFLICT (content): Merge conflict in 2.txt
+Automatic merge failed; fix conflicts and then commit the result.
+```
 
-   ```bash
-   git checkout --ours -- <file-path>
-   ```
+查看当前工作目录的状态，可以看见有个文件处于冲突中，待解决：
+```bash
+lx@lx MINGW64 /d/Documents/git_test03 (fix_B|MERGING)
+$ git status
+On branch fix_B
+Your branch and 'origin/fix_B' have diverged,
+and have 1 and 1 different commits each, respectively.
+  (use "git pull" if you want to integrate the remote branch with yours)
 
-   或者，如果你想要使用对方的版本（即被合并分支的版本），可以使用：
+You have unmerged paths.
+  (fix conflicts and run "git commit")
+  (use "git merge --abort" to abort the merge)
 
-   ```bash
-   git checkout --theirs -- <file-path>
-   ```
+Unmerged paths:
+  (use "git add <file>..." to mark resolution)
+        both modified:   2.txt
 
-   这里 `<file-path>` 是存在冲突的文件的路径。这些命令会用被合并分支（对方的分支）的版本覆盖工作目录中的文件。
+no changes added to commit (use "git add" and/or "git commit -a")
 
-3. **添加到暂存区**：
-   选择对方版本后，你需要将这些文件添加到暂存区：
+```
 
-   ```bash
-   git add <file-path>
-   ```
+查看冲突文件的内容：
+```bash
+lx@lx MINGW64 /d/Documents/git_test03 (fix_B|MERGING)
+$ cat 2.txt
+<<<<<<< HEAD
+22
+=======
+222
+>>>>>>> f54dd265ddebde6a06e2ea619a0588d2b1555945
+```
 
-4. **继续合并**：
-   如果你已经解决了所有文件的冲突，你可以继续完成合并操作：
+`<<<<<<< HEAD` 表示下方表示当前版本
+`=======` 表示分隔符，下方内容为冲突版本的内容
+`>>>>>>> f54dd265ddebde6a06e2ea619a0588d2b1555945` 表示冲突结束位置
 
-   ```bash
-   git commit
-   ```
+### 使用对方版本
+```bash
+lx@lx MINGW64 /d/Documents/git_test03 (fix_B|MERGING)
+$ git checkout --theirs 2.txt
+Updated 1 path from the index
 
-   Git 会提示你输入合并提交的消息。
+lx@lx MINGW64 /d/Documents/git_test03 (fix_B|MERGING)
+$ cat 2.txt
+222
+```
 
-## 注意事项
+### 使用本地版本
+```bash
+lx@lx MINGW64 /d/Documents/git_test03 (fix_B|MERGING)
+$ git checkout --ours 2.txt
+Updated 1 path from the index
 
-- 使用 `git checkout` 切换分支时，如果你有未提交的更改，Git 会警告你，因为这些更改可能会丢失。你可以先暂存更改，或者使用 `git stash` 保存更改。
-- `git checkout` 命令在检出文件时，如果文件在工作目录中被修改过，Git 会阻止检出操作以防止数据丢失。你需要先解决这些冲突，或者使用 `git checkout --force` 强制覆盖本地更改。
-- 在使用 `git checkout` 检出文件时，如果你想要保留工作目录中的更改，可以先将更改暂存，然后再检出文件。
+lx@lx MINGW64 /d/Documents/git_test03 (fix_B|MERGING)
+$ cat 2.txt
+22
+```
+
+### 添加到暂存区
+选择版本后，将这些文件添加到暂存区：
+
+```bash
+git add <file-path>
+```
+
+### 继续合并
+如果你已经解决了所有文件的冲突，你可以继续完成合并操作：
+
+```bash
+git commit -m "message"
+```
+
+或者 
+```bash
+git merge --continue
+```
 
 # git checkout 和 git cherry-pick
-`git checkout <commit-hash> -- <file-path>` 命令和 `git cherry-pick` 命令都可以用来将更改应用到当前分支，但它们的目的和行为有所不同，因此不能互相代替。
+`git checkout <commit-hash> -- <file-path>` 命令和 `git cherry-pick` 命令都可以用来将更改应用到当前分支，但它们的目的和行为有所不同。
 
 ## `git checkout <commit-hash> -- <file-path>`
 这个命令用于从特定的提交（`<commit-hash>`）中检出文件（`<file-path>`）到当前工作目录。这个操作不会改变分支的历史记录，也不会创建新的提交。它仅仅是替换工作目录中的文件内容，用指定提交中的文件版本覆盖。这个命令不会记录任何新的提交，也不会影响项目的提交历史。
@@ -1895,100 +2674,228 @@ git checkout <tag-name>
 ## `git cherry-pick`
 `git cherry-pick` 命令用于将一个或多个提交的应用到当前分支，从而创建新的提交。这个操作会将指定提交的更改作为新的提交引入到当前分支的历史中。`git cherry-pick` 可以用于将特定提交从一个分支应用到另一个分支，或者在同一个分支中重新应用已经存在的提交。
 
-## 区别
+# git branch
+> [Git - git-branch Documentation](https://git-scm.com/docs/git-branch/2.13.7) 
 
-- **历史记录**：`git checkout` 不会改变分支的历史记录，而 `git cherry-pick` 会创建新的提交，改变历史记录。
-- **提交**：`git cherry-pick` 会创建新的提交，而 `git checkout` 不会。
-- **原子性**：`git cherry-pick` 操作是原子性的，要么全部成功，要么全部失败。如果一个提交被 cherry-picked，那么它会被完全应用到当前分支。而 `git checkout` 只是简单地替换文件，不涉及提交的过程。
-- **冲突解决**：在使用 `git cherry-pick` 时，如果出现冲突，你需要解决冲突并完成 cherry-pick 操作。而在使用 `git checkout` 时，如果文件存在冲突，Git 会停止操作并让你手动解决。
+`git branch` 是一个用于创建、列出、删除和管理 Git 分支的命令。
+分支在 Git 中是一个轻量级的移动指针，指向代码历史的某个特定提交。
 
-虽然 `git checkout <commit-hash> -- <file-path>` 可以用来获取特定提交的文件版本，但它不能代替 `git cherry-pick` 的功能，因为后者涉及到创建新的提交和改变项目的历史记录。如果你只是想替换文件而不创建新的提交，使用 `git checkout`。如果你需要将更改作为新的提交引入到当前分支，那么 `git cherry-pick` 是正确的选择。
+## 创建分支
+```bash
+git branch <branch-name>
+```
+这个命令会创建一个新分支，但不会切换到该分支。
+
+## 创建并切换分支
+```bash
+git checkout -b <branch-name>
+```
+或者在某些 Git 版本中：
+```bash
+git switch -c <branch-name>
+```
+这些命令会创建一个新分支并立即切换到该分支。
+
+## 列出所有本地分支
+```bash
+git branch
+```
+这个命令会列出所有的本地分支。
+
+## 列出所有远程分支
+```bash
+git branch -r
+```
+这个命令会列出所有的远程分支。
+
+## 列出所有本地和远程分支
+```bash
+git branch -a
+```
+这个命令会列出所有的本地分支和远程分支。
+
+## 显示当前分支
+```bash
+git branch --show-current
+```
+或者使用 `git rev-parse --abbrev-ref HEAD`。
+这个命令会显示当前检出的分支名称。
+
+## 删除分支
+```bash
+git branch -d <branch-name>
+```
+这个命令会删除一个已经完全合并到当前分支的本地分支。如果分支未完全合并，Git 会阻止删除以防止数据丢失。
+
+## 强制删除分支
+```bash
+git branch -D <branch-name>
+```
+这个命令会强制删除一个分支，无论它是否已经合并。
+
+## 重命名分支
+`git branch -m` 和 `git branch -M` 是 Git 中用于重命名分支的两个命令，它们的主要区别在于处理分支重命名时的安全性。
+
+### git branch -m
+- `-m` 是 `--move` 的缩写。
+- 这个命令用于重命名当前分支。
+- 如果目标分支名称已经存在，并且没有进行任何提交，`git branch -m` 会失败，以防止潜在的数据丢失。
+- 如果目标分支已经存在并且有提交，`git branch -m` 会报错，因为它不想覆盖任何现有的分支历史。
+
+```bash
+git branch -m <old-name> <new-name>
+```
+这个命令会将分支 `<old-name>` 重命名为 `<new-name>`。
+
+### git branch -M
+
+- `-M` 是 `--move` 的缩写，与 `-m` 类似，但它的行为更加激进。
+- 这个命令也用于重命名当前分支。
+- 如果目标分支名称已经存在，`git branch -M` 会强制覆盖目标分支。这意味着目标分支的历史将被当前分支的历史替换，这可能会导致数据丢失。
+- `git branch -M` 通常用于修复损坏的分支或者在确定目标分支没有重要历史的情况下使用。
+
+## 设置上游分支
+```bash
+git branch -u <remote-branch>
+```
+或者使用 `git branch --set-upstream-to <remote-branch>`。
+这个命令会设置当前分支跟踪指定的远程分支。
+
+## 查看当前分支与上游分支的对应关系
+```bash
+lx@lx MINGW64 /d/Documents/git_test (fix_B)
+$ git branch -vv
+  branch01  9aaa1c6 [origin/branch01: ahead 4] fix B
+  feature01 b387cb1 [origin/tb01: ahead 2] Merge branch 'tb01' of https://github.com/lxwcd/git_test into feature01
+  feature02 f3f08ca add test04.txt
+* fix_B     f54dd26 [origin/fix_B] update 2.txt 222
+  main      a00fc7a [origin/main: ahead 10] Merge branch 'fix_B'
+  tb01      f9e71d6 [origin/tb01] Update test01.txt
+```
+
+- 显示所有分支及其上游信息
+- `*` 表示当前分支的对应关系
+- 显示与远程分支的 ahead  和 behind 的信息
+
+## 查看当前分支与上游分支的对应关系
+```bash
+lx@lx MINGW64 /d/Documents/git_test (fix_B)
+$ git branch -vv | grep "*"
+* fix_B     f54dd26 [origin/fix_B] update 2.txt 222
+```
+
+## 包含已合并/未合并信息
+
+```bash
+lx@lx MINGW64 /d/Documents/git_test03 (main)
+$ git branch
+  branch01
+  fix_B
+* main
+  tb01
+
+lx@lx MINGW64 /d/Documents/git_test03 (main)
+$ git branch --merged
+* main
+
+lx@lx MINGW64 /d/Documents/git_test03 (main)
+$ git branch --no-merged
+  branch01
+  fix_B
+  tb01
+```
+
+将 `branch01` 分支合并到 `main` 分支后查看：
+```bash
+lx@lx MINGW64 /d/Documents/git_test03 (main)
+$ git branch --merged
+  branch01
+* main
+```
+
+## 删除远程跟踪分支
+```bash
+git branch -dr <remote/branch>
+```
+这条命令会删除本地的远程跟踪分支。但并不会直接删除远程仓库中的分支，只是删除了本地对远程分支的跟踪信息。
+
+## 删除本地分支的上游分支设置
+
+```bash
+git branch --unset-upstream my-branch
+```
 
 # git switch 
 `git switch` 是 Git 2.23 版本引入的命令，用于切换分支。这个命令的作用与 `git checkout` 类似，但提供了更清晰的语义和错误检查。
 
 如果工作目录中有未被跟踪的文件，可以切换，未被跟踪的文件也会出现在切换后的分支上。
 
-## **切换到已存在的分支**
+## 切换到已存在的分支
 ```bash
 git switch <branch-name>
 ```
-例如，将工作目录切换到主分支：
+
+## 创建并切换新分支
 ```bash
-git switch master
+git switch -c <new-branch-name>
 ```
 
-## **使用 `-c` 或 `--create` 参数创建并切换新分支**
-  ```bash
-  git switch -c <new-branch-name>
-  ```
-  例如，创建一个名为 `feature-branch` 的新分支并切换到它：
-  ```bash
-  git switch -c feature-branch
-  ```
-  这相当于先执行 `git branch <new-branch-name>` 然后执行 `git switch <new-branch-name>` 的快捷方式。
+## 强制创建新分支
+```bash
+git switch -C <new-branch>
+```
 
-## **使用 `-C` 或 `--force-create` 参数强制创建新分支**
-  ```bash
-  git switch -C <new-branch>
-  ```
-  如果 `<new-branch>` 已经存在，它将被重置为 `<start-point>`。这相当于先执行 `git branch -f <new-branch>` 然后执行 `git switch <new-branch>`。
+如果 `<new-branch>` 已经存在，它将被重置为 `<start-point>`。
+这相当于先执行 `git branch -f <new-branch>` 然后执行 `git switch <new-branch>`。
 
 ## 根据远程分支创建本地分支
-使用 `git switch --track` 命令创建一个新的本地分支，并设置它跟踪远程分支。例如，如果你想要创建一个本地分支 `feature` 并跟踪远程的 `origin/feature`，可以执行以下命令：
+使用 `git switch --track` 命令创建一个新的本地分支，并设置它跟踪远程分支。
 
 ```bash
 git switch --track origin/feature
 ```
-
 或者使用 `-t` 选项：
-
 ```bash
 git switch -t origin/feature
 ```
-
-这个命令会创建一个新的本地 `feature` 分支，并立即设置它跟踪远程的 `origin/feature` 分支。
+创建一个新的本地 `feature` 分支，并立即设置它跟踪远程的 `origin/feature` 分支。
 
 也可以使用下面方法：
 ```bash
 git checkout -b feature origin/feature
 ```
 
-## **使用 `-d` 或 `--detach` 参数切换到一个提交**
-  ```bash
-  git switch -d <commit-hash>
-  ```
-  这会将 HEAD 分离并指向 `<commit-hash>`，允许你在一个提交上进行临时的检查或实验。
+## 使用 `-d` 或 `--detach` 参数切换到一个提交
 
-## **使用 `<commit_hash>` 恢复工作目录**
-  ```bash
-  git switch <commit_hash>
-  ```
-  这会将工作目录切换到指定提交 `<commit_hash>` 的状态，处于分离 HEAD 的状态。
+```bash
+git switch -d <commit-hash>
+```
 
-## **使用 `-` 快速切换回前一个分支**
-  ```bash
-  git switch -
-  ```
-  这允许你快速切换回前一个分支，无需记住分支名称。
+分离的HEAD 允许你直接切换到任何提交，而不需要创建一个分支。切换后所做的修改，提交，甚至 push 到远程都不会影响其他分支。
+切换到其他分支后拉取远程仓库的最新代码，之前分离 HEAD 后 Push 的内容看不到提交记录。
 
-## **使用 `git switch <branchName>` 从远程分支创建同名的本地分支并关联远程分支**
-  ```bash
-  git switch testmaster
-  ```
-  这会拉取远程分支到本地，并建立远程分支和本地分支的关联关系。
+## 快速切换回前一个分支
+```bash
+git switch -
+```
 
-## **使用 `--orphan <new-branch>` 创建孤儿分支**
-  ```bash
-  git switch --orphan <new-branch>
-  ```
-  这会创建一个新的孤儿分支，并删除所有跟踪的文件。
+## 从远程分支创建同名的本地分支并关联远程分支
+```bash
+git switch testmaster
+```
+这会拉取远程分支到本地，并建立远程分支和本地分支的关联关系。
 
-## **使用 `--recurse-submodules` 更新所有初始化的子模块**
-  ```bash
-  git switch --recurse-submodules <branch>
-  ```
-  这会根据超级项目中记录的提交更新所有活动子模块的内容。
+## 创建孤儿分支
+```bash
+git switch --orphan <new-branch>
+```
+这会创建一个新的孤儿分支，并删除所有跟踪的文件。
+
+## 使用 `--recurse-submodules` 更新所有初始化的子模块
+```bash
+git switch --recurse-submodules <branch>
+```
+这会根据超级项目中记录的提交更新所有活动子模块的内容。
 
 # git add 
 > [Git - git-add Documentation](https://git-scm.com/docs/git-add) 
@@ -2006,30 +2913,6 @@ git checkout -b feature origin/feature
 - **准备提交**：当你完成一些更改并准备提交时，使用 `git add` 将这些更改添加到暂存区。
 - **选择性暂存**：如果你有多个更改，可以选择性地暂存部分更改，以便分批次提交。
 
-## 基本使用
-
-- **暂存单个文件**：
-  ```bash
-  git add <file>
-  ```
-  这个命令将指定文件的更改添加到暂存区。
-
-- **暂存多个文件**：
-  ```bash
-  git add <file1> <file2> ...
-  ```
-  这个命令将多个文件的更改添加到暂存区。
-
-- **暂存所有更改**：
-  ```bash
-  git add .
-  ```
-  或者
-  ```bash
-  git add --all
-  ```
-  这些命令将所有更改（包括新文件和修改的文件）添加到暂存区。
-
 ## 选项
 
 - **`-A` 或 `--all`**：暂存所有更改，包括新文件和删除的文件。
@@ -2037,6 +2920,28 @@ git checkout -b feature origin/feature
 - **`-p`**：交互式地选择要暂存的更改。
 - **`-i`**：启动交互式暂存模式，允许你选择要暂存的更改。
 - **`-N` 或 `--intent-to-add`**：标记新文件为暂存状态，但不实际添加内容。
+
+## 暂存单个文件
+```bash
+git add <file>
+```
+这个命令将指定文件的更改添加到暂存区。
+
+## 暂存多个文件
+```bash
+git add <file1> <file2> ...
+```
+这个命令将多个文件的更改添加到暂存区。
+
+## 暂存所有更改
+```bash
+git add .
+```
+或者
+```bash
+git add --all
+```
+这些命令将所有更改（包括新文件和修改的文件）添加到暂存区。
 
 ## 使用通配符
 ```bash
@@ -2047,44 +2952,17 @@ git add *.cpp *.h
 
 使用 `git add -i` 或 `git add --interactive` 可以进入交互式暂存模式，这允许你逐个选择要暂存的更改。这个模式特别有用，当你有多个更改但只想提交其中一部分时。
 
-
-## 注意事项
-
-- **暂存区状态**：使用 `git status` 可以查看暂存区的状态，了解哪些文件已被暂存。
-- **撤销暂存**：如果你想要撤销暂存的文件，可以使用 `git reset <file>`。
-- **未跟踪文件**：`git add` 会将未跟踪的文件添加到暂存区，使其成为仓库的一部分。
-- **文件模式**：`git add` 会保留文件的模式（如执行权限），因此在提交时文件模式也会被记录。
-
 ## 查看可 add 的文件
-`git add -n` 或 `--dry-run` 是一个 Git 命令选项，用于模拟 `git add` 操作而不实际将文件添加到暂存区。这个选项非常有用，因为它允许你查看哪些文件会被添加到暂存区，从而避免意外添加不需要的文件。
+`git add -n` 或 `--dry-run` 是一个 Git 命令选项，用于模拟 `git add` 操作而不实际将文件添加到暂存区。
 
 - **模拟添加操作**：`-n` 选项用于模拟 `git add` 命令的行为。它不会实际将文件添加到暂存区，而是显示哪些文件将被添加。
 - **查看影响**：使用这个选项可以帮助你了解执行 `git add` 命令时哪些文件会被影响，从而避免意外添加不需要的文件。
 
-### 使用场景
-
-- **检查待添加文件**：当你想要确认哪些文件将被添加到暂存区时，可以使用 `git add -n` 进行检查。
-- **避免错误**：在执行实际的 `git add` 操作之前，使用 `git add -n` 可以帮助你避免将错误的文件添加到暂存区。
-
-### 示例命令
-
-假设有一些修改过的文件和新文件，你想要查看哪些文件会被 `git add` 添加到暂存区：
-
 ```bash
-git add -n .
+lx@lx MINGW64 /d/Documents/git_test03 (main)
+$ git add . --dry-run
+add 'test03.txt'
 ```
-
-这个命令会列出当前目录及其子目录中所有会被添加的文件，但不会实际将它们添加到暂存区。
-
-### 输出解释
-
-- **输出内容**：命令的输出会显示所有即将被添加到暂存区的文件的路径。这与实际执行 `git add` 时的输出相同，但不会改变暂存区的状态。
-- **理解输出**：通过查看输出，你可以确认是否有任何意外的文件被包含在内，或者是否有任何需要的文件被遗漏。
-
-### 注意事项
-
-- **不影响工作目录**：使用 `-n` 选项不会改变工作目录或暂存区的状态。
-- **结合其他选项使用**：你可以结合其他 `git add` 选项使用 `-n`，例如 `git add -A -n` 来查看所有将被添加的文件。
 
 # git commit
 > [Git - git-commit Documentation](https://git-scm.com/docs/git-commit) 
@@ -2095,18 +2973,6 @@ git add -n .
 2. **更新项目历史**：每次提交都会更新项目的提交历史，形成一个版本记录。
 3. **要求提交信息**：执行提交时，Git 会要求你提供一个提交信息，以描述所做的更改。
 
-## **指定提交信息 -m**
-```bash
-git commit -m "Commit message"
-```
-使用 `-m` 选项可以直接在命令行中指定提交信息。
-
-## **提交所有更改 -am**
-```bash
-git commit -a -m
-```
-使用 `-a` 选项会自动将所有已跟踪文件的更改添加到暂存区并提交，但不包括新文件。
-
 ## 选项
 
 - **`-m`**：指定提交信息。
@@ -2115,16 +2981,33 @@ git commit -a -m
 - **`-C <commit>`**：使用指定提交的信息作为当前提交的信息。
 - **`--dry-run`**：模拟提交操作，显示将要提交的内容，但不实际创建提交。
 
-## **修改最后一次提交 --amend**
-`git commit --amend` 是一个Git命令，用于修改最近一次提交的信息。这个命令通常用于当你想要修改最后一次提交的提交信息，或者当你想要将未暂存的更改添加到最近的提交中时。
+## 指定提交信息 -m
+```bash
+git commit -m "Commit message"
+```
+使用 `-m` 选项可以直接在命令行中指定提交信息。
 
-- 如果你刚刚做了一次提交，然后意识到提交信息有误或者不完整，你可以使用 `git commit --amend` 来修改它。
-- 如果你在提交后发现还有一些更改忘记加入，你可以使用 `git commit --amend` 将这些更改加入到上一个提交中。
+## 提交所有更改 -am
+```bash
+git commit -a -m
+```
+使用 `-a` 选项会自动将所有已跟踪文件的更改添加到暂存区并提交，但不包括新文件。
+
+## 修改最后一次提交 --amend
+
+`git commit --amend` 是一个Git命令，用于修改最近一次提交的信息。
+
+- 如果刚刚做了一次提交，然后意识到提交信息有误或者不完整，可以使用 `git commit --amend` 来修改它。
+- 如果在提交后发现还有一些更改忘记加入，你可以使用 `git commit --amend` 将这些更改加入到上一个提交中。
 - 如果修改提交内容后不更新提交日志，可以加 `--no-edit` 选项。
+```bash
+git commit --amend --no-edit
+```
 
 ### 注意事项
 - **重写历史**：
-`git commit --amend` 实际上会创建一个新的提交对象，它有一个不同的提交ID。这意味着它会重写项目的历史。如果你已经将原始提交推送到了远程仓库，那么使用 `git commit --amend` 后，你需要使用 `git push --force` 来更新远程仓库。这可能会影响其他协作者的工作，因此在团队项目中使用时需要谨慎。
+`git commit --amend` 实际上会创建一个新的提交对象，它有一个不同的提交ID。这意味着它会重写项目的历史。
+如果已经将原始提交推送到了远程仓库，那么使用 `git commit --amend` 后，需要使用 `git push --force` 来更新远程仓库。 使用强制推送最好先查看本地和远程的提交记录，如果本地和远程在 --amend 修改记录前一样，则可以强制推送；如果远程有新的提交记录，则不要强制推送。
 
 - **使用场景限制**：
 `git commit --amend` 只能用于最近的提交。如果你想要修改更早的提交，你需要使用 `git rebase` 命令。
@@ -2132,12 +3015,12 @@ git commit -a -m
 - **处理冲突**：
 如果在修正提交的过程中出现冲突，你需要手动解决这些冲突，然后继续修正过程。
 
-## **从文件读取提交日志 -F**
+## 从文件读取提交日志 -F
 ```bash
 git commit -F commit_msg.txt
 ```
 
-## **输入多行提交日志**
+## 输入多行提交日志
 ```bash
 $ git commit -F - <<EOF
 > modify test.md
@@ -2151,73 +3034,35 @@ $ git commit -F - <<EOF
 - `<<`：这是 here 文档的开始标记。它告诉 shell，接下来的输入将被重定向到命令的标准输入，直到遇到一个特定的结束标记。
 - `EOF`：这是结束标记（End Of File）。你可以选择任何字符串作为结束标记，但 `EOF` 是最常用的。这里表示输入将一直持续，直到遇到另一个 `EOF`。
 
-
 ## 钩子脚本
 
 - **`prepare-commit-msg`**：在编辑提交信息之前运行。
 - **`commit-msg`**：在提交信息被接受但提交尚未完成时运行。
 - **`post-commit`**：在提交完成后运行。
 
-## 注意事项
-
-- **暂存区内容**：`git commit` 只提交暂存区中的内容。确保你已经使用 `git add` 将需要的更改添加到暂存区。
-- **空提交**：如果你尝试提交但暂存区中没有更改，Git 会提示你没有内容要提交。
-- **提交历史**：提交历史记录了项目的更改，是团队协作和版本控制的基础。
-      
-      
-- `git rm file`  
-- `git commit -m "delete file"`  
-- `git push origin <remote repo>`  
-
 ## 处理错误的提交
 > [Git Guides - git commit](https://github.com/git-guides/git-commit#what-can-go-wrong-while-changing-history) 
 
 - `git revert`是更改历史记录的最安全方式。它不会删除现有提交，而是在新提交中应用特定提交引入变化的逆操作。
 - `git reset`是一个强大的命令，可以移动HEAD指针和分支指针到另一个时间点，但可能会导致工作丢失。在使用`git reset`之前，确保与团队沟通，并了解三种类型的重置（--soft, --mixed, --hard）。
-
 - `git reflog`是一个记录HEAD指向的每个提交的日志。如果你在使用`git reset`时无意中丢失了提交，可以使用`git reflog`找到并访问它们。
-
 - `git commit --amend`只更改当前分支上的最近一次提交。
-- 这个命令对于尚未推送到远程的提交、提交信息中有拼写错误或者提交中未包含预期更改的情况非常有用。
-
-# 防止本地分支修改提交历史顺序
-本地在 git commit 前先 git fetch，更新远程分支的引用，可以查看本地和远程的差异，是否有冲突等，
-然后提交，防止本地先提交后合并，修改提交历史的顺序。
+这个命令对于尚未推送到远程的提交、提交信息中有拼写错误或者提交中未包含预期更改的情况非常有用。
 
 # git rm 删除文件
 > [Git - git-rm Documentation](https://git-scm.com/docs/git-rm) 
 > [How to Delete a File or a Directory from a Git Repository](https://www.w3docs.com/snippets/git/how-to-delete-a-file-from-a-git-repository.html)  
 
-`git rm` 是 Git 中用于删除文件的命令。它不仅从工作目录中删除文件，还从暂存区和 Git 仓库中删除文件。
+`git rm` 是 Git 中用于删除已被 git 跟踪的文件的命令。它不仅从工作目录中删除文件，还从暂存区和 Git 仓库中删除文件。
 
 1. **删除文件**：`git rm` 用于删除工作目录中的文件，并将此删除操作添加到暂存区。
 2. **更新暂存区**：删除操作会被记录在暂存区中，以便在下次提交时更新仓库。
-3. **可选的提交**：虽然 `git rm` 将删除操作添加到暂存区，但它不会自动提交更改。你需要使用 `git commit` 来提交这些更改。
+3. **可选的提交**：虽然 `git rm` 将删除操作添加到暂存区，但它不会自动提交更改。需要使用 `git commit` 来提交这些更改。
 
 ## 使用场景
 
 - **移除不再需要的文件**：当你需要从项目中删除文件，并确保这些更改被版本控制时，可以使用 `git rm`。
 - **清理仓库**：在重构或清理项目时，`git rm` 可以帮助你移除旧文件或不再使用的文件。
-
-## 基本使用
-
-- **删除单个文件**：
-  ```bash
-  git rm <file>
-  ```
-  这个命令将指定文件从工作目录和暂存区中删除。
-
-- **删除多个文件**：
-  ```bash
-  git rm <file1> <file2> ...
-  ```
-  这个命令将多个文件从工作目录和暂存区中删除。
-
-- **删除目录**：
-  ```bash
-  git rm -r <directory>
-  ```
-  使用 `-r` 选项可以递归地删除目录及其内容。
 
 ## 选项
 
@@ -2226,51 +3071,30 @@ $ git commit -F - <<EOF
 - **`-n` 或 `--dry-run`**：模拟删除操作，显示将要删除的文件，但不实际删除。
 - **`-v` 或 `--verbose`**：在删除文件时显示详细信息。
 
-## git rm --cached 保留文件到工作目录
-`git rm --cached` 是一个 Git 命令，用于从 Git 版本控制中删除文件，但保留在本地工作目录中。以下是该命令的详细讲解：
-
-1. **从版本控制中移除文件**：
-   - `git rm --cached` 将文件从 Git 的索引（也称为暂存区）中移除，这意味着该文件将不再被 Git 跟踪和管理。
-
-2. **保留本地文件**：
-   - 与普通的 `git rm` 命令不同，`--cached` 选项使得 Git 只是从版本控制中移除文件，而不会从你的本地工作目录中删除实际的文件。
-
-3. **用途**：
-   - 这个命令常用于以下几种情况：
-     - 不想跟踪特定的文件或文件夹，例如大型数据文件、自动生成的文件或者敏感信息。
-     - 已经误将不应该被版本控制的文件添加到了 Git 中，需要将其从版本控制中移除。
-     - 调整 `.gitignore` 文件，使得新的忽略规则生效。有时候，即使你在 `.gitignore` 中添加了规则，已经追踪的文件依然会被提交。在这种情况下，你需要先使用 `git rm --cached` 移除这些文件，然后再提交更改。
-
-- **删除单个文件**：
-  ```bash
-  git rm --cached <file>
-  ```
-  这个命令将指定文件从 Git 的索引中删除，但保留在本地文件系统中。
-
-- **删除目录及其内容**：
-  ```bash
-  git rm --cached -r <directory>
-  ```
-  使用 `-r` 选项可以递归地删除目录及其内容，但不会在本地文件系统中删除它们。
-
-- 使用 `git rm --cached` 后，虽然文件在本地工作目录中仍然存在，但在下次执行 `git add .` 或 `git commit` 时，这些文件不会被包含在内。如果你想再次将这些文件添加到版本控制中，你需要先移除 `.gitignore` 中的相关规则（如果有的话），然后使用 `git add <file>` 添加它们。
-
-## 注意事项
-
-- **提交更改**：`git rm` 只是将删除操作添加到暂存区，你需要使用 `git commit` 来提交这些更改。
-- **恢复文件**：如果你想恢复被删除的文件，可以使用 `git restore` 或 `git checkout` 命令。
-- **与 `.gitignore` 配合使用**：如果你删除的文件是由于 `.gitignore` 配置错误导致的，确保更新 `.gitignore` 文件以避免将来的问题。
-
-## 示例
-
-假设有一个名为 `example.txt` 的文件，你想要从项目中删除它：
-
+## 删除单个文件
 ```bash
-git rm example.txt
-git commit -m "Remove example.txt"
+git rm <file>
 ```
 
-这个过程将 `example.txt` 从工作目录和暂存区中删除，并通过提交更新仓库。
+## 删除多个文件
+```bash
+git rm <file1> <file2> ...
+```
+
+## 删除目录
+```bash
+git rm -r <directory>
+```
+使用 `-r` 选项可以递归地删除目录及其内容。
+
+## git rm --cached 保留文件到工作目录
+- `git rm --cached` 将文件从 Git 的索引（也称为暂存区）中移除，这意味着该文件将不再被 Git 跟踪和管理。
+- 与普通的 `git rm` 命令不同，`--cached` 选项使得 Git 只是从版本控制中移除文件，而不会从你的本地工作目录中删除实际的文件。
+
+### 用途
+- 不想跟踪特定的文件或文件夹，例如大型数据文件、自动生成的文件或者敏感信息。
+- 已经误将不应该被版本控制的文件添加到了 Git 中，需要将其从版本控制中移除。
+- 调整 `.gitignore` 文件，使得新的忽略规则生效。有时候，即使你在 `.gitignore` 中添加了规则，已经追踪的文件依然会被提交。在这种情况下，你需要先使用 `git rm --cached` 移除这些文件，然后再提交更改。
 
 # git mv 移动文件
 > [Git - git-mv Documentation](https://git-scm.com/docs/git-mv) 
@@ -2286,314 +3110,29 @@ git commit -m "Remove example.txt"
 - **文件重命名**：当你需要更改文件的名称，并且希望这个更改被版本控制跟踪时。
 - **文件移动**：当你需要将文件从一个目录移动到另一个目录，并且希望这个移动操作被版本控制跟踪时。
 
-## 基本使用
-
-- **重命名文件**：
-  ```bash
-  git mv <old-name> <new-name>
-  ```
-  这个命令将 `<old-name>` 文件重命名为 `<new-name>`。
-
-- **移动文件**：
-  ```bash
-  git mv <file> <directory>
-  ```
-  这个命令将 `<file>` 移动到 `<directory>` 目录中。
-
-- **移动目录**：
-  ```bash
-  git mv <old-directory> <new-directory>
-  ```
-  这个命令将 `<old-directory>` 目录重命名为 `<new-directory>`。
-
 ## 选项
 
 - **`-f` 或 `--force`**：强制移动或重命名文件，即使目标已经存在。
 - **`-n` 或 `--no-overwrite`**：如果目标文件已经存在，不覆盖它。
 - **`-k` 或 `--keyword`**：使用关键字参数来指定文件重命名的规则。
 
-## 工作流程
-
-使用 `git mv` 的典型工作流程如下：
-
-1. 使用 `git mv` 命令移动或重命名文件。
-2. 检查更改是否正确：`git status`。
-3. 提交更改：`git commit -m "Moved/renamed <file>"`。
-
-## 注意事项
-
-- **自动添加到暂存区**：`git mv` 命令会自动将移动或重命名的更改添加到暂存区。
-- **与 `git add` 和 `git commit` 的关系**：由于 `git mv` 会自动添加更改到暂存区，通常不需要额外使用 `git add`。提交时，使用 `git commit` 将这些更改记录到历史记录中。
-- **文件状态**：如果文件在移动前有未提交的更改，`git mv` 会将这些更改一并移动到新的位置。
-- **文件冲突**：如果移动或重命名的文件在目标位置已经存在，并且有未提交的更改，可能会发生冲突。
-
-# git log 查看日志
-> [Git - git-log Documentation](https://git-scm.com/docs/git-log) 
-> [Git - Viewing the Commit History](https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History) 
-> [Git Log Command Explained](https://www.freecodecamp.org/news/git-log-command/) 
-
-List commits that are reachable by following the parent links from the given commit(s), but exclude commits that are reachable from the one(s) given with a ^ in front of them. The output is given in reverse chronological order by default.
-
-You can think of this as a set operation. Commits reachable from any of the commits given on the command line form a set, and then commits reachable from any of the ones given with ^ in front are subtracted from that set. The remaining commits are what comes out in the command’s output. Various other options and paths parameters can be used to further limit the result.
-
-1. **查看提交历史**：`git log` 显示项目的提交历史记录，包括提交信息、作者、日期等。
-2. **过滤和格式化**：通过各种选项，可以过滤特定的提交记录、格式化输出内容等。
-
-## 选项
-
-- **`--summary`**：显示每个提交的简要总结。
-- **`--stat`**：显示每个提交的统计信息，包括文件更改数量。
-- **`--shortstat`**：以更简洁的格式显示统计信息。
-- **`--name-only`**：仅显示提交中更改的文件名。
-- **`--name-status`**：显示文件名及其更改状态（如 A 表示添加，M 表示修改）。
-- **`--pretty=format:"<format>"`**：自定义输出格式。例如：
-  ```bash
-  git log --pretty=format:"%h - %an, %ar : %s"
-  ```
-  这个命令自定义输出格式，显示提交哈希、作者、日期和提交信息。
-- **`--oneline`**：每个提交显示为一行，包含提交哈希和提交信息。
-- **`--graph`**：以图形方式显示提交历史，帮助理解分支和合并关系。
-- **`--since` 和 `--until`**：过滤自指定日期以来的提交记录。
-- **`--author`**：过滤指定作者的提交记录。
-- **`--grep`**：过滤包含特定文本的提交信息。
-
-## **查看所有提交**
+## 重命名文件
 ```bash
-git log
+git mv <old-name> <new-name>
 ```
-这个命令显示项目的完整提交历史，默认按照时间顺序，从最新的开始显示。
+这个命令将 `<old-name>` 文件重命名为 `<new-name>`。
 
-## **查看特定分支的提交**
+## 移动文件
 ```bash
-git log <branch-name>
+git mv <file> <directory>
 ```
-这个命令显示指定分支的提交历史。
+这个命令将 `<file>` 移动到 `<directory>` 目录中。
 
-## **查看不同分支差异**
+## 移动目录
 ```bash
-$ git log foo bar ^baz
+git mv <old-directory> <new-directory>
 ```
-上面命令查看那些可达于 foo 或 bar 分支最新提交，但不可达于 baz 的提交。即列出那些在 foo 或 bar 分支上存在，但在 baz 分支上不存在的提交。
-
-## **查看一个分支相对于另一个分支的提交差异**
-### git log branch1..branch2
-```bash
-$ git log origin..HEAD --oneline
-```
-HEAD 当前分支最新提交相对于 origin 分支最新提交的提交记录，即 HEAD 有但 origin 没有的提交记录
-和下面命令功能相同：
-```bash
-$ git log HEAD ^origin --oneline
-```
-
-## **查看特定文件的提交**
-```bash
-git log <file>
-```
-这个命令显示指定文件的提交历史。
-
-```bash
-$ git log -3 --oneline  demo/test.md
-748d2f6b4 modify test.md
-75844c6a5 modify test.md
-d3c488765 modify test.md
-```
-
-## **指定输出日志数目**
-```bash
-git log -3
-```
-输出日志显示最新的 3 条
-
-## **查看提交差异 --patch**
-> [Git - Viewing the Commit History](https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History) 
-
-使用`-p`或`--patch`参数，可以查看每个提交的具体差异，下面是官方文档示例：
-```bash
-$ git log -p -2
-commit ca82a6dff817ec66f44342007202690a93763949
-Author: Scott Chacon <schacon@gee-mail.com>
-Date:   Mon Mar 17 21:52:11 2008 -0700
-
-    Change version number
-
-diff --git a/Rakefile b/Rakefile
-index a874b73..8f94139 100644
---- a/Rakefile
-+++ b/Rakefile
-@@ -5,7 +5,7 @@ require 'rake/gempackagetask'
- spec = Gem::Specification.new do |s|
-     s.platform  =   Gem::Platform::RUBY
-     s.name      =   "simplegit"
--    s.version   =   "0.1.0"
-+    s.version   =   "0.1.1"
-     s.author    =   "Scott Chacon"
-     s.email     =   "schacon@gee-mail.com"
-     s.summary   =   "A simple gem for using Git in Ruby code."
-
-commit 085bb3bcb608e1e8451d4b2432f8ecbe6306e7e7
-Author: Scott Chacon <schacon@gee-mail.com>
-Date:   Sat Mar 15 16:40:33 2008 -0700
-
-    Remove unnecessary test
-```
-
-这将显示最新两个提交的详细差异，包括文件的增删改。
-其中 a 表示该提交前的版本，b 表示该提交后的版本。
-`@@` 标记差异的开始，对于提交前的 a 版本，从第 5 行开始的 7 行内容，对于提交后的 b 版本，从第 5 行开始的 7 行内容。
-`-` 表示原始版本中存在但新版本被删除的行，`+` 表示原始版本没有 ，新版本添加的行。
-
-## **统计信息 --stat**
-
-```bash
-$ git log -1 --stat
-commit 740e65b2fd98f0b99f3bcfd8dc8e1b8ad8bb6a3f (HEAD -> feature)
-Author: lxw <15521168075@163.com>
-Date:   Thu Jan 9 13:09:24 2025
-
-    modify test.md
-
- demo/test.md | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-```
-这将显示每个提交修改的文件列表、文件数量变化以及添加和删除的行数统计。
-
-## **自定义格式 --pretty**
-
-使用`--pretty`参数，我们可以自定义日志的显示格式。例如，`oneline`将每个提交显示在一行上：
-
-```bash
-$ git log --pretty=oneline
-```
-
-输出示例：
-
-```
-ca82a6dff817ec66f44342007202690a93763949 Change version number
-085bb3bcb608e1e8451d4b2432f8ecbe6306e7e7 Remove unnecessary test
-a11bef06a3f659402fe7563abf99ad00de2209e6 Initial commit
-```
-
-## **格式化输出 --pretty=format**
-> [Git - Viewing the Commit History](https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History#pretty_format) 
-
-`--pretty=format`允许自定义输出格式。例如，显示提交的哈希值、作者和提交信息：
-
-```bash
-$ git log --pretty=format:"%h - %an, %ar : %s"
-```
-
-输出示例：
-
-```
-ca82a6d - Scott Chacon, 6 years ago : Change version number
-085bb3b - Scott Chacon, 6 years ago : Remove unnecessary test
-a11bef0 - Scott Chacon, 6 years ago : Initial commit
-```
-
-## **ASCII 图形显示历史 --graph**
-
-```bash
-$ git log --pretty=format:"%h %s" --graph -5
-```
-
-## **显示提交的引用信息 --decorate**
-从 Git 2.10 版本开始，`--decorate` 选项默认是开启的。
-如果你希望关闭 `--decorate` 选项，可以使用 `--no-decorate`：
-```bash
-git log --no-decorate -1
-```
-这个命令会显示最近一次提交的详细信息，但不会显示指向该提交的引用名称。
-
-假设你有以下提交历史：
-```bash
-A -- B -- C -- D -- E
-       \         /
-        F-------G
-```
-执行 `git log --decorate -1`：
-```bash
-commit 9aaa1c654b076de24c529ce46d3c4d95211a2871 (HEAD -> fix_B, branch01)
-Author: lxwcd <15521168075@163.com>
-Date:   Thu Dec 19 21:43:41 2024 +0800
-
-    fix B
-```
-在这个例子中：
-- `9aaa1c654b076de24c529ce46d3c4d95211a2871` 是当前提交的哈希值。
-- `(HEAD -> fix_B, branch01)` 表示：
-  - `HEAD` 指向 `fix_B` 分支。
-  - `fix_B` 分支的最新提交是这个提交。
-  - `branch01` 分支的最新提交也是这个提交。
-
-## **时间限制**
-> [Git - Viewing the Commit History](https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History#pretty_format) 
-
-`--since`和`--until`参数可以用来限制显示特定时间范围内的提交：
-
-```bash
-$ git log --since="2 weeks ago"
-```
-
-这将显示最近两周内的提交记录。
-
-## **作者和关键词搜索**
-
-`--author`和`--grep`参数可以用来根据作者或提交信息中的关键词来过滤提交：
-
-```bash
-$ git log --author="Scott Chacon" --grep="version"
-```
-
-这将显示所有作者为“Scott Chacon”且提交信息中包含“version”的提交。
-
-## 文件路径过滤
-
-最后，我们可以通过文件路径来限制显示特定文件的提交历史：
-
-```bash
-$ git log -- path/to/file
-```
-
-这将只显示影响`path/to/file`文件的提交记录。
-
-## **查看特定内容的日志 -S**
-`git log -S` 选项是一个非常有用的过滤器，用于查找那些改变了指定字符串出现次数的提交。这个选项通常被称为 Git 的“pickaxe”选项。
-
-- **查找字符串变化**：`-S<string>` 选项用于查找那些添加或删除了指定字符串的提交。这可以帮助你快速定位某个特定代码片段或功能的引入和修改历史。
-
-```bash
-git log -S "function_name"
-```
-这个命令会列出所有添加或删除了 `function_name` 这个字符串的提交。
-
-### 注意事项
-- **字符串匹配**：`-S` 选项使用简单的字符串匹配，而不是正则表达式。如果你需要使用正则表达式，可以使用 `-G` 选项。
-- **性能考虑**：对于大型项目，使用 `-S` 选项可能会比较慢，因为它需要检查每个提交中的每个文件。
-
-### 结合其他选项使用
-- **`--pickaxe-regex`**：如果你需要使用正则表达式来匹配字符串，可以结合 `--pickaxe-regex` 选项使用。
-- **`--stat`**：显示每个提交的统计信息，帮助你更好地理解每个提交的影响。
-- **`--graph`**：以图形方式显示提交历史，帮助你理解分支和合并的结构。
-
-## **--first-parent**
-> [Visualize Merge History with git log --graph, --first-parent, and --no-merges](https://redfin.engineering/visualize-merge-history-with-git-log-graph-first-parent-and-no-merges-c6a9b5ff109c)   
-
-`git log --first-parent` 用于查看提交历史时只显示每个提交的第一个父提交。这在处理包含合并提交的历史时特别有用，因为它可以帮助你从“主分支”的角度查看历史，跳过那些来自合并分支的提交。
-
-- **显示第一父提交**：`--first-parent` 选项告诉 `git log` 只显示每个提交的第一个父提交。这对于理解主分支（如 `main` 或 `master`）的线性历史非常有帮助，因为它会忽略那些通过合并操作引入的分支提交。
-- **应用场景**：当你想要查看主分支的清晰历史，而不被合并操作引入的复杂分支历史干扰时，这个选项非常有用。例如，如果你遵循一个严格的分支策略，其中所有功能分支最终都合并回主分支，`--first-parent` 可以帮助你只看到主分支上的关键提交。
-
-## **排除合并信息 --no-merges****
-`--no-merges` 选项用于排除合并信息。当使用 `--no-merges` 选项时，`git log` 只显示那些没有合并操作的提交。
-- **排除合并信息**：`--no-merges` 选项告诉 `git log` 只显示那些没有合并操作的提交。这在处理包含合并提交的历史时特别有用，因为它可以避免看到那些通过合并操作引入的分支提交。
-- **应用场景**：当你想要查看主分支的线性历史，而不被合并操作引入的复杂分支历史干扰时，这个选项非常有用。例如，如果你遵循一个严格的分支策略，其中所有功能分支最终都合并回主分支，`--no-merges` 可以帮助你只看到主分支上的关键提交。
-
-## 注意事项
-
-- **输出量**：默认情况下，`git log` 可能会显示大量的提交记录。使用过滤选项可以帮助你快速找到相关信息。
-- **图形化工具**：虽然 `git log` 提供了丰富的文本输出选项，但有时使用图形化工具（如 `gitk` 或其他第三方工具）可能更直观。
-- **性能**：对于非常大的仓库，`git log` 可能会有些慢。在这种情况下，考虑使用过滤选项来减少输出量。
+这个命令将 `<old-directory>` 目录重命名为 `<new-directory>`。
 
 # git reflog
 > [Git - git-reflog Documentation](https://git-scm.com/docs/git-reflog)   
@@ -2604,342 +3143,59 @@ git log -S "function_name"
 
 `git reflog` 是 Git 操作的一道安全保障，它能够记录几乎所有本地仓库的改变，包括所有分支的 commit 提交，以及已经被删除的 commit。这使得 `git reflog` 成为恢复丢失提交或分支的重要工具。
 
-## **查看引用日志**
+## 查看引用日志
 最基本的用法是 `git reflog`，它会显示 HEAD 的引用日志，列出 HEAD 的所有历史更新操作，包括分支切换、提交、重置等。
+
 ```bash
-git reflog
+lx@lx MINGW64 /d/Documents/git_test03 (main)
+$ git reflog
+fc003e8 (HEAD -> main) HEAD@{0}: commit: rename 1.txt to 11.txt:wq
+e43f274 HEAD@{1}: checkout: moving from orb to main
+f9e71d6 (origin/tb01, tb01) HEAD@{2}: checkout: moving from main to tb01
+e43f274 HEAD@{3}: checkout: moving from 0676fcbfe8e0b54b47d8bf168d440febb5abe0b8 to main
 ```
-输出类似于：
-```
-eb1050b (HEAD -> feature_branch) HEAD@{0}: checkout: moving from main to feature_branch
-1525c48 (origin/main, main) HEAD@{1}: checkout: moving from 2bf1773d87a7806cda25d4d313995bb08adbabf5 to main
-```
+
 这里 `HEAD@{n}` 表示 HEAD 在过去第 n 次操作时的位置。
 
-## **show**
+## show
 显示指定引用的日志，如果未指定引用，则默认显示 HEAD 的日志。`git reflog show` 是 `git log -g --abbrev-commit --pretty=oneline` 的别名。
+
 ```bash
 git reflog show <ref>
 ```
-## **list**
+
+## list
 列出所有有对应 reflog 的引用。
 ```bash
 git reflog list
 ```
-## **expire**
+
+## expire
 修剪旧的 reflog 条目，可以指定时间来删除过时的日志条目。
 ```bash
 git reflog expire [--expire=<time>] [--expire-unreachable=<time>] [--all]
 ```
-## **delete**
+
+## delete
 删除单个 reflog 条目，需要指定确切的条目。
+
 ```bash
 git reflog delete <ref>@{<specifier>}
 ```
-## **exists**
+
+## exists
 检查某个引用是否有 reflog。
 ```bash
 git reflog exists <ref>
 ```
 
-## **基于时间的引用**
+## 基于时间的引用
 `git reflog` 支持基于时间的引用，例如 `HEAD@{1.day.ago}` 表示 HEAD 在一天前的位置。
 ```bash
 git diff main@{0} main@{1.day.ago}
 ```
 这个命令比较了 `main` 分支当前状态和一天前的状态。
 
-# git show
-> [Git - git-show Documentation](https://git-scm.com/docs/git-show) 
-
-`git show` 用于展示各种 Git 对象的详细内容，包括提交（commit）、标签（tag）和分支（branch）。
-
-## 常用选项
-
-1. **`--name-only`**
-   - 仅显示提交中涉及的文件名列表。
-
-2. **`--name-status`**
-   - 显示提交中涉及的文件名以及它们的状态（新增、修改、删除）。
-
-3. **`--stat`**
-   - 显示提交的统计信息，包括每个文件的增删行数和文件状态。
-
-4. **`--shortstat`**
-   - 显示提交的简要统计信息，只包括每个文件的增删行数。
-
-5. **`--summary`**
-   - 显示提交的统计信息摘要，类似于 `--stat`，但不包括每个文件的详细信息。
-
-6. **`--patch`**
-   - 显示提交的差异（默认选项），展示具体的代码变化。
-
-7. **`--full-index`**
-   - 显示差异时，显示完整的索引信息。
-
-8. **`--oneline`**
-   - 仅显示提交的 SHA-1 哈希值和提交信息，一行显示。
-
-9. **`--pretty`**
-   - 指定输出格式，例如 `oneline`、`short`、`full`、`fuller`、`reference`、`raw` 等。
-
-10. **`--expand-tabs`**
-    - 在显示差异时，将制表符展开为适当数量的空格。
-
-11. **`--color`**
-    - 显示颜色差异。
-
-12. **`--no-color`**
-    - 不显示颜色差异。
-
-13. **`--textconv`**
-    - 使用文本转换过滤器处理文件的差异。
-
-14. **`--word-diff`**
-- 显示单词级别的差异。
-
-## **查看提交详情**
-- `git show <commit>`：显示指定提交的详细信息，包括作者、日期、提交信息和具体的 diff（差异）。
-- `git show HEAD`：显示当前分支的最新提交的详细信息。
-
-## **查看标签详情**
-- `git show <tag>`：显示指定标签的详细信息，包括标签信息和指向的提交。
-
-## **查看分支比较**
-- `git show <branch>`：显示指定分支的最新提交的详细信息。
-
-## **查看最新提交的详细信息**
-```bash
-git show HEAD
-```
-
-## **查看特定提交的文件列表**
-```bash
-git show --name-only <commit>
-```
-
-## **查看特定提交的统计信息**
-```bash
-git show --stat <commit>
-```
-
-## **查看特定提交的简要统计信息**
-```bash
-git show --shortstat <commit>
-```
-
-## **查看特定提交的差异，不包括文件内容**
-```bash
-git show --pretty=raw <commit>
-```
-
-## **查看特定提交的 SHA-1 哈希值和提交信息**
-```bash
-git show --oneline <commit>
-```
-
-# HEAD 
-> [Git - Reset Demystified](https://git-scm.com/book/en/v2/Git-Tools-Reset-Demystified#_git_reset)      
-
-HEAD is the pointer to the current branch reference, which is in turn a pointer to the last commit made on that branch. That means HEAD will be the parent of the next commit that is created. It’s generally simplest to think of HEAD as the snapshot of your last commit on that branch.
-
-## `HEAD` 的作用
-
-1. **指向当前分支**：`HEAD` 通常指向当前分支的引用，比如 `master` 或 `feature`。当你检出（checkout）一个分支时，`HEAD` 会更新为指向该分支的最新提交。
-2. **确定工作目录**：`HEAD` 指向的提交决定了你的工作目录的内容。当你检出不同的提交时，工作目录会更新以反映该提交时的文件状态。
-3. **暂存区的基础**：`HEAD` 也用作暂存区（staging area）的基础。当你添加（add）更改到暂存区时，这些更改是相对于 `HEAD` 指向的提交进行的。
-
-## `HEAD` 的工作方式
-
-- **引用文件**：在 `.git` 目录中，`HEAD` 是一个文件，通常包含对当前分支的引用。例如，`HEAD` 文件可能包含 `ref: refs/heads/master`，表示 `HEAD` 指向 `master` 分支。
-- **更新 `HEAD`**：当你执行 `git checkout <branch>` 或 `git commit` 等命令时，`HEAD` 会更新为指向新的分支或新的提交。
-
-### 使用 `HEAD`
-
-- **查看 `HEAD`**：
-  ```bash
-  cat .git/HEAD
-  ```
-  这个命令显示 `HEAD` 文件的内容，通常是一个指向当前分支的引用。
-
-- **检出 `HEAD`**：
-  ```bash
-  git checkout HEAD
-  ```
-  这个命令将工作目录恢复到 `HEAD` 指向的提交状态。
-
-- **比较 `HEAD`**：
-  ```bash
-  git diff HEAD
-  ```
-  这个命令显示自 `HEAD` 指向的提交以来工作目录中的更改。
-
-## 查看当前分支的 `HEAD` 
-### 1. 使用 `git log`
-
-运行以下命令来查看当前分支的最新提交，这通常是 `HEAD` 指向的提交：
-
-```bash
-git log -1
-```
-
-这个命令显示最近一次提交的详细信息，包括提交哈希、作者、日期和提交信息。
-
-### 2. 使用 `git show`
-
-如果你想查看 `HEAD` 指向的提交的详细内容，可以使用：
-
-```bash
-git show HEAD
-```
-
-这个命令显示 `HEAD` 指向的提交的详细信息，包括更改的内容。
-
-### 3. 使用 `git rev-parse`
-
-要获取 `HEAD` 指向的提交的哈希值，可以使用：
-
-```bash
-git rev-parse HEAD
-```
-
-这个命令输出 `HEAD` 指向的提交的哈希值。
-
-### 4. 查看 `.git/HEAD` 文件
-
-如果你想直接查看 `HEAD` 文件的内容，可以使用：
-
-```bash
-cat .git/HEAD
-```
-
-这个命令显示 `HEAD` 文件的内容，通常是一个指向当前分支的引用，如 `ref: refs/heads/main`。
-
-### 5. 使用 `git status`
-
-运行以下命令来查看当前分支的状态，包括 `HEAD` 指向的提交：
-
-```bash
-git status
-```
-
-这个命令显示当前分支的状态，包括 `HEAD` 指向的提交和任何未提交的更改。
-
-## HEAD^
-
-- **定义**：`HEAD^`（读作 "HEAD caret"）引用 `HEAD` 指向的提交的父提交。如果有多个父提交（例如，在合并提交中），`HEAD^` 引用第一个父提交。
-- **用途**：用于指定 `HEAD` 的直接父提交。这在查看提交历史或执行需要指定特定提交的操作时非常有用。
-- **示例**：`git log HEAD^` 会显示 `HEAD` 的父提交的详细信息。
-
-## HEAD~
-
-- **定义**：`HEAD~`（读作 "HEAD tilde"）是 `HEAD` 的简写形式，通常用于指定 `HEAD` 指向的提交的父提交。`HEAD~` 与 `HEAD^` 在大多数情况下是等效的。
-- **用途**：用于指定 `HEAD` 的父提交，特别是在需要简洁引用时。
-- **示例**：`git log HEAD~` 会显示 `HEAD` 的父提交的详细信息。
-
-### HEAD~n
-
-- **定义**：`HEAD~n`（其中 `n` 是一个正整数）引用 `HEAD` 指向的提交的第 `n` 个父提交。例如，`HEAD~3` 引用 `HEAD` 的第三个父提交。
-- **用途**：用于指定 `HEAD` 的祖先提交。这在查看提交历史或执行需要指定特定提交的操作时非常有用。
-- **示例**：`git log HEAD~3` 会显示 `HEAD` 的第三个父提交的详细信息。
-
-## 使用场景
-
-- **查看提交历史**：使用 `git log HEAD^` 或 `git log HEAD~` 查看 `HEAD` 的父提交的历史。
-- **比较提交**：使用 `git diff HEAD^` 或 `git diff HEAD~` 比较 `HEAD` 和其父提交之间的差异。
-- **撤销提交**：使用 `git reset --soft HEAD^` 撤销最后一次提交，但保留工作目录和暂存区的状态。
-在 Git 中，`HEAD` 是一个非常重要的概念，它指向当前分支的最新提交。`HEAD` 及其相关语法（如 `HEAD~3`）用于引用特定的提交。以下是关于 `HEAD` 及其语法的详细讲解：
-
-### 总结
-
-`HEAD`、`HEAD^`、`HEAD~` 和 `HEAD~n` 是 Git 中用于引用提交的强大工具。它们帮助你指定和操作特定的提交及其关系。理解这些概念对于有效使用 Git 进行版本控制和历史管理至关重要。
-
-
-## `HEAD` 的重要性
-
-
-- **版本控制的基础**：`HEAD` 是 Git 版本控制的核心，它决定了你正在工作的版本和状态。
-- **分支和合并**：在分支和合并操作中，`HEAD` 用于确定当前的工作基础和合并的目标。
-
-## 注意事项
-
-- **`HEAD` 与 `ORIG_HEAD`**：在某些操作（如合并冲突解决）中，Git 会创建一个 `ORIG_HEAD` 引用，以保存原始 `HEAD` 的状态，以便在需要时可以恢复。
-- **`HEAD` 与 `FETCH_HEAD`**：`FETCH_HEAD` 用于记录 `git fetch` 操作的结果，与 `HEAD` 不同，它通常用于比较和合并操作。
-
-# Index
-> [Git - Reset Demystified](https://git-scm.com/book/en/v2/Git-Tools-Reset-Demystified#_git_reset)      
-
-在 Git 中，"index"（索引）是一个非常重要的概念，它通常被称为 "staging area"（暂存区）。索引是 Git 用来准备下一次提交的文件列表。
-
-The index is your proposed next commit. We’ve also been referring to this concept as Git’s “Staging Area” as this is what Git looks at when you run git commit.
-
-## 索引的作用
-
-1. **暂存更改**：索引用于暂存（stage）你想要在下一次提交中包含的更改。你可以将更改的文件添加到索引中，然后一次性提交所有暂存的更改。
-2. **准备提交**：当你执行 `git add` 命令时，更改的文件会被添加到索引中。这些文件将在下一次 `git commit` 时被提交。
-3. **跟踪更改**：索引跟踪你对文件所做的更改，直到这些更改被提交。
-
-## 索引的工作方式
-
-- **索引文件**：在 `.git` 目录中，索引是一个名为 `index` 的文件，它包含了当前暂存的文件列表。
-- **更新索引**：当你使用 `git add` 添加文件时，索引文件会被更新以反映这些更改。
-- **重置索引**：你可以使用 `git reset` 命令来重置索引，移除暂存的文件或将索引恢复到特定状态。
-
-## 使用索引
-
-- **添加文件到索引**：
-  ```bash
-  git add <file>
-  ```
-  这个命令将指定文件的更改添加到索引中。
-
-- **查看索引内容**：
-  ```bash
-  git ls-files --stage
-  ```
-  这个命令显示索引中的文件及其状态。
-
-- **重置索引**：
-  ```bash
-  git reset <file>
-  ```
-  这个命令将指定文件从索引中移除，但保留工作目录中的更改。
-
-- **清空索引**：
-  ```bash
-  git reset
-  ```
-  这个命令清空索引，移除所有暂存的更改。
-
-## 索引与工作目录
-
-- **工作目录**：工作目录是你当前工作的文件夹，包含了项目的文件。
-- **索引与工作目录的关系**：索引是从工作目录中选择的更改的集合，这些更改将在下一次提交时被记录。
-
-## 注意事项
-
-- **索引状态**：使用 `git status` 命令可以查看索引的状态，了解哪些文件已被暂存以及哪些文件尚未暂存。
-- **索引与提交**：索引中的文件将在下一次提交时被提交。确保你已经将所有想要提交的更改添加到索引中。
-- **索引与分支**：当你切换分支时，索引会被更新以反映新分支的状态。
-
-# The Working Directory
-> [Git - Reset Demystified](https://git-scm.com/book/en/v2/Git-Tools-Reset-Demystified#_git_reset)      
-
-you have your working directory (also commonly referred to as the “working tree”).
-
-在 Git 中，"working directory"（工作目录）和 "working tree"（工作树）是两个密切相关但略有不同的概念。它们都涉及到你在本地检出的文件和目录，但它们的含义和用途有所不同。以下是关于这两个概念的详细讲解：
-
-1. **定义**：工作目录是指你当前正在工作的目录，它是你检出的文件和目录的集合。当你克隆一个仓库或检出一个分支时，Git 会在你的本地文件系统中创建一个工作目录。
-2. **内容**：工作目录包含了项目的文件和目录，这些文件和目录是你从 Git 仓库中检出的。你可以在这个目录中编辑文件、添加新文件或删除文件。
-3. **更改跟踪**：当你在工作目录中进行更改时，这些更改不会立即被 Git 跟踪。你需要使用 `git add` 将更改添加到暂存区（索引），然后使用 `git commit` 提交这些更改。
-
-- **检出分支或提交**：使用 `git checkout <branch>` 或 `git checkout <commit>` 检出不同的分支或提交，Git 会更新工作目录和工作树以反映所检出的状态。
-- **查看状态**：使用 `git status` 查看工作目录和工作树的状态，了解哪些文件已被修改但尚未提交。
-- **添加更改**：使用 `git add <file>` 将工作目录或工作树中的更改添加到暂存区。
-- **提交更改**：使用 `git commit` 提交暂存区中的更改，更新工作目录和工作树的状态。
-
-# workflow
-> [Git - Reset Demystified](https://git-scm.com/book/en/v2/Git-Tools-Reset-Demystified#_git_reset)      
 
 # Undo things
 > [Git - Undoing Things](https://git-scm.com/book/en/v2/Git-Basics-Undoing-Things) 
@@ -3426,217 +3682,6 @@ git push -u origin main
 - **权限**：在添加或修改远程仓库时，确保你有足够的权限。
 
 通过 `git remote`，你可以有效地管理远程仓库的引用，这对于协作开发和代码托管非常重要。
-
-# git branch
-> [Git - git-branch Documentation](https://git-scm.com/docs/git-branch/2.13.7) 
-
-`git branch` 是一个用于创建、列出、删除和管理 Git 分支的命令。分支在 Git 中是一个轻量级的移动指针，指向你代码历史的某个特定提交。
-
-## **创建分支**
-```bash
-git branch <branch-name>
-```
-这个命令会创建一个新分支，但不会切换到该分支。例如，`git branch feature-x` 会创建一个名为 `feature-x` 的新分支。
-
-## **创建并切换分支**
-```bash
-git checkout -b <branch-name>
-```
-或者在某些 Git 版本中：
-```bash
-git switch -c <branch-name>
-```
-这些命令会创建一个新分支并立即切换到该分支。
-
-## **列出所有本地分支**
-```bash
-git branch
-```
-这个命令会列出所有的本地分支。
-
-## **列出所有远程分支**
-```bash
-git branch -r
-```
-这个命令会列出所有的远程分支。
-
-## **列出所有本地和远程分支**
-```bash
-git branch -a
-```
-这个命令会列出所有的本地分支和远程分支。
-
-## **显示当前分支**
-```bash
-git branch --show-current
-```
-或者使用 `git rev-parse --abbrev-ref HEAD`。
-这个命令会显示当前检出的分支名称。
-
-## **删除分支**
-```bash
-git branch -d <branch-name>
-```
-这个命令会删除一个已经完全合并到当前分支的本地分支。如果分支未完全合并，Git 会阻止删除以防止数据丢失。
-
-## **强制删除分支**
-```bash
-git branch -D <branch-name>
-```
-这个命令会强制删除一个分支，无论它是否已经合并。
-
-## 重命名分支
-`git branch -m` 和 `git branch -M` 是 Git 中用于重命名分支的两个命令，它们的主要区别在于处理分支重命名时的安全性。
-
-### git branch -m
-- `-m` 是 `--move` 的缩写。
-- 这个命令用于重命名当前分支。
-- 如果目标分支名称已经存在，并且没有进行任何提交，`git branch -m` 会失败，以防止潜在的数据丢失。
-- 如果目标分支已经存在并且有提交，`git branch -m` 会报错，因为它不想覆盖任何现有的分支历史。
-
-```bash
-git branch -m <old-name> <new-name>
-```
-这个命令会将分支 `<old-name>` 重命名为 `<new-name>`。
-
-### git branch -M
-
-- `-M` 是 `--move` 的缩写，与 `-m` 类似，但它的行为更加激进。
-- 这个命令也用于重命名当前分支。
-- 如果目标分支名称已经存在，`git branch -M` 会强制覆盖目标分支。这意味着目标分支的历史将被当前分支的历史替换，这可能会导致数据丢失。
-- `git branch -M` 通常用于修复损坏的分支或者在确定目标分支没有重要历史的情况下使用。
-
-## 创建新远程分支
-本地创建一个分支，git push -u origin remote_branch 可以将本地和远程分支关联且新建远程分支
-
-## 设置跟踪关系
-
-## **设置上游分支**
-```bash
-git branch -u <remote-branch>
-```
-或者使用 `git branch --set-upstream-to <remote-branch>`。
-这个命令会设置当前分支跟踪指定的远程分支。
-
-## **查看上游分支**
-```bash
-git branch -vv
-```
-这个命令会显示所有分支及其上游信息。
-
-## 重命名远程分支
-在 Git 中，重命名远程分支可以通过两步完成：首先重命名本地分支，然后将其推送到远程仓库以更新远程分支的名称。
-
-### 步骤 1: 重命名本地分支
-
-1. **检出你想要重命名的分支**：
-   ```bash
-   git checkout <old-branch-name>
-   ```
-   将 `<old-branch-name>` 替换为你想要重命名的分支的当前名称。
-
-2. **重命名本地分支**：
-   ```bash
-   git branch -m <new-branch-name>
-   ```
-   将 `<new-branch-name>` 替换为你想要设置的新分支名称。
-
-如果还没有本地分支，则用下面直接新建本地分支：
-```bash
-git checkout -b <new-branch-name> origin/<old-branch-name>
-```
-可以用 `git branch -vv` 查看本地分支与远程分支对应关系。
-
-### 步骤 2: 推送更改到远程仓库
-
-1. **强制推送到远程仓库**：
-   ```bash
-   git push -u origin :<old-branch-name>
-   git push -u origin <new-branch-name>
-   ```
-   这里的 `<old-branch-name>` 是分支的旧名称，而 `<new-branch-name>` 是新名称。第一个命令用于删除远程分支的旧名称，第二个命令用于将重命名后的本地分支推送到远程仓库。
-
-   - `:<old-branch-name>` 表示删除远程分支。
-   - `-u` 参数是 `--set-upstream` 的简写，它设置远程跟踪分支。
-
-### 注意事项
-
-- 如果你的分支已经被其他人使用，强制推送 (`git push --force`) 可能会导致其他人的工作丢失。在这种情况下，你应该先与团队成员沟通，以确保不会覆盖其他人的更改。
-- 如果你的远程分支已经被设置为跟踪分支，你可能需要使用 `-u` 参数来更新跟踪信息，如下所示：
-  ```bash
-  git push -u origin <new-branch-name>
-  ```
-  这将设置新的本地分支作为远程分支的上游（upstream）。
-
-- 如果你只想更新远程分支的名称，而不改变本地分支的名称，你可以使用以下命令：
-  ```bash
-  git push origin :<old-branch-name>
-  git push origin <new-branch-name>
-  ```
-  这将删除旧的远程分支并推送新的远程分支，而不会改变你当前检出的本地分支名称。
-
-## **包含已合并/未合并信息**
-```bash
-git branch --merged
-git branch --no-merged
-```
-这些命令分别列出所有已经合并到当前分支的分支和所有未合并到当前分支的分支。
-
-## **删除远程跟踪分支**
-```bash
-git branch -dr <remote/branch>
-```
-这条命令会删除本地的远程跟踪分支。但并不会直接删除远程仓库中的分支，只是删除了本地对远程分支的跟踪信息。
-
-# **本地分支的上游分支** 
-在 Git 中，每个本地分支可以设置一个对应的上游分支（也称为远程跟踪分支），这样当你执行 `git push` 或 `git pull` 时，Git 会自动知道要与哪个远程分支交互。
-
-## 设置本地分支的上游分支
-
-1. **设置新分支的上游分支**：
-   当你创建一个新的本地分支并想要将其设置为跟踪远程仓库中的某个分支时，可以使用以下命令：
-   ```bash
-   git checkout -b my-branch origin/existing-remote-branch
-   ```
-   这个命令会创建一个新的本地分支 `my-branch` 并将其设置为跟踪远程分支 `origin/existing-remote-branch`。
-
-2. **修改现有分支的上游分支**：
-   如果你想要更改一个已经存在的本地分支的上游分支，可以使用以下命令：
-   ```bash
-   git branch --set-upstream-to my-branch origin/new-remote-branch
-   ```
-   或者，如果你的 Git 版本较旧，可能需要使用：
-   ```bash
-   git branch --set-upstream my-branch origin/new-remote-branch
-   ```
-   这些命令会将本地分支 `my-branch` 的上游分支设置为 `origin/new-remote-branch`。
-
-### 查看本地分支的上游分支
-
-1. **使用 `git branch` 命令**：
-   你可以使用以下命令查看所有本地分支及其对应的上游分支：
-   ```bash
-   git branch -vv
-   ```
-   这个命令会列出所有本地分支，并显示它们是否与上游分支同步，以及上游分支的最后一次提交信息。
-
-2. **单独查看特定分支的上游分支**：
-   如果你想要查看特定分支的上游分支，可以使用：
-   ```bash
-   git branch -vv my-branch
-   ```
-   这会显示 `my-branch` 分支的上游分支信息。
-
-### 删除本地分支的上游分支设置
-
-如果你想要删除本地分支的上游分支设置，可以使用以下命令：
-```bash
-git branch --unset-upstream my-branch
-```
-
-这个命令会移除 `my-branch` 分支的上游分支设置，之后你将需要手动指定远程分支进行推送和拉取操作。
-
-通过这些命令，你可以灵活地设置和管理你的本地分支与远程分支之间的关系，这对于多人协作的项目来说非常重要。
 
 # git apply
 
@@ -5095,3 +5140,130 @@ Date:   Mon Jan 6 15:10:04 2025
 
 M       demo/test.md
 ```
+
+# 常用案例
+
+## 输出未被跟踪的文件名
+```bash
+lx@lx MINGW64 /d/Documents/git_test (fix_B)
+$ git status -s
+AM git.md
+ M test01.txt
+?? .gitignore
+?? 0001-commit-B.patch
+?? 0001-fix-B.patch
+?? 0001-update-fix_B.patch
+?? 0002-commit-C.patch
+?? 0002-update-fix_B.patch
+?? 1.patch
+?? 2.txt
+
+lx@lx MINGW64 /d/Documents/git_test (fix_B)
+$ git status -s |  grep "??" | cut -d" " -f2
+.gitignore
+0001-commit-B.patch
+0001-fix-B.patch
+0001-update-fix_B.patch
+0002-commit-C.patch
+0002-update-fix_B.patch
+1.patch
+2.txt
+```
+
+## 有冲突时指定使用版本
+
+两个仓库中的一个分支都修改了文件 2.txt 的相同一行，但修改内容内容不同，一个仓库已经将修改推送到远程仓库，另一个仓库修改后提交到本地，然后 git pull 时提示有冲突：
+```bash
+lx@lx MINGW64 /d/Documents/git_test03 (fix_B)
+$ git pull
+remote: Enumerating objects: 5, done.
+remote: Counting objects: 100% (5/5), done.
+remote: Compressing objects: 100% (1/1), done.
+remote: Total 3 (delta 1), reused 3 (delta 1), pack-reused 0 (from 0)
+Unpacking objects: 100% (3/3), 239 bytes | 9.00 KiB/s, done.
+From https://github.com/lxwcd/git_test
+   15f80f2..f54dd26  fix_B      -> origin/fix_B
+Auto-merging 2.txt
+CONFLICT (content): Merge conflict in 2.txt
+Automatic merge failed; fix conflicts and then commit the result.
+```
+
+查看当前工作目录的状态，可以看见有个文件处于冲突中，待解决：
+```bash
+lx@lx MINGW64 /d/Documents/git_test03 (fix_B|MERGING)
+$ git status
+On branch fix_B
+Your branch and 'origin/fix_B' have diverged,
+and have 1 and 1 different commits each, respectively.
+  (use "git pull" if you want to integrate the remote branch with yours)
+
+You have unmerged paths.
+  (fix conflicts and run "git commit")
+  (use "git merge --abort" to abort the merge)
+
+Unmerged paths:
+  (use "git add <file>..." to mark resolution)
+        both modified:   2.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+```
+
+查看冲突文件的内容：
+```bash
+lx@lx MINGW64 /d/Documents/git_test03 (fix_B|MERGING)
+$ cat 2.txt
+<<<<<<< HEAD
+22
+=======
+222
+>>>>>>> f54dd265ddebde6a06e2ea619a0588d2b1555945
+```
+
+`<<<<<<< HEAD` 表示下方表示当前版本
+`=======` 表示分隔符，下方内容为冲突版本的内容
+`>>>>>>> f54dd265ddebde6a06e2ea619a0588d2b1555945` 表示冲突结束位置
+
+### 使用对方版本
+```bash
+lx@lx MINGW64 /d/Documents/git_test03 (fix_B|MERGING)
+$ git checkout --theirs 2.txt
+Updated 1 path from the index
+
+lx@lx MINGW64 /d/Documents/git_test03 (fix_B|MERGING)
+$ cat 2.txt
+222
+```
+
+### 使用本地版本
+```bash
+lx@lx MINGW64 /d/Documents/git_test03 (fix_B|MERGING)
+$ git checkout --ours 2.txt
+Updated 1 path from the index
+
+lx@lx MINGW64 /d/Documents/git_test03 (fix_B|MERGING)
+$ cat 2.txt
+22
+```
+
+### 添加到暂存区
+选择版本后，将这些文件添加到暂存区：
+
+```bash
+git add <file-path>
+```
+
+### 继续合并
+如果你已经解决了所有文件的冲突，你可以继续完成合并操作：
+
+```bash
+git commit -m "message"
+```
+
+或者 
+```bash
+git merge --continue
+```
+
+## 合并到主干分支
+在 feature 分支进行开发后，合并到主干分支，为了保持主干分支的提交记录干净，可以先本地切换到主干分支，拉取远程主干分支的最新代码，然后本地尝试用 git rebase 合并到主干，查看是否有冲突，无则直接 git rebase；有冲突则解决冲突再合并。
