@@ -1,4 +1,4 @@
-﻿git 学习  
+git 学习  
       
 # 学习资源  
 > 初步了解 git：[廖雪峰 Git 教程](https://www.liaoxuefeng.com/wiki/896043488029600)  
@@ -358,12 +358,12 @@ windows 上配置后有点问题，暂未使用。
       
 ### Windows 中安装的 git 设置代理  
 在 git 设置代理：  
-```git  
+```bash  
 git config --global http.https://github.com.proxy socks5://127.0.0.1:7890  
 ```
       
 配置完查看：  
-```git  
+```bash  
 $ git config --global --list  
 http.https://github.com.proxy=socks5://127.0.0.1:7890  
 ```
@@ -1382,23 +1382,6 @@ index cd7fb11..a821b44 100644
  b
  C
 +001
-diff --git a/test02.txt b/test02.txt
-index 8de02e1..98bbcac 100644
---- a/test02.txt
-+++ b/test02.txt
-@@ -1,2 +1,3 @@
- test02
--local git rebase
-\ No newline at end of file
-+local git rebase002
-+002
-diff --git a/test05.txt b/test05.txt
-new file mode 100644
-index 0000000..7ed6ff8
---- /dev/null
-+++ b/test05.txt
-@@ -0,0 +1 @@
-+5
 ```
 
 这将显示最新两个提交的详细差异，包括文件的增删改。
@@ -2921,13 +2904,7 @@ git switch --recurse-submodules <branch>
 - **`-i`**：启动交互式暂存模式，允许你选择要暂存的更改。
 - **`-N` 或 `--intent-to-add`**：标记新文件为暂存状态，但不实际添加内容。
 
-## 暂存单个文件
-```bash
-git add <file>
-```
-这个命令将指定文件的更改添加到暂存区。
-
-## 暂存多个文件
+## 暂存文件
 ```bash
 git add <file1> <file2> ...
 ```
@@ -3233,33 +3210,23 @@ git reset --soft HEAD~3
 
 ### `--soft`
 
-- **作用**：重置 HEAD 到指定状态，但保留工作目录和暂存区的状态。
-- **结果**：这允许你重新提交。`--soft` 是最安全的重置选项，因为它不会丢失任何更改。
-- **使用场景**：当你想要撤销最后一次提交，但保留所有更改在暂存区时，可以使用 `--soft`。
+- 重置 HEAD 到指定状态，但保留工作目录和暂存区的状态。
 
 ### `--mixed`（默认）
 
-- **作用**：重置 HEAD 和暂存区到指定状态，但保留工作目录的状态。
-- **结果**：这允许你重新暂存更改。`--mixed` 是默认的重置选项，如果你没有指定任何选项，Git 将使用这个模式。
-- **使用场景**：当你想要撤销最后一次提交并重置暂存区，但保留工作目录中的更改时，可以使用 `--mixed`。
+- 重置 HEAD 和暂存区到指定状态，但保留工作目录的状态。
 
 ### `--hard`
 
-- **作用**：重置 HEAD、暂存区和工作目录到指定状态。
-- **结果**：这将丢失所有未提交的更改。`--hard` 是最危险的重置选项，因为它会丢弃所有未提交的更改。
-- **使用场景**：当你想要完全撤销最后一次提交并丢弃所有未提交的更改时，可以使用 `--hard`。
+- 重置 HEAD、暂存区和工作目录到指定状态。
 
 ### `--merge`
 
-- **作用**：重置 HEAD 到指定状态，并尝试合并工作目录和暂存区的更改。
-- **结果**：这允许你撤销最后一次提交并尝试合并更改。如果合并失败，你将得到一个合并冲突。
-- **使用场景**：当你想要撤销最后一次提交并尝试合并更改时，可以使用 `--merge`。
+- 重置 HEAD 到指定状态，并尝试合并工作目录和暂存区的更改。
 
 ### `--keep`
 
-- **作用**：重置 HEAD 到指定状态，但保留工作目录和暂存区的状态，即使这意味着 HEAD 指向不同的分支。
-- **结果**：这允许你切换到不同的分支并保留所有更改。
-- **使用场景**：当你想要切换到不同的分支并保留所有更改时，可以使用 `--keep`。
+- 重置 HEAD 到指定状态，但保留工作目录和暂存区的状态，即使这意味着 HEAD 指向不同的分支。
 
 ### 显示被撤销的提交
 执行 `git reset --soft HEAD^` 后查看被撤销的上次提交，直接用 `git log` 无法查看之前被撤销的提交。
@@ -3303,7 +3270,7 @@ e43f274 HEAD@{3}: reset: moving to HEAD^
 
 可以看见在 `5e51d74` 提交后，进行 reset，因此 HEAD 又变成 `e43f274`，然后又继续有新的提交。
 
-# 撤销暂存区的添加 git restor --staged
+## 撤销暂存区的添加 git restor --staged
 撤销后修改会存在工作目录，但处于未暂存的状态。
 
 ```bash
@@ -3317,11 +3284,15 @@ Changes to be committed:
   (use "git restore --staged <file>..." to unstage)
         modified:   test02.txt
         modified:   test03.txt
+```
 
-
+撤销暂存区的全部修改，但工作目录修改保持不变。
+```bash
 lx@lx MINGW64 /d/Documents/git_test03 (main)
 $ git restore --staged .
+```
 
+```bash
 lx@lx MINGW64 /d/Documents/git_test03 (main)
 $ git status
 On branch main
@@ -3337,7 +3308,7 @@ Changes not staged for commit:
 no changes added to commit (use "git add" and/or "git commit -a")
 ```
 
-# 撤销未暂存的修改 git restore
+## 撤销未暂存的修改 git restore
 
 仅撤销未暂存的修改，不影响已暂存的修改。
 ```bash
@@ -3393,7 +3364,7 @@ git reset --hard HEAD
 ### 撤销远程的提交 git revert
 本地提交后 Push 到远程，本地用 git reset --soft HEAD^ 撤销了最近一次提交，如果远程该分支只有自己用，且远程没有比本地更新的提交，则可以 git push --force 覆盖远程提交记录。
 
-如果远程有更新的提交记录，则可以用 `git revert HEAD^`，会新建一个撤销上次提交的提交记录，因此不会和远程冲突。
+如果远程有更新的提交记录，则可以用 `git revert HEAD`，会新建一个撤销上次提交的提交记录，因此不会和远程冲突。
 
 ```bash
 lx@lx MINGW64 /d/Documents/git_test03 (main)
@@ -3419,24 +3390,19 @@ e43f274 Merge branch 'branch01'
 
 撤销后可以用 `git push` 推送到远程仓库。
 
-## git restore
+# git restore
 > [Git - git-restore Documentation](https://git-scm.com/docs/git-restore) 
-
-`git restore` 是 Git 中的一个命令，用于恢复工作目录中的文件。它允许你将文件恢复到特定的状态，通常是从 `HEAD` 或其他指定的源。
-
-### 功能和用途
-
-1. **恢复工作目录文件**：`git restore` 用于将工作目录中的文件恢复到某个特定的状态。这可以是从 `HEAD`、索引（暂存区）或其他指定的源。
-2. **恢复索引内容**：使用 `--staged` 选项可以恢复索引（暂存区）的内容。
-3. **恢复工作目录和索引**：结合 `--staged` 和 `--worktree` 选项可以同时恢复工作目录和索引的内容。
-
-### 基本语法
 
 ```bash
 git restore [<options>] [--source=<tree>] [--staged] [--worktree] [--] <pathspec>…
 ```
 
-### 选项
+1. **恢复工作目录文件**：`git restore` 用于将工作目录中的文件恢复到某个特定的状态。这可以是从 `HEAD`、索引（暂存区）或其他指定的源。
+2. **恢复索引内容**：使用 `--staged` 选项可以恢复索引（暂存区）的内容。
+3. **恢复工作目录和索引**：结合 `--staged` 和 `--worktree` 选项可以同时恢复工作目录和索引的内容。
+
+
+## 选项
 
 - **`--source=<tree>`**：指定恢复内容的源。可以是提交、分支或标签。默认情况下，如果没有指定 `--staged`，则从索引恢复；如果指定了 `--staged`，则从 `HEAD` 恢复。
 - **`--staged`**：恢复索引（暂存区）的内容。
@@ -3448,29 +3414,46 @@ git restore [<options>] [--source=<tree>] [--staged] [--worktree] [--] <pathspec
 - **`--ignore-unmerged`**：在从索引恢复工作目录文件时，如果有未合并的条目且没有指定 `--ours`、`--theirs`、`--merge` 或 `--conflict`，则不中止操作。
 - **`--recurse-submodules`**：如果路径规范指定的是活动子模块，并且恢复位置包括工作目录，则只有在指定了此选项时才会更新子模块。
 
-### 示例
+## 特定文件取消暂存
 
-1. **从其他提交中恢复文件**：
-   ```bash
-   git restore --source master~2 Makefile
-   ```
-   这个命令将 `Makefile` 文件恢复到 `master` 分支的前两次提交的状态。
+已暂存的文件，希望取消暂存，但保持文件在工作目录中不变：
+```bash
+git restore --staged hello.c
+```
 
-2. **恢复索引中的文件**：
-   ```bash
-   git restore --staged hello.c
-   ```
-   这个命令将 `hello.c` 文件恢复到索引中的状态。
+## 全部文件取消暂存
 
-3. **同时恢复索引和工作目录中的文件**：
-   ```bash
-   git restore --source=HEAD --staged --worktree hello.c
-   ```
-   或者使用简写形式：
-   ```bash
-   git restore -s@ -SW hello.c
-   ```
-   这些命令将 `hello.c` 文件恢复到 `HEAD` 指向的状态，并同时更新索引和工作目录。
+```bash
+git restore --staged .
+```
+
+## 筛选文件取消暂存
+
+```bash
+git restore --staged *.cpp
+```
+
+## 从其他提交中恢复文件
+```bash
+git restore --source master~2 Makefile
+```
+这个命令将 `Makefile` 文件恢复到 `master` 分支的前两次提交的状态。
+
+## 恢复索引中的文件
+```bash
+git restore --staged hello.c
+```
+这个命令将 `hello.c` 文件恢复到索引中的状态。
+
+## 同时恢复索引和工作目录中的文件
+```bash
+git restore --source=HEAD --staged --worktree hello.c
+```
+或者使用简写形式：
+```bash
+git restore -s@ -SW hello.c
+```
+这些命令将 `hello.c` 文件恢复到 `HEAD` 指向的状态，并同时更新索引和工作目录。
 
 ### 注意事项
 
