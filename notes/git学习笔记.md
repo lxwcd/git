@@ -1,4 +1,4 @@
-﻿git 学习  
+git 学习  
       
 # 学习资源  
 > 初步了解 git：[廖雪峰 Git 教程](https://www.liaoxuefeng.com/wiki/896043488029600)  
@@ -722,6 +722,8 @@ node_modules/
 # 忽略所有 .DS_Store 文件
 .DS_Store
 ```
+
+## 从忽略文件夹中排除部分文件
 
 ## 特殊规则
 
@@ -4262,6 +4264,12 @@ $ git log --oneline -5 fix_B  | tac | cut -d" " -f1 | xargs git cherry-pick --no
 ```
 
 ## pick 其他分支的特定提交
+
+pick main2 分支的最新提交：
+```bash
+lx@lx MINGW64 /d/Documents/git_test04 (main3)
+$ git cherry-pick main2
+```
 
 pick main2 分支的第 5 个父提交：
 ```bash
