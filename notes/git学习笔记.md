@@ -1,4 +1,4 @@
-git 学习  
+﻿git 学习  
       
 # 学习资源  
 > 初步了解 git：[廖雪峰 Git 教程](https://www.liaoxuefeng.com/wiki/896043488029600)  
@@ -658,81 +658,169 @@ Git 子模块（Submodule）是一种将一个 Git 仓库嵌入到另一个 Git 
 
 可以写到多个位置，如果忽略文件只针对本地仓库，将忽略的文件放到 `$GIT_DIR/info/exclude` 中，即仓库根目录的 `.git` 目录中。
 
-## 作用
-
 - **指定忽略规则**：`.gitignore` 文件包含一系列的模式（pattern），用于匹配文件和目录路径。Git 会根据这些模式决定哪些文件不需要版本控制。
 - **保持仓库清洁**：通过忽略不必要的文件，`.gitignore` 帮助保持仓库的清洁和组织。
 
 ## 本地仓库忽略
+
 放在下面文件中
 ```bash
 .git/info/excluede
 ```
 
-## 忽略规则
+## 注释和空行
+以 `#` 开头的行被视为注释，空行会被忽略。
 
-- **模式匹配**：`.gitignore` 文件中的每一行都是一个模式，用于匹配文件路径。模式可以使用通配符，如 `*`、`?`、`[` 和 `]`。
-- **注释和空行**：以 `#` 开头的行被视为注释，空行会被忽略。
 
-## 常用模式
+## `/` 作用
+> If there is a separator at the beginning or middle (or both) of the pattern, then the pattern is relative to the directory level of the particular .gitignore file itself. Otherwise the pattern may also match at any level below the .gitignore level.
 
-- `*`：匹配任意数量的字符。
-- `?`：匹配任意单个字符。
-- `[abc]`：匹配括号内的任意字符（在这个例子中是 `a`、`b` 或 `c`）。
-- `**`：匹配任意数量的目录层级。
-
-### 双星号 `**`
-1. **双星号（`**`）在模式匹配中的特殊含义：**
-   - 当双星号（`**`）出现在模式中，并且与完整路径名进行匹配时，它们具有特殊的含义。
-
-2. **双星号后跟斜杠（`/`）表示在所有目录中匹配：**
-   - 如果模式以双星号（`**`）开始，并且后面紧跟着一个斜杠（`/`），这意味着在所有目录中进行匹配。例如，`**/foo`会匹配任何地方的文件或目录`foo`，这与模式`foo`相同。`**/foo/bar`会匹配任何直接位于目录`foo`下的文件或目录`bar`。
-
-3. **斜杠后跟双星号（`/**`）表示匹配目录内的所有内容：**
-   - 如果模式以斜杠（`/`）开始，后面紧跟着双星号（`/**`），这意味着匹配目录内的所有内容。例如，`abc/**`会匹配`abc`目录内的所有文件，相对于`.gitignore`文件的位置，匹配深度是无限的。
-
-4. **斜杠后跟双星号再跟斜杠表示匹配零个或多个目录：**
-   - 如果模式中包含斜杠（`/`）后跟双星号（`**`），然后再跟一个斜杠（`/`），这意味着匹配零个或多个目录。例如，`a/**/b`会匹配`a/b`、`a/x/b`、`a/x/y/b`等。
-
-5. **其他连续的星号被视为普通星号，并根据之前的规则进行匹配：**
-   - 如果模式中出现其他连续的星号（`*`），它们将被视为普通的星号，并根据之前提到的规则进行匹配。
-
-### 忽略文件夹
-`folder` 和 `folder/` 都会忽略该目录下的子目录
-
-## 示例
+### `/` 在开头
 
 ```bash
-# 忽略所有 .log 文件
-*.log
+/1.txt
+```
+排除 `.gitignore` 文件所在目录下的 1.txt 文件。
 
-# 忽略 build 目录
-build/
+### `/` 在中间
 
-# 忽略所有 .tmp 文件，但不忽略子目录中的 .tmp 文件
-*.tmp
-!*.subdir/*.tmp
-
-# 忽略 node_modules 目录
-node_modules/
-
-# 忽略 .env 文件
-.env
-
-# 忽略所有 .DS_Store 文件
-.DS_Store
+```bash
+dir1/file2.txt
 ```
 
-## 从忽略文件夹中排除部分文件
+匹配 `.gitignore` 文件所在目录中的 `dir1` 目录下的 `file2.txt` 文件。
 
-## 特殊规则
+### `/` 在结尾
 
-- **排除特定文件**：使用感叹号 `!` 可以排除特定的文件或模式，使其不被忽略。
-- **目录分隔符**：如果模式以 `/` 结尾，表示匹配的是目录。
+```bash
+dir1/
+```
+
+将排除 `.gitignore` 目录及其子目录中所有名为 `dir1` 的目录及其所有内容。
+一旦该目录被排除，则后续无法再排除目录中文件的忽略。
+```bash
+dir1/
+!dir1/file2.txt
+```
+将无法撤销 `dir1/file2.txt` 文件的忽略。
+
+### 无 `/` 结尾
+
+```bash
+dir1
+```
+
+将排除 `.gitignore` 目录及其子目录中所有名为 `dir1` 的目录及其所有内容，或者名为 `dir1` 的文件。
+一旦该目录被排除，则后续无法再排除目录中文件的忽略。
+
+## 忽略目录及其子目录
+```bash
+dir/
+```
+
+## 忽略目录中的文件
+```bash
+dir/*
+```
+
+不会忽略目录，因此后续可以为目录中的特定文件加规则：
+```bash
+dir1/*
+!dir1/file2.txt
+```
+
+忽略 `dir` 目录中全部文件，但排除 `dir1/file2.txt` 文件。
+
+## 多级目录的忽略
+
+如下目录结构：
+```bash
+project/
+├── .gitignore
+├── doc/
+│   └── frotz/
+│       └── file1.txt
+├── a/
+│   └── doc/
+│       └── frotz/
+│           └── file2.txt
+└── frotz/
+    └── file3.txt
+```
+
+- `doc/frotz/` 匹配结果
+匹配 `project/doc/frotz/` 目录及其内容。
+不匹配 `project/a/doc/frotz/` 目录及其内容，因为路径 `doc/frotz/` 是相对于 `.gitignore` 文件所在的目录的，而 `a/doc/frotz/` 不在该路径范围内。
+
+
+- `frotz/` 匹配结果
+匹配 `project/frotz/` 目录及其内容。
+也匹配 `project/a/frotz/` 目录及其内容，因为路径 `frotz/` 会匹配 `.gitignore` 文件所在目录及其所有子目录中的 `frotz` 目录。
+
+## `*` 匹配任意除了 / 外的字符
+> The pattern foo/*, matches foo/test.json (a regular file), foo/bar (a directory), but it does not match foo/bar/hello.c (a regular file), as the asterisk in the pattern does not match bar/hello.c which has a slash in it.
+
+`*` 是一个通配符，用于匹配任意数量的字符（包括零个字符）。
+
+```bash
+*.txt
+```
+匹配结果：
+```text
+file1.txt：会被匹配并忽略。
+file2.txt：会被匹配并忽略。
+dir1/file3.txt：会被匹配并忽略。
+dir1/subdir/file4.txt：会被匹配并忽略。
+```
+
+```bash
+dir1/*
+```
+根据官方讲解，匹配结果应该如下：
+```text
+dir1/file1.txt：会被匹配并忽略。
+dir1/file2.log：会被匹配并忽略。
+dir1/subdir/file3.txt：不会被匹配并忽略（因为 * 只匹配 dir1 目录中的直接子文件，不匹配 subdir/file3.txt）。
+```
+但实际测试发现子目录的文件也被匹配了，因为 Git 在处理 `.gitignore` 文件时，会递归对子目录应用相同的规则。
+
+## `?` 匹配任意一个除了 / 外的一个字符
+
+## `[]` 匹配范围内地任意字符
+
+如 `[a-zA-Z]` 可以匹配范围内的任意一个字符。
+
+## `!` 取消忽略
+> An optional prefix "!" which negates the pattern; any matching file excluded by a previous pattern will become included again. It is not possible to re-include a file if a parent directory of that file is excluded. Git doesn’t list excluded directories for performance reasons, so any patterns on contained files have no effect, no matter where they are defined. Put a backslash ("\") in front of the first "!" for patterns that begin with a literal "!", for example, "\!important!.txt".
+
+- `!` 符号用于取消之前忽略的规则。
+- 如果文件的父目录被排除，则无法重新包含该文件。
+如果忽略目录 `folder1/`，则即使后面用 `!folder1/foo.txt` 取消特定文件的忽略也不能生效，因为 git 不会检查 folder1 目录中的文件是否还有其他规则。
+- 如果用 `folder1/*` 仅忽略目录中的文件而不忽略目录本身，则后续可以用 `!folder1/foo.txt` 取消特定文件的忽略。
+- 用 `\!` 来匹配 `!` 本身。
+
+## 双星号 `**`
+
+### leading `**`
+> A leading "**" followed by a slash means match in all directories. For example, "**/foo" matches file or directory "foo" anywhere, the same as pattern "foo". "**/foo/bar" matches file or directory "bar" anywhere that is directly under directory "foo".
+
+### trailing `/**`
+> A trailing "/**" matches everything inside. For example, "abc/**" matches all files inside directory "abc", relative to the location of the `.gitignore` file, with infinite depth.
+
+### middle `/**`
+> A slash followed by two consecutive asterisks then a slash matches zero or more directories. For example, "a/**/b" matches "a/b", "a/x/b", "a/x/y/b" and so on.
+
+## 示例
+```bash
+# exclude everything except directory foo/bar
+/*
+!/foo
+/foo/*
+!/foo/bar
+```
 
 ## 应用 `.gitignore` 规则
-
-- **现有文件**：如果文件已经被跟踪（即已经提交过），那么即使后来在 `.gitignore` 中添加了匹配的规则，这些文件仍然会被跟踪。要停止跟踪这些文件，需要先从仓库中删除它们。
+- **现有文件**：如果文件已经被跟踪（即已经提交过），那么即使后来在 `.gitignore` 中添加了匹配的规则，这些文件仍然会被跟踪。要停止跟踪这些文件，需要先从仓库中删除它们。但已跟踪的文件加入 `.gitignore` 规则后，这些文件如果被修改然后 `git add`，会出现提示信息。
 - **新文件**：对于尚未被跟踪的文件，`.gitignore` 规则会立即生效。
 
 # 分支
