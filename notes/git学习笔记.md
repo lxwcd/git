@@ -1,4 +1,4 @@
-﻿git 学习  
+git 学习  
       
 # 学习资源  
 > 初步了解 git：[廖雪峰 Git 教程](https://www.liaoxuefeng.com/wiki/896043488029600)  
@@ -2144,8 +2144,8 @@ index cd7fb11..a821b44 100644
 +001
 ```
 
-- a 最新提交版本
-- b 表示当前工作目录未暂存的版本
+- a 暂存区
+- b 工作区
 - `100644` 中 `100` 表示文件类型为普通文件，`644` 表示文件权限，可以通过 `ll` 查看：
 ```bash
 lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (fix_B)
