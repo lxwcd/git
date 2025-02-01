@@ -1,4 +1,4 @@
-git 学习  
+﻿git 学习  
       
 # 学习资源  
 > 初步了解 git：[廖雪峰 Git 教程](https://www.liaoxuefeng.com/wiki/896043488029600)  
@@ -415,7 +415,6 @@ file:C:/Users/lxw/.gitconfig    i18n.logoutputencoding=utf-8
 
 # Git 存储数据方式  
 > [Git Internals Part 2: How does Git store your data?](https://www.developernation.net/blog/git-internals-how-does-git-store-your-data)  
-> [1.3 Getting Started - What is Git?](https://git-scm.com/book/en/v2/Getting-Started-What-is-Git%3F#what_is_git_section)  
 > [Commits are snapshots, not diffs](https://github.blog/2020-12-17-commits-are-snapshots-not-diffs/)  
 > [BASIC SNAPSHOTTING](http://git.github.io/git-reference/basic/)  
 > [What is a git "Snapshot"?](https://stackoverflow.com/questions/4964099/what-is-a-git-snapshot)  
@@ -423,9 +422,56 @@ file:C:/Users/lxw/.gitconfig    i18n.logoutputencoding=utf-8
 > [Are Git's pack files deltas rather than snapshots?](https://stackoverflow.com/questions/5176225/are-gits-pack-files-deltas-rather-than-snapshots)  
 > [Git Internals - Packfiles](https://git-scm.com/book/en/v2/Git-Internals-Packfiles)  
       
-      
 - In git, commits are snapshots, not diffs  
-      
+
+## Git仓库（Repositories）
+Git仓库是存储项目所有信息的数据库，用于保留和管理项目的修订和历史记录。Git仓库包含以下内容：
+**项目完整副本**：Git仓库保存了项目整个生命周期的完整副本。
+**配置信息**：Git在每个仓库中维护一套配置值，例如用户的姓名和电子邮件地址。这些配置信息不会在克隆、分叉或其他复制操作中传播，而是以站点、用户和仓库为基础进行管理。
+**存储位置**：所有仓库数据都存储在工作目录根目录下的隐藏文件夹.git中。
+
+Git仓库中有两个核心数据结构：对象存储（Object Store）和索引（Index）。
+
+## 对象存储（Object Store）
+对象存储是Git数据存储机制的核心，包含以下内容：
+**原始数据文件**：存储项目的文件内容。
+**日志消息、作者信息等**：记录每次提交的详细信息。
+
+**对象类型**：Git对象存储中有四种类型的对象，它们构成了Git高级数据结构的基础，blob、tree、commits和tags。
+
+### Blob（二进制大对象）
+binary large object。
+表示文件的每个版本。
+不包含文件名或元数据，仅包含文件内容。
+
+### Tree（树）
+表示目录结构的一个层级。
+包含文件的Blob ID、路径名和元数据。
+可以递归引用其他子树对象，构建完整的文件和子目录层级。
+
+### Commit（提交）
+表示对仓库的一次更改。
+包含作者、提交日期和日志消息等元数据。
+每个提交都链接到一个Tree对象，记录提交时仓库的状态。
+提交对象通过有向无环图（DAG）组织，表示项目的版本历史。
+
+### Tag（标签）
+给某个对象（通常是提交）一个可读的名称，例如“Ver-1.0-Alpha”。
+Git通过将对象压缩并存储在包文件（Pack Files）中，优化磁盘空间和网络流量的使用。
+
+## 索引（Index）
+索引是一个临时的、动态的二进制文件，描述了整个仓库的目录结构。它有以下特点：
+**捕获项目结构**：索引捕获了项目在某个时间点的结构版本。
+**阶段性更改**：Git允许在逻辑上分阶段更改索引内容，区分逐步开发和提交改进。
+
+## Git跟踪对象历史
+Git对象存储是一个基于内容寻址的存储系统，每个对象都有一个唯一的名称，通过SHA-1哈希算法生成。
+
+**SHA-1哈希**：对对象内容应用SHA-1算法，生成一个40字符的哈希值。
+**内容唯一性**：任何文件内容的微小变化都会导致SHA-1哈希值的变化，从而将新版本的文件单独索引。
+**存储方式**：Git只存储文件内容，而不是文件之间的差异。每个文件内容通过SHA-1哈希值引用，确保其唯一性。
+**全局唯一性**：相同的文件内容在不同位置或不同机器上会产生相同的SHA-1哈希值，因此SHA-1哈希值是一个全局唯一的标识符。
+
 # 文件的两种状态 - tracked and untracked
 > [Git - Recording Changes to the Repository](https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository) 
 
@@ -435,9 +481,65 @@ Tracked files are files that were in the last snapshot, as well as any newly sta
 ## untracked file
 Tracked files are files that were in the last snapshot, as well as any newly staged files; they can be unmodified, modified, or staged. In short, tracked files are files that Git knows about.
 
-# 快速前进（fast-forward）和非快速前进
-- **快速前进（fast-forward）**：当你的本地分支落后于远程分支时，Git 可以安全地将本地分支的指针向前移动到远程分支的最新提交，这称为快速前进。这种情况下，没有新的合并提交产生，因为历史是线性的。
+# 快速前进（fast-forward）
+> [Git Merge | Atlassian Git Tutorial](https://www.atlassian.com/git/tutorials/using-branches/git-merge) 
+
+- **快速前进（fast-forward）**：当本地分支落后于远程分支且本地分支没有超前远程分支时，Git 可以安全地将本地分支的指针向前移动到远程分支的最新提交，这称为快速前进。这种情况下，没有新的合并提交产生，因为历史是线性的。
 - **非快速前进**：如果远程分支有新的提交分叉，你的本地分支不是远程分支的直接祖先，那么 Git 无法通过快速前进来更新本地分支。这时，Git 需要创建一个新的合并提交，将两个分支的历史合并在一起。
+
+git fast-forward（快进合并）主要适用于本地分支落后于待合并分支，并且没有超前的部分。
+它要求合并的分支历史是线性的，即待合并的分支的提交历史是当前分支的直接延续。
+
+## 条件
+**线性历史**：待合并的分支的提交历史是当前分支的直接延续。
+**没有新的本地提交**：当前分支没有新的提交，或者当前分支的提交历史完全包含在待合并的分支中。
+
+```
+A -- B -- C [main]
+         \
+          D -- E [feature]
+```
+在这个场景中，feature 分支是从 main 分支的 B 提交处创建的，并且 main 分支没有新的提交。此时，feature 分支的提交历史是 main 分支的直接延续。可以执行fast-forward 合并。
+bash复制
+```bash
+git checkout main
+git merge feature --ff-only
+```
+
+Git 会采用 fast-forward 策略，结果如下：
+```bash
+A -- B -- C -- D -- E [main, feature]
+```
+
+main 分支的指针直接移动到 feature 分支的最新提交 E 上。
+没有创建新的合并提交，历史保持线性。
+
+如果本地比待合并分支有新的提交：
+```bash
+lx@lx MINGW64 /d/Documents/git_test04 (fix_C)
+$ git branch -vv
+  fix_B a3df94d [origin/fix_B] Merge branch 'fix_B' of https://github.com/lxwcd/git_test into fix_B
+* fix_C 69cf6cc [origin/fix_B: ahead 1, behind 2] modify 2.txt
+  main  03d14ae [origin/main: ahead 2, behind 19] update main test01.txt
+  main2 a47ac74 [origin/main: ahead 8, behind 19] Revert "update main test01.txt"
+  main3 ee19c9a [origin/main: ahead 5, behind 19] Revert "add test02.txt and test03.txt"
+```
+
+执行 fast-forward 合并将失败。
+```bash
+lx@lx MINGW64 /d/Documents/git_test04 (fix_C)
+$ git merge origin/fix_B --ff-only
+hint: Diverging branches can't be fast-forwarded, you need to either:
+hint:
+hint:   git merge --no-ff
+hint:
+hint: or:
+hint:
+hint:   git rebase
+hint:
+hint: Disable this message with "git config advice.diverging false"
+fatal: Not possible to fast-forward, aborting.
+```
 
 # Refs（引用）
 在 Git 中，`refs` 是指向提交对象（commit objects）的指针。它们存储在 `.git/refs` 目录下，分为几个部分：
