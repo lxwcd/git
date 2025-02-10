@@ -5210,10 +5210,169 @@ pick 2c28453 modify test01.txt
 
 可以修改 rebase 的顺序等。
 
-## git rebase --edit-todo 修改合并的顺序等
+### p, pick <commit>
+使用指定的提交，不做任何修改。
+默认行为。
+
+### r, reword <commit>
+作用：使用指定的提交，但能编辑提交日志的 message。
+```bash
+pick 1fc6c95 Patch A
+reword 6b2481b Patch B
+```
+
+保存并退出后，Git 会暂停在 6b2481b 提交，编辑提交日志的 message。
+
+### e, edit <commit>
+使用指定的提交，但在应用后暂停，允许进行修改提交内容和日志 message。
+```bash
+reword 67bcef2 modify 2.txt
+edit 6f95c1c modify test01.txt
+```
+保存并退出后，Git 会暂停在 6f95c1c 提交，可以使用 git commit --amend 修改提交内容。
+```bash
+lx@lx MINGW64 /d/Documents/git_test04 (fix_D_03|REBASE 3/3)
+$ git status
+interactive rebase in progress; onto 09cfa35
+Last commands done (3 commands done):
+   reword 67bcef2 modify 2.txt
+   edit 6f95c1c modify test01.txt
+  (see more in file .git/rebase-merge/done)
+No commands remaining.
+You are currently editing a commit while rebasing branch 'fix_D_03' on '09cfa35'.
+  (use "git commit --amend" to amend the current commit)
+  (use "git rebase --continue" once you are satisfied with your changes)
+
+nothing to commit, working tree clean
+
+lx@lx MINGW64 /d/Documents/git_test04 (fix_D_03|REBASE 3/3)
+$
+```
+
+### s, squash <commit>
+将指定的提交合并到前一个提交中。
+
+```bash
+pick 01c7623 rebase 91b0e3c Fix bug and fix confict
+pick 67bcef2 modify 2.txt
+squash 6f95c1c modify test01.txt
+```
+
+当合并 `67bcef2` 时会进入一个编辑界面，将 `6f95c1c` 提交一起合并到 `67bcef2` 中：
+```Bash
+# This is a combination of 2 commits.
+# This is the 1st commit message:
+
+modify 2.txt
+
+# This is the commit message #2:
+
+modify test01.txt
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# Date:   Sun Feb 9 21:25:57 2025 +0800
+#
+# interactive rebase in progress; onto 09cfa35
+# Last commands done (3 commands done):
+#    pick 67bcef2 modify 2.txt
+#    squash 6f95c1c modify test01.txt
+# No commands remaining.
+# You are currently rebasing branch 'fix_D_03' on '09cfa35'.
+#
+# Changes to be committed:
+#	modified:   2.txt
+#	modified:   test01.txt
+#
+```
+
+### f, fixup [-C | -c] <commit>
+将指定的提交合并到前一个提交中，但不保留当前提交的消息。
+
+```bash
+pick 01c7623 rebase 91b0e3c Fix bug and fix confict
+pick 67bcef2 modify 2.txt
+fixup 6f95c1c modify test01.txt
+```
+
+保存并退出后，Git 会将 `6f95c1c` 的内容合并到 `67bcef2` 中，但不会提示编辑提交消息。
+最后查看日志看到最后两个提交记录的 message 为倒数第二个日志的提交 message。且 Author 信息更新。
+
+### x, exec <command>
+在指定的提交之后运行一个 shell 命令。
+
+```bash
+pick 1fc6c95 Patch A
+exec echo "Running a command"
+```
+
+保存并退出后，Git 会在应用 1fc6c95 提交后运行 echo "Running a command"。
+
+### b, break
+在指定的提交之后暂停，允许手动处理。
+
+```bash
+pick 1fc6c95 Patch A
+break
+```
+
+保存并退出后，Git 会在应用 1fc6c95 提交后暂停，可以手动处理（如 git commit --amend）。
+
+### d, drop commit
+删除指定的提交。
+
+```bash
+pick 1fc6c95 Patch A
+drop 6b2481b Patch B
+```
+
+保存并退出后，Git 会删除 6b2481b 提交。
+
+### l, label <label>
+为当前的 HEAD 添加一个标签。
+
+```bash
+pick 1fc6c95 Patch A
+label mylabel
+```
+
+保存并退出后，Git 会在应用 1fc6c95 提交后为当前的 HEAD 添加一个标签 mylabel。
+
+### t, reset <label>
+将 HEAD 重置到指定的标签。
+
+```bash
+pick 1fc6c95 Patch A
+label mylabel
+reset mylabel
+```
+保存并退出后，Git 会在应用 1fc6c95 提交后将 HEAD 重置到 mylabel。
+
+### m, merge [-C <commit> | -c <commit>] <label>
+创建一个合并提交。
+
+```bash
+pick 1fc6c95 Patch A
+merge -c 6b2481b mylabel
+```
+
+保存并退出后，Git 会创建一个合并提交，使用 6b2481b 的提交消息。
+
+### u, update-ref <ref>
+跟踪一个占位符，用于更新指定的引用。
+
+```bash
+pick 1fc6c95 Patch A
+update-ref refs/heads/mybranch
+```
+
+保存并退出后，Git 会在应用 1fc6c95 提交后更新 refs/heads/mybranch。
+
+### git rebase --edit-todo 修改合并的顺序等
 和 git rebase -i 相似，修改合并信息。
 
-## git rebase --onto  
+### git rebase --onto  
 `git rebase --onto` 允许你将一系列提交从一个分支重新应用到另一个分支上。  
   
 `git rebase --onto <newbase> <since> <onto>`  
@@ -5269,7 +5428,7 @@ pick 2c28453 modify test01.txt
   
 > A Non-Fast-Forward (No-FF) merge happens when the target branch has diverged from the branch being merged or when you explicitly choose to create a merge commit. In this case, Git creates a new commit that represents the merging of the two branches. Git creates a new merge commit that has two parent commits: one from the target branch and one from the branch being merged. The merge commit is a snapshot of the merged work, preserving the history of both branches.  
   
-- **快速前进（fast-forward）**：当本地分支落后于远程分支且本地分支没有超前远程分支时，Git 可以安全地将本地分支的指针向前移动到远程分支的最新提交，这称为快速前进。这种情况下，没有新的合并提交产生，因为历史是线性的。  
+- **快速前进（fast-forward）**：当本地分支落后于远程分支且本地分支没有超前远程分支时，Git 可以安全地将本地分支的指针向前移动到远程分支的最新提交，即为快速前进。这种情况下，没有新的合并提交产生，因为历史是线性的。  
 - **非快速前进**：如果远程分支有新的提交分叉，你的本地分支不是远程分支的直接祖先，那么 Git 无法通过快速前进来更新本地分支。这时，Git 需要创建一个新的合并提交，将两个分支的历史合并在一起。  
   
 git fast-forward（快进合并）主要适用于本地分支落后于待合并分支，并且没有超前的部分。  
@@ -5281,8 +5440,8 @@ git fast-forward（快进合并）主要适用于本地分支落后于待合并�
   
 ```bash  
 A -- B -- C [main]  
-         \  
-          D -- E [feature]  
+          \  
+           D -- E [feature]  
 ```  
 在这个场景中，feature 分支是从 main 分支的 B 提交处创建的，并且 main 分支没有新的提交。此时，feature 分支的提交历史是 main 分支的直接延续。可以执行fast-forward 合并。  
 bash复制  
@@ -5952,9 +6111,55 @@ git commit -m "message"
 git merge --continue  
 ```  
   
-## 合并到主干分支  
-在 feature 分支进行开发后，合并到主干分支，为了保持主干分支的提交记录干净，可以先本地切换到主干分支，拉取远程主干分支的最新代码，然后本地尝试用 git rebase 合并到主干，查看是否有冲突，无则直接 git rebase；有冲突则解决冲突再合并。  
-  
+## 合并 feature 分支合并到主干分支  
+
+- git fetch -p 更新远程仓库
+- 拉取远程仓库主分支到本地
+```bash
+git checkout -b dev origin/dev
+```
+- git switch -c 复制当前分支到新分支进行合并操作
+如果当前分支工作目录不干净，可以 git stash 保持未提交的信息；
+或者 git commmit 提交，然后到新分支后 git reset --hard HEAD^ 撤销提交。
+- 查看 feature 分支和待合并的主分支的提交差异
+```bash
+git branch -u origin/dev
+git branch -vv
+```
+- 如果 feature 分支仅自己使用，且只有超前主分支的记录，无落后记录，则可以用 git rebase 或者 git merge -ff 合并。
+- 如果 feature 分支仅自己使用，有超前主分支的记录，也有落后记录，则可以用 git rebase 尝试合并，如果有冲突则中途解决冲突。
+- 如果 feature 分支是自己和其他人合作开发的分支，比主分支有超前和落后的记录，则可以先用 git rebase 尝试合并，看是否有冲突。
+- 如果 feature 分支是别人合作开发的分支，比主分支有超前和落后的记录，则需要用 git merge 合并。
+  - 如果无冲突，可直接用 git rebase 合并。  
+  - 如果有冲突，冲突是自己的提交记录，也可以修改冲突记录，然后继续用 git rebase 合并。  
+  - 如果有冲突，但冲突是别人的提交记录，则然对方进行合并解决冲突，或者自己解决冲突。
+    根据实际需要，用 git rebase，解决冲突会修改其他人的提交记录，但最终显示 Author 仍为对方或者可以改为自己。
+    或者用 git merge 等其他方式合并。
+
+## 提 Pull Request 策略
+
+### 更新最新代码
+提 PR 前更新远程仓库代码，依据远程仓库主分支的最新代码在本地新建 feature 分支。
+
+### 冲突文件先提 PR 尽快合并
+对于很容易发生的修改，如多语言，工程文件等，可以在提 PR 前更新代码，查看其他人 PR，如果当前 Active PR 没有多语言的修改，则先将这些易冲突的文件先提 PR 尽快合并到主分支。
+
+### 提 PR 前本地合并 feature 分支到主分支
+本地代码修改完后，在提 PR 前，先更新远程仓库主分支的代码并拉取到本地，然后将当前分支合并到主分支，如果有冲突解决冲突。
+合并步骤见前面介绍。
+
+合并后分支只有超前远程主分支的记录，无落后记录。
+
+### 新建远程 feature 分支提 PR
+本地合并以后，将本地 feature 分支推送到远程仓库且在远程仓库新建 featrue 分支：
+```bash
+git push -u origin HEAD:feature
+```
+
+### PR 通过后合并到远程仓库主分支策略
+PR 经过验证后真正合并到远程仓库时，可能远程仓库主分支又有了新的提交记录，这时可以在本地拉取远程仓库主分支，再将 feature 分支尝试合并到主分支，如 git rebase，如果没有冲突，则可以在远程仓库选择 git rebase 合并方案。
+如果有冲突。则本地进行合并，并解决冲突后，重新推送到远程仓库进行 PR。
+
 # github 文档换行处理  
 上传到 github 上的文档，行末尾需要添加两个空格才会换行  
         
