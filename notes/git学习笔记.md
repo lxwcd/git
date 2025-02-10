@@ -1,4 +1,4 @@
-﻿git 学习  
+git 学习  
         
 # 学习资源  
 > 初步了解 git：[廖雪峰 Git 教程](https://www.liaoxuefeng.com/wiki/896043488029600)  
@@ -1537,7 +1537,6 @@ $ git status -s |  grep "??" | cut -d" " -f2
   
 # git date
 > [Dates in Git - Azure Repos](https://learn.microsoft.com/en-us/azure/devops/repos/git/git-dates?view=azure-devops) 
-
 
 ## Author Date
 作者时间是指提交的作者（Author）创建提交时的时间戳。它记录了最初编写代码并创建提交的时间。
@@ -3746,7 +3745,6 @@ git commit -a -m
 使用 `-a` 选项会自动将所有已跟踪文件的更改添加到暂存区并提交，但不包括新文件。  
   
 ## 修改最后一次提交 --amend  
-
   
 `git commit --amend` 是一个Git命令，用于修改最近一次提交的信息。  
   
@@ -5406,7 +5404,7 @@ update-ref refs/heads/mybranch
    - `feature` 分支本身不会改变，它的提交历史仍然包含 A、B、C 和 D。  
    - `master` 分支现在包含了来自 `feature` 分支的更改，但是没有额外的合并提交记录。  
   
-### 注意事项  
+#### 注意事项  
   
 - 使用 `git rebase --onto` 时，如果重新应用的提交与目标分支有冲突，你需要解决这些冲突，然后继续变基过程。  
 - 这个命令会改变历史，所以如果你的分支已经推送到远程仓库，你应该避免使用这个命令，除非你确定不会影响其他人的工作。  
@@ -5420,6 +5418,8 @@ update-ref refs/heads/mybranch
 ## --no-commit  
 > [Git - git-merge Documentation](https://git-scm.com/docs/git-merge#Documentation/git-merge.txt---no-commit)   
   
+不自动提交
+
 ## --ff 快速前进（fast-forward）  
 > [Git Merge | Atlassian Git Tutorial](https://www.atlassian.com/git/tutorials/using-branches/git-merge)   
 > [Git Fast-Forward VS Non-Fast-Forward](https://leimao.github.io/blog/Git-Fast-Forward-VS-Non-Fast-Forward/)   
