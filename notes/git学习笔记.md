@@ -683,7 +683,7 @@ Git 子模块（Submodule）是一种将一个 Git 仓库嵌入到另一个 Git 
 > [GitHub - github/gitignore: A collection of useful .gitignore templates](https://github.com/github/gitignore)  
 > [.gitignore file - ignoring files in Git | Atlassian Git Tutorial](https://www.atlassian.com/git/tutorials/saving-changes/gitignore)  
     
-`.gitignore` 是一个在 Git 仓库中使用的特殊文件，用于指定 Git 应该忽略的文件和目录。这个文件帮助你防止不小心提交不需要版本控制的文件，比如编译产物、日志文件、个人配置文件等。  
+`.gitignore` 是一个在 Git 仓库中使用的特殊文件，用于指定 Git 应该忽略的文件和目录。这个文件帮助防止不小心提交不需要版本控制的文件，比如编译产物、日志文件、个人配置文件等。  
     
 不影响已被跟踪的文件。  
     
@@ -701,7 +701,15 @@ Git 子模块（Submodule）是一种将一个 Git 仓库嵌入到另一个 Git 
     
 ## 注释和空行  
 以 `#` 开头的行被视为注释，空行会被忽略。  
-    
+
+## 检查优先级
+> [Git - gitignore Documentation](https://git-scm.com/docs/gitignore)  
+
+由高到低：
+- command line
+- .gitignore 文件，越是接近对应文件的 .gitignore 优先级越高
+- .git/info/excluede  
+- Patterns read from the file specified by the configuration variable core.excludesFile
     
 ## `/` 作用  
 > If there is a separator at the beginning or middle (or both) of the pattern, then the pattern is relative to the directory level of the particular .gitignore file itself. Otherwise the pattern may also match at any level below the .gitignore level.  
@@ -709,9 +717,15 @@ Git 子模块（Submodule）是一种将一个 Git 仓库嵌入到另一个 Git 
 ### `/` 在开头  
     
 ```bash  
+# 忽略当前 .gitignore 文件所在目录下的 1.txt 文件。  
 /1.txt  
+
+# 仅匹配当前 .gitignore 文件所在目录下的 11 文件或 11 目录，不匹配 /test02/11 文件
+/11
+
+# 匹配所有目录下的 11 文件或 11 目录，匹配 /test02/11 文件
+11
 ```  
-排除 `.gitignore` 文件所在目录下的 1.txt 文件。  
     
 ### `/` 在中间  
     
@@ -726,6 +740,11 @@ dir1/file2.txt
 ```bash  
 dir1/  
 ```  
+
+```bash
+# 仅匹配当前 .gitignore 文件所在目录下的 11 目录，不匹配 11 文件
+/11/
+```
     
 将排除 `.gitignore` 目录及其子目录中所有名为 `dir1` 的目录及其所有内容。  
 一旦该目录被排除，则后续无法再排除目录中文件的忽略。  
@@ -4003,6 +4022,11 @@ git rm -r <directory>
 ## git rm --cached 保留文件到工作目录  
 - `git rm --cached` 将文件从 Git 的索引（也称为暂存区）中移除，这意味着该文件将不再被 Git 跟踪和管理。  
 - 与普通的 `git rm` 命令不同，`--cached` 选项使得 Git 只是从版本控制中移除文件，而不会从你的本地工作目录中删除实际的文件。  
+
+删除全部已暂存的文件以及目录，但保留工作区：
+```bash
+git rm -rf --cached .
+```
     
 ### 用途  
 - 不想跟踪特定的文件或文件夹，例如大型数据文件、自动生成的文件或者敏感信息。  
@@ -6158,7 +6182,110 @@ git push -u origin HEAD:feature
 ### PR 通过后合并到远程仓库主分支策略  
 PR 经过验证后真正合并到远程仓库时，可能远程仓库主分支又有了新的提交记录，这时可以在本地拉取远程仓库主分支，再将 feature 分支尝试合并到主分支，如 git rebase，如果没有冲突，则可以在远程仓库选择 git rebase 合并方案。  
 如果有冲突。则本地进行合并，并解决冲突后，重新推送到远程仓库进行 PR。  
-  
+
+# git subtree
+> [Just a moment...](https://stackoverflow.com/questions/32407634/when-to-use-git-subtree) 
+> [Git Subtree: Alternative to Git Submodule | Atlassian Git Tutorial](https://www.atlassian.com/git/tutorials/git-subtree) 
+> [Using Git subtrees for repository separation](https://makingsoftware.wordpress.com/2013/02/16/using-git-subtrees-for-repository-separation/) 
+
+git subtree 是 Git 的一个强大功能，用于将一个外部代码库（子树）集成到主仓库中，作为主仓库的一部分进行管理和维护。它特别适用于需要共享或复用代码的场景，例如多个项目需要共享同一模块的代码。
+集成第三方库：将外部库作为子树集成到主仓库中，便于开发和测试。
+分发模块化代码：将大型项目的独立模块分离为单独的代码库，便于维护和分发。
+保持历史记录：保留子树的完整提交历史，便于追溯每个子树的变化。
+实际使用场景
+代码共享：多个项目需要共享同一模块的代码。
+公共组件管理：将公共组件集中管理，方便多个子项目使用和更新。
+
+## 添加子树
+将外部仓库的代码添加到主仓库的指定目录中。
+```bash
+git subtree add --prefix=<目录路径> <仓库地址> <分支>
+```
+
+例如，将 child-repo 仓库的 master 分支添加到 parent-repo 仓库的 features 目录中：
+```bash
+git subtree add --prefix=features https://github.com/child-repo/child-repo.git master
+```
+## 更新子树
+将外部仓库的最新更改同步到主仓库的子树目录中。
+```bash
+git subtree pull --prefix=<目录路径> <仓库地址> <分支>
+```
+
+例如，更新 features 目录中的代码：
+```bash
+git subtree pull --prefix=features https://github.com/child-repo/child-repo.git master
+```
+
+## 推送子树更改
+将对子树目录的更改推送到外部仓库。
+```bash
+git subtree push --prefix=<目录路径> <仓库地址> <分支>
+```
+
+例如，将 features 目录中的更改推送到 child-repo 仓库：
+```bash
+git subtree push --prefix=features https://github.com/child-repo/child-repo.git master
+```
+
+## 分离子树
+将子树目录的更改提取到一个临时分支中，便于后续操作。
+
+```bash
+git subtree split --prefix=<目录路径> -b <临时分支名>
+```
+
+例如，提取 features 目录的更改到临时分支 temp-branch：
+```bash
+git subtree split --prefix=features -b temp-branch
+```
+
+# git subtree VS git submodule
+git subtree 和 git submodule 都是 Git 提供的用于管理子项目的工具，但它们在功能、使用方式和适用场景上有显著的区别。
+1. 功能和行为
+git submodule
+功能：
+将一个外部仓库作为子模块嵌入到主仓库中。
+子模块在主仓库中表现为一个目录，但实际是一个独立的 Git 仓库。
+行为：
+子模块的代码和历史记录与主仓库是分开的。
+需要额外的命令来初始化和更新子模块。
+修改子模块代码时，需要在子模块目录中单独提交，然后在主仓库中记录子模块的新提交。
+git subtree
+功能：
+将一个外部仓库的代码作为子树嵌入到主仓库中。
+子树的代码和历史记录会合并到主仓库的历史中。
+行为：
+子树在主仓库中表现为一个普通目录，对开发者透明。
+修改子树代码时，直接在主仓库中提交，然后可以将更改推送到子树的外部仓库。
+2. 使用场景
+git submodule
+适用场景：
+当需要引用一个独立的、稳定的外部项目时。
+当子模块的代码不需要频繁更新，或者更新时需要明确记录版本号。
+git subtree
+适用场景：
+当需要频繁更新子树代码，并且希望子树的更改能够直接反映在主仓库中。
+当希望简化操作流程，避免额外的子模块初始化和更新步骤。
+3. 操作复杂性
+git submodule
+优点：
+明确区分主仓库和子模块，适合需要严格版本控制的场景。
+缺点：
+操作较为繁琐，需要额外的命令来管理子模块。
+学习成本较高，需要理解 Git 的分支和提交机制。
+git subtree
+优点：
+操作简单，对开发者透明，不需要额外的初始化和更新步骤。
+更适合需要频繁更新子树代码的场景。
+缺点：
+子树的代码和历史记录会合并到主仓库中，可能会导致主仓库的历史记录变得复杂。
+4. 推荐使用
+git submodule：适用于需要严格版本控制、子模块代码相对稳定的场景。
+git subtree：适用于需要频繁更新子树代码、操作流程简单的场景。
+总结
+git subtree 和 git submodule 都是强大的工具，但它们在功能和使用方式上有显著的区别。选择哪种工具取决于你的具体需求，包括是否需要频繁更新子项目代码、是否需要严格版本控制，以及是否希望简化操作流程。  
+
 # github 文档换行处理  
 上传到 github 上的文档，行末尾需要添加两个空格才会换行  
           
