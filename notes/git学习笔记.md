@@ -12,19 +12,19 @@
 > [Git - What is Git?](https://git-scm.com/book/en/v2/Getting-Started-What-is-Git%3F)  
       
 1. **Git 的基本概念**：  
-   - Git 与其他版本控制系统（如 CVS、Subversion 或 Perforce）的主要区别在于它如何存储数据。Git 将数据视为一系列文件系统快照，而不是基于文件的变更列表（delta-based）。  
+   - Git 与其他版本控制系统（如 CVS、Subversion 或 Perforce）的主要区别在于它如何存储数据。Git 将数据视为一系列文件系统快照，而不是基于文件的变更列表（delta-based）。 ([Git 存储数据方式](#Git-存储数据方式)) 
       
 2. **快照而非差异**：  
    - Git 在每次提交时，都会保存项目文件的当前状态的快照。如果文件未更改，Git 只存储对先前相同文件的链接，而不是文件本身。这种方法使得 Git 更像是一个带有强大工具的迷你文件系统。  
       
 3. **几乎每个操作都是本地的**：  
-   - Git 的大多数操作只需要本地文件和资源，不需要网络上的其他计算机的信息。这意味着即使在没有网络连接的情况下，你也可以进行大多数操作，如查看项目历史或提交更改。  
+   - Git 的大多数操作只需要本地文件和资源，不需要网络上的其他计算机的信息。这意味着即使在没有网络连接的情况下，也可以进行大多数操作，如查看项目历史或提交更改。  
       
 4. **Git 的完整性**：  
    - Git 在存储之前会对所有内容进行校验和检查，并通过校验和引用这些内容。Git 使用 SHA-1 哈希来确保文件或目录结构的完整性。这意味着任何文件或目录的内容更改都会被 Git 检测到。  
       
 5. **Git 通常只添加数据**：  
-   - 在 Git 中执行的操作几乎都是向 Git 数据库中添加数据。提交到 Git 的快照很难丢失，特别是如果你定期将数据库推送到其他仓库。  
+   - 在 Git 中执行的操作几乎都是向 Git 数据库中添加数据。提交到 Git 的快照很难丢失，特别是如果定期将数据库推送到其他仓库。  
       
 6. **三种状态**：  
    - Git 有三个主要的状态：已修改（modified）、已暂存（staged）和已提交（committed）。文件可以处于这三个状态之一。  
@@ -421,6 +421,7 @@ file:C:/Users/lxw/.gitconfig    i18n.logoutputencoding=utf-8
 > [Is the git storage model wasteful?](https://stackoverflow.com/questions/7321360/is-the-git-storage-model-wasteful)  
 > [Are Git's pack files deltas rather than snapshots?](https://stackoverflow.com/questions/5176225/are-gits-pack-files-deltas-rather-than-snapshots)  
 > [Git Internals - Packfiles](https://git-scm.com/book/en/v2/Git-Internals-Packfiles)  
+> [Git Internals - Git Objects](https://www.youtube.com/watch?v=MyvyqdQ3OjI&ab_channel=Brief) 
             
 - In git, commits are snapshots, not diffs  
       
