@@ -1,4 +1,4 @@
-git 学习  
+﻿git 学习  
             
 # 学习资源  
 > 初步了解 git：[廖雪峰 Git 教程](https://www.liaoxuefeng.com/wiki/896043488029600)  
@@ -6259,6 +6259,10 @@ git subtree add --prefix=<目录路径> <仓库地址> <分支>
 ```bash  
 git subtree add --prefix=features https://github.com/child-repo/child-repo.git master  
 ```  
+
+## 提交子树代码
+修改子树中的文件后，和普通文件一样 commit 提交。
+
 ## 更新子树  
 将外部仓库的最新更改同步到主仓库的子树目录中。  
 ```bash  
