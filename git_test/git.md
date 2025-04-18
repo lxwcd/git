@@ -3227,51 +3227,62 @@ CommitDate: Sun Feb 9 22:32:24 2025 +0800
 ```
 
 # git merge  
-> [Git - git-merge Documentation](https://git-scm.com/docs/git-merge)   
-  
+> [Git - git-merge Documentation](https://git-scm.com/docs/git-merge)  
+      
 ## --no-commit  
-> [Git - git-merge Documentation](https://git-scm.com/docs/git-merge#Documentation/git-merge.txt---no-commit)   
+> [Git - git-merge Documentation](https://git-scm.com/docs/git-merge#Documentation/git-merge.txt---no-commit)  
+      
+不自动提交  
 
-不自动提交
-  
-## --ff 快速前进（fast-forward）  
-> [Git Merge | Atlassian Git Tutorial](https://www.atlassian.com/git/tutorials/using-branches/git-merge)   
-> [Git Fast-Forward VS Non-Fast-Forward](https://leimao.github.io/blog/Git-Fast-Forward-VS-Non-Fast-Forward/)   
-  
+## --ff
+> [Git - git-merge Documentation](https://git-scm.com/docs/git-merge#Documentation/git-merge.txt---ff) 
+
+Specifies how a merge is handled when the merged-in history is already a descendant of the current history. --ff is the default unless merging an annotated (and possibly signed) tag that is not stored in its natural place in the refs/tags/ hierarchy, in which case --no-ff is assumed.
+
+With --ff, when possible resolve the merge as a fast-forward (only update the branch pointer to match the merged branch; do not create a merge commit). When not possible (when the merged-in history is not a descendant of the current history), create a merge commit.
+
+With --no-ff, create a merge commit in all cases, even when the merge could instead be resolved as a fast-forward.
+
+With --ff-only, resolve the merge as a fast-forward when possible. When not possible, refuse to merge and exit with a non-zero status.
+    
+## --ff-only 快速前进（fast-forward）  
+> [Git Merge | Atlassian Git Tutorial](https://www.atlassian.com/git/tutorials/using-branches/git-merge)  
+> [Git Fast-Forward VS Non-Fast-Forward](https://leimao.github.io/blog/Git-Fast-Forward-VS-Non-Fast-Forward/)  
+      
 > A Fast-Forward merge occurs when the branch you are merging into (often main or master) has not diverged from the branch you are merging (often a feature branch). In other words, the commit history of the target branch is a strict subset of the branch being merged. In a Fast-Forward merge, Git simply moves the pointer of the target branch forward to the latest commit on the branch being merged. No new merge commit is created; the history is linear.  
-  
+      
 > A Non-Fast-Forward (No-FF) merge happens when the target branch has diverged from the branch being merged or when you explicitly choose to create a merge commit. In this case, Git creates a new commit that represents the merging of the two branches. Git creates a new merge commit that has two parent commits: one from the target branch and one from the branch being merged. The merge commit is a snapshot of the merged work, preserving the history of both branches.  
-  
+      
 - **快速前进（fast-forward）**：当本地分支落后于远程分支且本地分支没有超前远程分支时，Git 可以安全地将本地分支的指针向前移动到远程分支的最新提交，即为快速前进。这种情况下，没有新的合并提交产生，因为历史是线性的。  
 - **非快速前进**：如果远程分支有新的提交分叉，你的本地分支不是远程分支的直接祖先，那么 Git 无法通过快速前进来更新本地分支。这时，Git 需要创建一个新的合并提交，将两个分支的历史合并在一起。  
-  
+      
 git fast-forward（快进合并）主要适用于本地分支落后于待合并分支，并且没有超前的部分。  
 它要求合并的分支历史是线性的，即待合并的分支的提交历史是当前分支的直接延续。  
-  
+      
 **条件**：  
 **线性历史**：待合并的分支的提交历史是当前分支的直接延续。  
 **没有新的本地提交**：当前分支没有新的提交，或者当前分支的提交历史完全包含在待合并的分支中。  
-  
+      
 ```bash  
 A -- B -- C [main]  
           \  
            D -- E [feature]  
 ```  
-在这个场景中，feature 分支是从 main 分支的 B 提交处创建的，并且 main 分支没有新的提交。此时，feature 分支的提交历史是 main 分支的直接延续。可以执行fast-forward 合并。  
+在这个场景中，feature 分支是从 main 分支的 C 提交处创建的，并且 main 分支没有新的提交。此时，feature 分支的提交历史是 main 分支的直接延续。可以执行fast-forward 合并。  
 bash复制  
 ```bash  
 git checkout main  
 git merge feature --ff-only  
 ```  
-  
+      
 Git 会采用 fast-forward 策略，结果如下：  
 ```bash  
 A -- B -- C -- D -- E [main, feature]  
 ```  
-  
+      
 main 分支的指针直接移动到 feature 分支的最新提交 E 上。  
 没有创建新的合并提交，历史保持线性。  
-  
+      
 如果本地比待合并分支有新的提交：  
 ```bash  
 lx@lx MINGW64 /d/Documents/git_test04 (fix_C)  
@@ -3282,7 +3293,7 @@ $ git branch -vv
   main2 a47ac74 [origin/main: ahead 8, behind 19] Revert "update main test01.txt"  
   main3 ee19c9a [origin/main: ahead 5, behind 19] Revert "add test02.txt and test03.txt"  
 ```  
-  
+      
 执行 fast-forward 合并将失败。  
 ```bash  
 lx@lx MINGW64 /d/Documents/git_test04 (fix_C)  
@@ -3298,23 +3309,28 @@ hint:
 hint: Disable this message with "git config advice.diverging false"  
 fatal: Not possible to fast-forward, aborting.  
 ```  
-  
+      
 ## --squash 合并多个提交记录为一个提交记录  
 git merge --squash 的主要作用是将一个分支上的所有提交合并为一个单独的提交，并将这些更改应用到当前分支上。它不会创建合并提交，而是将所有更改暂存为一次新的提交。这常用于清理历史记录，将多个提交合并为一个。  
-  
+      
 ```bash  
 git merge --squash feature  
 ```  
 这会将 feature 分支上的所有更改合并到当前分支，但不会自动创建一个新的提交。  
-  
+      
 ```bash  
 git commit -m "Squash commit: Merge feature branch changes"  
 ```  
-  
+      
 ## --abort  
-  
+      
 ## --continue  
-  
+      
+## -X 合并策略  
+> [Git - git-merge Documentation](https://git-scm.com/docs/git-merge#_merge_strategies)  
+      
+### ort  
+      
 # Undo things
 
 ## 修改本地的最新提交 git commit --amend
@@ -3734,3 +3750,87 @@ git push -u origin HEAD:feature
 ### PR 通过后合并到远程仓库主分支策略
 PR 经过验证后真正合并到远程仓库时，可能远程仓库主分支又有了新的提交记录，这时可以在本地拉取远程仓库主分支，再将 feature 分支尝试合并到主分支，如 git rebase，如果没有冲突，则可以在远程仓库选择 git rebase 合并方案。
 如果有冲突。则本地进行合并，并解决冲突后，重新推送到远程仓库进行 PR。
+
+# git 多人协作
+
+## 更新远程仓库
+```bash
+git fetch -p
+```
+
+## 新建 feature 分支
+以远程仓库最新 develop 分支为基础新建 feature 分支：
+```bash
+git checkout -b feature origin/develop
+```
+
+## 修改 feature 分支
+
+### 容易冲突的文件单独创建提交记录并提 PR
+对于容易冲突的文件，如工程文件，多语言文件等，修改后单独创建提交记录，可以提前提 PR，这些文件的修改编译通过后提前尽快合并到主分支，防止后面合并时冲突。
+
+工程文件，可以先建好文件，内容为空，或者注释掉，先将文件加入工程中，单独创建提交记录并提 PR。
+如果提 PR 时有其他 PR 也修改了这些文件，或者像稍后合并，则将这些冲突提交单独创建提交记录，方便后面合并解决冲突。
+
+## feature 本地与远程仓库主分支合并
+feature 分支修改完后，准备提 PR 之前，先更新远程仓库主分支的代码并拉取到本地，然后将当前分支合并到主分支，如果有冲突解决冲突。
+
+## 整理提交记录
+在本地修改后，可以修改部分就先进行提交，后面继续补充修改后，如果希望和上一个使用同样的提交记录，则可以用 [git commit --amend](#git-commit) 合并到上一个提交记录。
+
+如果之前的提交已经推送到远程仓库的 feature 分支，则需要用 [git push --force](#强制推送) 强制覆盖远程仓库 feature 分支。
+
+### 查看 feature 分支和待合并的主分支的提交差异
+```bash
+git fetch -p
+git branch -u origin/develop
+git branch -vv
+```
+上面操作可以看到当前分支超前和落后远程多少提交。如果具体想看远程超强的提交记录，用 [git log](#git-log-查看日志) 命令。
+```bash
+git log HEAD..origin/develop --oneline
+```
+
+### 创建 feature 分支的副本分支
+进行合并前，最好创建一个当前分支的副本分支，用该分支进行合并测试，这样合并出错后可以切换回原来分支：
+```cpp
+git swich -c feature_copy
+```
+
+### 在 feature-copy 分支进行合并测试
+可以先用 git rebase 的方式合并到主干分支，这样不会影响主干分支的提交记录，且不会创建额外分支历史。
+```bash
+git rebase origin/develop
+```
+
+如果直接合并有冲突，且是工程文件或者多语言文件等的冲突，这种必须使用主干的版本，再将自己的修改重新添加，这是可以用 [git cherry-pick](#git-cherry-pick) 合并。
+
+```bash
+git cherry-pick <commit-id>
+// 等待需要添加冲突文件，手动添加
+git add <file>
+git commit -m "message"
+// 继续用 git cherry-pick 合并
+git cherry-pick <commit-id>
+```
+注意按照原来的提交顺序合并。
+
+如果是其他文件的冲突，需要在冲突的文件中每个地方判断解决，具体见[有冲突时指定使用版本](#有冲突时指定使用版本)。
+
+如果有冲突，解决冲突后，用 git rebase --continue 继续合并。
+
+或者希望终止合并，则用 git rebase --abort。
+
+## 将合并后的本地分支推送到远程仓库
+```bash
+git push -u origin HEAD:feature
+```
+
+## 提 PR
+
+## PR 通过后合并到远程仓库主分支
+PR　通过后，将远程的 feature 分支合并到远程仓库主分支。
+
+这时可能远程仓库的主分支又有了新的提交记录，因此可以在本地按照上面的方式进行合并尝试，看是否有冲突，如果无，且能用 git rebase 合并，则选择 git rebase 合并方案。  
+
+有冲突则需要本地处理冲突后才能进行合并。
