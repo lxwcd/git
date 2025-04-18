@@ -2537,7 +2537,7 @@ $ git log foo bar ^baz
 $ git log origin/demo..HEAD --oneline  
 ```  
       
-当前分支最新提交相对于 origin/demo 分支最新提交的提交记录，即 HEAD 有但 origin/demo 没有的提交记录  
+当前分支最新提交相对于 origin/demo 分支最新提交的差异提交记录，即 HEAD 有但 origin/demo 没有的提交记录  
       
 和下面命令功能相同：  
 ```bash  
@@ -6314,6 +6314,90 @@ git push -u origin HEAD:feature
 PR 经过验证后真正合并到远程仓库时，可能远程仓库主分支又有了新的提交记录，这时可以在本地拉取远程仓库主分支，再将 feature 分支尝试合并到主分支，如 git rebase，如果没有冲突，则可以在远程仓库选择 git rebase 合并方案。  
 如果有冲突。则本地进行合并，并解决冲突后，重新推送到远程仓库进行 PR。  
   
+# git 多人协作
+
+## 更新远程仓库
+```bash
+git fetch -p
+```
+
+## 新建 feature 分支
+以远程仓库最新 develop 分支为基础新建 feature 分支：
+```bash
+git checkout -b feature origin/develop
+```
+
+## 修改 feature 分支
+
+### 容易冲突的文件单独创建提交记录并提 PR
+对于容易冲突的文件，如工程文件，多语言文件等，修改后单独创建提交记录，可以提前提 PR，这些文件的修改编译通过后提前尽快合并到主分支，防止后面合并时冲突。
+
+工程文件，可以先建好文件，内容为空，或者注释掉，先将文件加入工程中，单独创建提交记录并提 PR。
+如果提 PR 时有其他 PR 也修改了这些文件，或者像稍后合并，则将这些冲突提交单独创建提交记录，方便后面合并解决冲突。
+
+## feature 本地与远程仓库主分支合并
+feature 分支修改完后，准备提 PR 之前，先更新远程仓库主分支的代码并拉取到本地，然后将当前分支合并到主分支，如果有冲突解决冲突。
+
+## 整理提交记录
+在本地修改后，可以修改部分就先进行提交，后面继续补充修改后，如果希望和上一个使用同样的提交记录，则可以用 [git commit --amend](#git-commit) 合并到上一个提交记录。
+
+如果之前的提交已经推送到远程仓库的 feature 分支，则需要用 [git push --force](#强制推送) 强制覆盖远程仓库 feature 分支。
+
+### 查看 feature 分支和待合并的主分支的提交差异
+```bash
+git fetch -p
+git branch -u origin/develop
+git branch -vv
+```
+上面操作可以看到当前分支超前和落后远程多少提交。如果具体想看远程超强的提交记录，用 [git log](#git-log-查看日志) 命令。
+```bash
+git log HEAD..origin/develop --oneline
+```
+
+### 创建 feature 分支的副本分支
+进行合并前，最好创建一个当前分支的副本分支，用该分支进行合并测试，这样合并出错后可以切换回原来分支：
+```cpp
+git swich -c feature_copy
+```
+
+### 在 feature-copy 分支进行合并测试
+可以先用 git rebase 的方式合并到主干分支，这样不会影响主干分支的提交记录，且不会创建额外分支历史。
+```bash
+git rebase origin/develop
+```
+
+如果直接合并有冲突，且是工程文件或者多语言文件等的冲突，这种必须使用主干的版本，再将自己的修改重新添加，这是可以用 [git cherry-pick](#git-cherry-pick) 合并。
+
+```bash
+git cherry-pick <commit-id>
+// 等待需要添加冲突文件，手动添加
+git add <file>
+git commit -m "message"
+// 继续用 git cherry-pick 合并
+git cherry-pick <commit-id>
+```
+注意按照原来的提交顺序合并。
+
+如果是其他文件的冲突，需要在冲突的文件中每个地方判断解决，具体见[有冲突时指定使用版本](#有冲突时指定使用版本)。
+
+如果有冲突，解决冲突后，用 git rebase --continue 继续合并。
+
+或者希望终止合并，则用 git rebase --abort。
+
+## 将合并后的本地分支推送到远程仓库
+```bash
+git push -u origin HEAD:feature
+```
+
+## 提 PR
+
+## PR 通过后合并到远程仓库主分支
+PR　通过后，将远程的 feature 分支合并到远程仓库主分支。
+
+这时可能远程仓库的主分支又有了新的提交记录，因此可以在本地按照上面的方式进行合并尝试，看是否有冲突，如果无，且能用 git rebase 合并，则选择 git rebase 合并方案。  
+
+有冲突则需要本地处理冲突后才能进行合并。
+
 # git subtree  
 > [Just a moment...](https://stackoverflow.com/questions/32407634/when-to-use-git-subtree)   
 > [Git Subtree: Alternative to Git Submodule | Atlassian Git Tutorial](https://www.atlassian.com/git/tutorials/git-subtree)   
