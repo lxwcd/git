@@ -1,4 +1,4 @@
-﻿git 学习  
+git 学习  
             
 # 学习资源  
 > 初步了解 git：[廖雪峰 Git 教程](https://www.liaoxuefeng.com/wiki/896043488029600)  
@@ -12,19 +12,19 @@
 > [Git - What is Git?](https://git-scm.com/book/en/v2/Getting-Started-What-is-Git%3F)  
       
 1. **Git 的基本概念**：  
-   - Git 与其他版本控制系统（如 CVS、Subversion 或 Perforce）的主要区别在于它如何存储数据。Git 将数据视为一系列文件系统快照，而不是基于文件的变更列表（delta-based）。 ([Git 存储数据方式](#Git-存储数据方式)) 
+   - Git 与其他版本控制系统（如 CVS、Subversion 或 Perforce）的主要区别在于它如何存储数据。Git 将数据视为一系列文件系统快照，而不是基于文件的变更列表（delta-based）。  
       
 2. **快照而非差异**：  
    - Git 在每次提交时，都会保存项目文件的当前状态的快照。如果文件未更改，Git 只存储对先前相同文件的链接，而不是文件本身。这种方法使得 Git 更像是一个带有强大工具的迷你文件系统。  
       
 3. **几乎每个操作都是本地的**：  
-   - Git 的大多数操作只需要本地文件和资源，不需要网络上的其他计算机的信息。这意味着即使在没有网络连接的情况下，也可以进行大多数操作，如查看项目历史或提交更改。  
+   - Git 的大多数操作只需要本地文件和资源，不需要网络上的其他计算机的信息。这意味着即使在没有网络连接的情况下，你也可以进行大多数操作，如查看项目历史或提交更改。  
       
 4. **Git 的完整性**：  
    - Git 在存储之前会对所有内容进行校验和检查，并通过校验和引用这些内容。Git 使用 SHA-1 哈希来确保文件或目录结构的完整性。这意味着任何文件或目录的内容更改都会被 Git 检测到。  
       
 5. **Git 通常只添加数据**：  
-   - 在 Git 中执行的操作几乎都是向 Git 数据库中添加数据。提交到 Git 的快照很难丢失，特别是如果定期将数据库推送到其他仓库。  
+   - 在 Git 中执行的操作几乎都是向 Git 数据库中添加数据。提交到 Git 的快照很难丢失，特别是如果你定期将数据库推送到其他仓库。  
       
 6. **三种状态**：  
    - Git 有三个主要的状态：已修改（modified）、已暂存（staged）和已提交（committed）。文件可以处于这三个状态之一。  
@@ -81,6 +81,15 @@ $ date
 Fri Jan 17 14:46:31 CST 2025  
 ```  
       
+## 修改 git bash 命令行模式为 vi 模式
+
+临时修改：
+```bash
+set -o vi
+```
+
+当前用户永久修改：将上面命令写到 `~/.bashrc` 中，永久生效。  
+
 ## vim 配置  
 输入 vim 后，输入 `:verion` 查看配置文件的路径，如：  
 ```bash  
@@ -415,13 +424,13 @@ file:C:/Users/lxw/.gitconfig    i18n.logoutputencoding=utf-8
       
 # Git 存储数据方式  
 > [Git Internals Part 2: How does Git store your data?](https://www.developernation.net/blog/git-internals-how-does-git-store-your-data)  
+> [1.3 Getting Started - What is Git?](https://git-scm.com/book/en/v2/Getting-Started-What-is-Git%3F#what_is_git_section)  
 > [Commits are snapshots, not diffs](https://github.blog/2020-12-17-commits-are-snapshots-not-diffs/)  
 > [BASIC SNAPSHOTTING](http://git.github.io/git-reference/basic/)  
 > [What is a git "Snapshot"?](https://stackoverflow.com/questions/4964099/what-is-a-git-snapshot)  
 > [Is the git storage model wasteful?](https://stackoverflow.com/questions/7321360/is-the-git-storage-model-wasteful)  
 > [Are Git's pack files deltas rather than snapshots?](https://stackoverflow.com/questions/5176225/are-gits-pack-files-deltas-rather-than-snapshots)  
 > [Git Internals - Packfiles](https://git-scm.com/book/en/v2/Git-Internals-Packfiles)  
-> [Git Internals - Git Objects](https://www.youtube.com/watch?v=MyvyqdQ3OjI&ab_channel=Brief) 
             
 - In git, commits are snapshots, not diffs  
       
@@ -525,6 +534,36 @@ $ git log --oneline -1
       
 `refspec` 的强大之处在于它允许精确控制 Git 引用的同步和映射，这对于管理复杂的分支结构和远程仓库非常有用。  
       
+假设有一个远程仓库 `origin`，其 URL 为 `https://github.com/user/repo.git`，并且你想要管理远程分支和本地分支的映射。
+
+## **简单的 refspec**
+如果你想要将远程的 `master` 分支拉取到本地的 `master` 分支，你可以使用以下 `refspec`：
+```bash
+git fetch origin master:refs/heads/master
+```
+这里，`master` 是源引用（远程的 `master` 分支），`refs/heads/master` 是目标引用（本地的 `master` 分支）。
+
+## **使用通配符的 refspec**
+如果你想要拉取远程仓库的所有分支到本地，可以使用通配符 `*`：
+```bash
+git fetch origin '*:refs/heads/*'
+```
+这里，`*` 匹配远程仓库的所有引用，`refs/heads/*` 指定所有匹配的远程引用都应该映射到本地的 `refs/heads/` 下。
+
+## **推送标签**
+如果你想要推送本地的所有标签到远程仓库，可以使用以下 `refspec`：
+```bash
+git push origin 'refs/tags/*:refs/tags/*'
+```
+这里，`refs/tags/*` 匹配本地的所有标签，并且将它们推送到远程仓库的 `refs/tags/` 下。
+
+## **删除远程引用**
+`refspec` 也可以用于删除远程引用。例如，要删除远程的 `feature` 分支，可以使用以下命令：
+```bash
+git push origin ':refs/heads/feature'
+```
+注意，这里 `<src>` 只有一个冒号 `:`，这意味着没有源引用，只有目标引用，这将导致远程的 `feature` 分支被删除。
+
 ## `+` 的用途  
 > $ git fetch origin +seen:seen maint:tmp  
 > This updates (or creates, as necessary) branches seen and tmp in the local repository by fetching from the branches (respectively) seen and maint from the remote repository.  
@@ -2199,7 +2238,6 @@ Date:   Thu Dec 19 21:43:41 2024 +0800
 ```bash  
 $ git log --since="2 weeks ago"  
 ```  
-    
       
 ### 绝对时间  
 ```bash  
@@ -2495,10 +2533,10 @@ $ git log foo bar ^baz
 ### git log branch1..branch2  
       
 ```bash  
-$ git log origin..HEAD --oneline  
+$ git log origin/demo..HEAD --oneline  
 ```  
       
-HEAD 当前分支最新提交相对于 origin 分支最新提交的提交记录，即 HEAD 有但 origin 没有的提交记录  
+当前分支最新提交相对于 origin/demo 分支最新提交的提交记录，即 HEAD 有但 origin/demo 没有的提交记录  
       
 和下面命令功能相同：  
 ```bash  
@@ -2668,6 +2706,9 @@ M       test01.txt
 ## --full-index  
 显示差异时，显示完整的索引信息。  
       
+# git describe
+> [Git - git-describe Documentation](https://git-scm.com/docs/git-describe) 
+
 # git merge-base 查找分支的共同祖先  
 > [Git - git-merge-base Documentation](https://git-scm.com/docs/git-merge-base)  
       
@@ -5520,6 +5561,17 @@ update-ref refs/heads/mybranch
 > [Git - git-merge Documentation](https://git-scm.com/docs/git-merge#Documentation/git-merge.txt---no-commit)  
       
 不自动提交  
+
+## --ff
+> [Git - git-merge Documentation](https://git-scm.com/docs/git-merge#Documentation/git-merge.txt---ff) 
+
+Specifies how a merge is handled when the merged-in history is already a descendant of the current history. --ff is the default unless merging an annotated (and possibly signed) tag that is not stored in its natural place in the refs/tags/ hierarchy, in which case --no-ff is assumed.
+
+With --ff, when possible resolve the merge as a fast-forward (only update the branch pointer to match the merged branch; do not create a merge commit). When not possible (when the merged-in history is not a descendant of the current history), create a merge commit.
+
+With --no-ff, create a merge commit in all cases, even when the merge could instead be resolved as a fast-forward.
+
+With --ff-only, resolve the merge as a fast-forward when possible. When not possible, refuse to merge and exit with a non-zero status.
     
 ## --ff-only 快速前进（fast-forward）  
 > [Git Merge | Atlassian Git Tutorial](https://www.atlassian.com/git/tutorials/using-branches/git-merge)  
@@ -6284,10 +6336,6 @@ git subtree add --prefix=<目录路径> <仓库地址> <分支>
 ```bash  
 git subtree add --prefix=features https://github.com/child-repo/child-repo.git master  
 ```  
-
-## 提交子树代码
-修改子树中的文件后，和普通文件一样 commit 提交。
-
 ## 更新子树  
 将外部仓库的最新更改同步到主仓库的子树目录中。  
 ```bash  
