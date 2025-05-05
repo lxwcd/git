@@ -60,18 +60,18 @@
 lxw@lx MINGW64 /e/src_git/demo (develop)  
 $ date  
 Fri Jan 17 06:41:27 GMT 2025  
-```  
+```
       
 修改 `TZ` 变量，注意这里时区设置和 linux 中格式有区别 (linux 中国时区为 `Asia/Shanghai`)  
       
 在 Windows 的 Git Bash 中，TZ 环境变量的格式通常为：  
 ```bash  
 TZ=<标准时间>-<UTC偏移量><夏令时时间>-<夏令时UTC偏移量>  
-```  
+```
 要设置中国时区（东八区），可以使用以下命令：  
 ```bash  
 export TZ="CST-8"  
-```  
+```
       
 永久修改则在配置文件中修改，如当前用户修改可在 `~/.bashrc` 中设置  
 修改完后 `. ~/.bashrc` 时期生效，再用 date 命令查看，时区已修改成功：  
@@ -79,8 +79,17 @@ export TZ="CST-8"
 lxw@lx MINGW64 /e/src_git/demo (develop)  
 $ date  
 Fri Jan 17 14:46:31 CST 2025  
-```  
+```
       
+## 修改 git bash 命令行模式为 vi 模式
+
+临时修改：
+```bash
+set -o vi
+```
+
+当前用户永久修改：将上面命令写到 `~/.bashrc` 中，永久生效。  
+
 ## vim 配置  
 输入 vim 后，输入 `:verion` 查看配置文件的路径，如：  
 ```bash  
@@ -92,7 +101,7 @@ Fri Jan 17 14:46:31 CST 2025
        defaults file: "$VIMRUNTIME/defaults.vim"  
   fall-back for $VIM: "/etc"  
  f-b for $VIMRUNTIME: "/usr/share/vim/vim91"  
-```  
+```
       
 在 Git Bash 和其他类 Unix 环境中，`/etc/vimrc` 是 Vim 编辑器的系统级配置文件的传统路径。这个路径源自 Unix 和 Linux 系统，其中 `/etc` 是用于存储系统级配置文件的目录。然而，在 Windows 系统中，并没有 `/etc` 这样的目录，这是一个 Unix 和 Linux 特有的目录结构。  
       
@@ -112,7 +121,7 @@ Fri Jan 17 14:46:31 CST 2025
 ```bash  
 " 设置全局自定义配置文件的路径变量  
 let $MYVIMRC = "$HOME/.vimrc"  
-```  
+```
       
 git bash 中用 ls 查看有 /etc/vimrc 文件，可以在最后加上一个自己的 vimrc 文件配置：  
 ```bash  
@@ -120,7 +129,7 @@ git bash 中用 ls 查看有 /etc/vimrc 文件，可以在最后加上一个自�
 if filereadable("$HOME/.vimrc")  
   source $HOME/.vimrc  
 endif  
-```  
+```
       
 ## 设置别名  
 希望全局配置，可以在 `/etc/profile.d/aliases.sh` 中添加。  
@@ -140,7 +149,7 @@ alias checkDeletedLog='git fsck --unreachable | grep commit | cut -d" " -f3 | xa
 alias checkSkipWorktree='git ls-files -v | grep "^S" '  
 alias checkUnchangedSkipWorktree=' git ls-files -v | grep "^[S|s]" '  
 alias restoreStashCommit='git update-ref --create-reflog refs/stash '  
-```  
+```
       
 ### 修改 vim 中光标样式  
 ```bash  
@@ -153,12 +162,12 @@ if &term =~ "xterm\\|rxvt"
   " 设置普通模式下的光标样式为块状  
   let &t_EI .= "\<Esc>[2 q"  " EI = NORMAL mode (ELSE)  
 endif  
-```  
+```
 ### 复制到系统剪贴板  
 选中后使用 `"+ y` 复制内容，即复制到系统剪贴板。  
 ```bash  
 set clipboard=unnamedplus  
-```  
+```
 `set clipboard=unnamedplus` 是 Vim 中的一个配置选项，用于指定 Vim 如何与系统剪贴板交互。下面是这个配置选项的详细解释：  
       
 - Vim 的 `clipboard` 选项控制 Vim 如何使用系统剪贴板。通过设置这个选项，你可以让 Vim 的复制（yank）和粘贴（paste）操作直接与系统剪贴板进行交互。  
@@ -176,7 +185,7 @@ set clipboard=unnamedplus
 lxw@lx MINGW64 /e/doc/git_test (main)  
 $ git config  
 edit             get              list             remove-section   rename-section   set              unset  
-```  
+```
       
 ## system level  
 `git config --system` 是一个用于设置系统级 Git 配置的命令选项。系统级配置影响当前操作系统上的所有 Git 用户和仓库。  
@@ -201,13 +210,13 @@ edit             get              list             remove-section   rename-secti
 - **设置系统级配置**：  
   ```bash  
   sudo git config --system user.email "system@example.com"  
-  ```  
+  ```
   这个命令会将 `user.email` 配置设置为 `system@example.com`，适用于所有用户和所有仓库。  
       
 - **查看系统级配置**：  
   ```bash  
   git config --system --get user.email  
-  ```  
+  ```
   这个命令会显示系统级配置中设置的 `user.email` 值。  
       
 ### 注意事项  
@@ -229,7 +238,7 @@ edit             get              list             remove-section   rename-secti
 - **示例命令**：  
   ```bash  
   git config --local user.email "local@example.com"  
-  ```  
+  ```
   这个命令会将 `user.email` 配置设置为 `local@example.com`，但仅适用于当前仓库。  
       
 ### `git config --global`  
@@ -240,7 +249,7 @@ edit             get              list             remove-section   rename-secti
 - **示例命令**：  
   ```bash  
   git config --global user.email "global@example.com"  
-  ```  
+  ```
   这个命令会将 `user.email` 配置设置为 `global@example.com`，适用于当前用户的所有仓库。  
       
 ### 总结  
@@ -251,20 +260,20 @@ edit             get              list             remove-section   rename-secti
 ## 查看全局配置信息  
 ```bash  
 $ git config list --global  
-```  
+```
       
 ## 获取某个配置的信息  
 ```bash  
 lxw@lx MINGW64 /e/doc/git_test (main)  
 $ git config get --global diff.tool  
 vimdiff  
-```  
+```
       
 ## 取消某个配置  
 ```bash  
 lxw@lx MINGW64 /e/doc/git_test (main)  
 $ git config unset --global diff.date  
-```  
+```
       
 ## 修改配置文件的路径  
 修改 Git 配置文件的路径通常涉及到更改 Git 查找配置文件的位置。Git 配置文件有三个主要层级：系统级（system）、全局级（global）和项目级（local）。每个层级的配置文件路径可以通过环境变量或 Git 命令进行修改。  
@@ -278,14 +287,14 @@ $ git config unset --global diff.date
 - **临时修改**（当前终端会话有效）：  
   ```bash  
   export GIT_CONFIG_GLOBAL=/path/to/your/global/config  
-  ```  
+  ```
       
 - **永久修改**（对所有终端会话有效）：  
   将上述 `export` 命令添加到你的 shell 配置文件中（如 `~/.bashrc`、`~/.zshrc` 等），然后重新加载配置文件：  
   ```bash  
   echo 'export GIT_CONFIG_GLOBAL=/path/to/your/global/config' >> ~/.bashrc  
   source ~/.bashrc  
-  ```  
+  ```
       
 ### 修改系统配置文件路径  
 > [bash 配置文件介绍](https://github.com/lxwcd/linux/blob/main/notes/shell学习笔记.md#bash-环境配置文件的用途说明)  
@@ -295,14 +304,14 @@ $ git config unset --global diff.date
 - **临时修改**：  
   ```bash  
   export GIT_CONFIG_SYSTEM=/path/to/your/system/config  
-  ```  
+  ```
       
 - **永久修改**：  
   将上述 `export` 命令添加到你的 shell 配置文件中，然后重新加载配置文件：  
   ```bash  
   echo 'export GIT_CONFIG_SYSTEM=/path/to/your/system/config' >> ~/.bashrc  
   source ~/.bashrc  
-  ```  
+  ```
       
 ### 修改项目配置文件路径  
       
@@ -311,18 +320,18 @@ $ git config unset --global diff.date
 - **指定配置文件**：  
   ```bash  
   git config --file /path/to/your/project/config --get core.editor  
-  ```  
+  ```
             
 ## 设置用户名和电子邮件  
 ```bash  
 root@ubuntu2204c12:~# git config --global user.name "name"  
 root@ubuntu2204c12:~# git config --global user.email "email@163.com"  
-```  
+```
       
 ## 设置初始默认分支名  
 ```bash  
 sudo git config --system init.defaultBranch main  
-```  
+```
       
 git config --global diff.date format:'%Y-%m-%d %H:%M:%S'  
       
@@ -330,7 +339,7 @@ git config --global diff.date format:'%Y-%m-%d %H:%M:%S'
 修改时区以便用 git log 查看日志时的时间和系统时间处于一个时区：  
 ```bash  
 git config --global log.date=local  
-```  
+```
       
 ## 配置换行符  
 - **Unix/Linux/Mac** 使用 LF（Line Feed，`\n`）作为换行符。  
@@ -374,13 +383,13 @@ windows 上配置后有点问题，暂未使用。
 在 git 设置代理：  
 ```bash  
 git config --global http.https://github.com.proxy socks5://127.0.0.1:7890  
-```  
+```
             
 配置完查看：  
 ```bash  
 $ git config --global --list  
 http.https://github.com.proxy=socks5://127.0.0.1:7890  
-```  
+```
       
 ### vmware 虚拟机中安装的 git 设置代理  
 > [vmware Ubuntu虚拟机设置代理](https://blog.csdn.net/qq_36383272/article/details/116307665)  
@@ -388,7 +397,7 @@ http.https://github.com.proxy=socks5://127.0.0.1:7890
 ```bash  
 git config --global http.proxy http://192.168.0.119:7890  
 git config --global https.proxy https://192.168.0.119:7890  
-```  
+```
             
 上面的地址 `192.168.0.119` 为宿主机的 ip 地址，端口 `7890` 为代理端口  
       
@@ -405,7 +414,7 @@ file:C:/Users/lxw/.gitconfig    core.quotepath=false
 file:C:/Users/lxw/.gitconfig    gui.encoding=utf-8  
 file:C:/Users/lxw/.gitconfig    i18n.commitencoding=utf-8  
 file:C:/Users/lxw/.gitconfig    i18n.logoutputencoding=utf-8  
-```  
+```
       
 `git config --show-origin` 是一个非常有用的命令，它允许你查看 Git 配置项及其来源文件。这个命令可以帮助你理解每个配置项是从哪个配置文件中读取的。  
       
@@ -415,6 +424,7 @@ file:C:/Users/lxw/.gitconfig    i18n.logoutputencoding=utf-8
       
 # Git 存储数据方式  
 > [Git Internals Part 2: How does Git store your data?](https://www.developernation.net/blog/git-internals-how-does-git-store-your-data)  
+> [1.3 Getting Started - What is Git?](https://git-scm.com/book/en/v2/Getting-Started-What-is-Git%3F#what_is_git_section)  
 > [Commits are snapshots, not diffs](https://github.blog/2020-12-17-commits-are-snapshots-not-diffs/)  
 > [BASIC SNAPSHOTTING](http://git.github.io/git-reference/basic/)  
 > [What is a git "Snapshot"?](https://stackoverflow.com/questions/4964099/what-is-a-git-snapshot)  
@@ -508,7 +518,7 @@ f9e71d645c5ec284d6bd0c185e1bf47838462eeb refs/remotes/origin/tb01
 lx@lx MINGW64 /d/Documents/git_test04 (fix_C)  
 $ git log --oneline -1  
 69cf6cc (HEAD -> fix_C) modify 2.txt  
-```  
+```
       
 # Refspec（引用规范）  
 > [Git - The Refspec](https://git-scm.com/book/en/v2/Git-Internals-The-Refspec)  
@@ -516,15 +526,45 @@ $ git log --oneline -1
 `refspec` 是一个字符串，用于定义如何将远程仓库的引用（refs）映射到本地仓库的引用。它通常用于 `git fetch` 和 `git push` 命令中，以指定要操作的远程引用和本地引用。  
       
 一个 `refspec` 的一般格式如下：  
-```  
+```
 <src>:<dst>  
-```  
+```
       
 - **<src>**：源引用，可以是分支名、标签名或使用通配符的引用模式。  
 - **<dst>**：目标引用，是远程引用映射到本地引用的路径。  
       
 `refspec` 的强大之处在于它允许精确控制 Git 引用的同步和映射，这对于管理复杂的分支结构和远程仓库非常有用。  
       
+假设有一个远程仓库 `origin`，其 URL 为 `https://github.com/user/repo.git`，并且你想要管理远程分支和本地分支的映射。
+
+## **简单的 refspec**
+如果你想要将远程的 `master` 分支拉取到本地的 `master` 分支，你可以使用以下 `refspec`：
+```bash
+git fetch origin master:refs/heads/master
+```
+这里，`master` 是源引用（远程的 `master` 分支），`refs/heads/master` 是目标引用（本地的 `master` 分支）。
+
+## **使用通配符的 refspec**
+如果你想要拉取远程仓库的所有分支到本地，可以使用通配符 `*`：
+```bash
+git fetch origin '*:refs/heads/*'
+```
+这里，`*` 匹配远程仓库的所有引用，`refs/heads/*` 指定所有匹配的远程引用都应该映射到本地的 `refs/heads/` 下。
+
+## **推送标签**
+如果你想要推送本地的所有标签到远程仓库，可以使用以下 `refspec`：
+```bash
+git push origin 'refs/tags/*:refs/tags/*'
+```
+这里，`refs/tags/*` 匹配本地的所有标签，并且将它们推送到远程仓库的 `refs/tags/` 下。
+
+## **删除远程引用**
+`refspec` 也可以用于删除远程引用。例如，要删除远程的 `feature` 分支，可以使用以下命令：
+```bash
+git push origin ':refs/heads/feature'
+```
+注意，这里 `<src>` 只有一个冒号 `:`，这意味着没有源引用，只有目标引用，这将导致远程的 `feature` 分支被删除。
+
 ## `+` 的用途  
 > $ git fetch origin +seen:seen maint:tmp  
 > This updates (or creates, as necessary) branches seen and tmp in the local repository by fetching from the branches (respectively) seen and maint from the remote repository.  
@@ -561,7 +601,7 @@ $ git log --oneline -1
       
 ```bash  
 git init --bare myproject.git  
-```  
+```
       
 这将创建一个名为 `myproject.git` 的目录，其中包含一个裸仓库。  
       
@@ -584,7 +624,7 @@ git init --bare myproject.git
       
 ```bash  
 git clone --mirror https://github.com/user/repo.git  
-```  
+```
 这个命令会创建一个名为 `repo.git` 的裸仓库，其中包含了 `https://github.com/user/repo.git` 仓库的所有引用。可以使用这个裸仓库来推送更新到远程服务器，或者作为其他仓库的备份。  
       
 # 子模块  
@@ -604,29 +644,29 @@ Git 子模块（Submodule）是一种将一个 Git 仓库嵌入到另一个 Git 
    使用 `git submodule add` 命令将远程仓库添加为子模块。  
    ```bash  
    git submodule add <repository-url> <path>  
-   ```  
+   ```
    例如，将一个名为 `lib` 的远程仓库添加为子模块：  
    ```bash  
    git submodule add https://github.com/user/lib.git lib  
-   ```  
+   ```
       
 2. **克隆包含子模块的仓库**：  
    克隆时使用 `--recurse-submodules` 参数来初始化并克隆子模块。  
    ```bash  
    git clone --recurse-submodules https://github.com/user/repo.git  
-   ```  
+   ```
       
 3. **更新子模块**：  
    使用 `git submodule update` 命令来更新子模块到最新提交。  
    ```bash  
    git submodule update --init --recursive  
-   ```  
+   ```
       
 4. **同步子模块**：  
    如果你在父项目中做了一些关于子模块的更改（比如更新了子模块的引用），你需要使用 `git submodule sync` 来同步这些更改。  
    ```bash  
    git submodule sync  
-   ```  
+   ```
       
 5. **检出特定提交**：  
    你可以检出子模块的特定提交。  
@@ -635,7 +675,7 @@ Git 子模块（Submodule）是一种将一个 Git 仓库嵌入到另一个 Git 
    cd <path-to-submodule>  
    git checkout <commit-hash>  
    cd ..  
-   ```  
+   ```
       
 ## 示例  
       
@@ -645,36 +685,36 @@ Git 子模块（Submodule）是一种将一个 Git 仓库嵌入到另一个 Git 
    ```bash  
    git init MyProject  
    cd MyProject  
-   ```  
+   ```
       
 2. **添加 CommonLib 作为子模块**：  
    ```bash  
    git submodule add https://github.com/user/CommonLib.git lib  
-   ```  
+   ```
    这会在 `MyProject` 中创建一个 `lib` 目录，并将 `CommonLib` 仓库克隆到这个目录中。  
       
 3. **提交子模块引用**：  
    ```bash  
    git commit -m "Add CommonLib as a submodule"  
-   ```  
+   ```
       
 4. **克隆 MyProject 并递归子模块**：  
    ```bash  
    git clone --recurse-submodules https://github.com/user/MyProject.git  
    cd MyProject  
-   ```  
+   ```
       
 5. **更新子模块**：  
    如果 `CommonLib` 有更新，你可以更新子模块：  
    ```bash  
    git submodule update --init --recursive  
-   ```  
+   ```
       
 6. **同步子模块引用**：  
    如果你更改了子模块的远程 URL 或其他设置，你需要同步这些更改：  
    ```bash  
    git submodule sync  
-   ```  
+   ```
       
 通过使用子模块，你可以保持项目的清晰结构，同时管理复杂的依赖关系。子模块提供了一种灵活的方式来集成外部代码，同时保持项目的独立性和可维护性。  
       
@@ -698,7 +738,7 @@ Git 子模块（Submodule）是一种将一个 Git 仓库嵌入到另一个 Git 
 放在下面文件中  
 ```bash  
 .git/info/excluede  
-```  
+```
       
 ## 注释和空行  
 以 `#` 开头的行被视为注释，空行会被忽略。  
@@ -726,13 +766,13 @@ Git 子模块（Submodule）是一种将一个 Git 仓库嵌入到另一个 Git 
   
 # 匹配所有目录下的 11 文件或 11 目录，匹配 /test02/11 文件  
 11  
-```  
+```
       
 ### `/` 在中间  
       
 ```bash  
 dir1/file2.txt  
-```  
+```
       
 匹配 `.gitignore` 文件所在目录中的 `dir1` 目录下的 `file2.txt` 文件。  
   
@@ -747,19 +787,19 @@ dir1/file2.txt
 ```bash  
 # 匹配任意目录下的 11 目录，不匹配 11 文件  
 11/  
-```  
+```
   
 ```bash  
 # 仅匹配当前 .gitignore 文件所在目录下的 11 目录，不匹配 11 文件  
 /11/  
-```  
+```
       
 #### 注意  
   
 ```bash  
 dir1/  
 !dir1/file2.txt # 无法生效   
-```  
+```
   
 `dir1/` 将排除 `.gitignore` 目录及其子目录中所有名为 `dir1` 的目录及其所有内容。  
 一旦该目录被排除，则后续无法再排除目录中文件的忽略。  
@@ -771,7 +811,7 @@ dir1/
 # 匹配任意目录下的 dir 目录或 11 文件  
 dir1  
 !dir1/1.txt # 不生效  
-```  
+```
       
 一旦该目录被忽略，则后续无法再排除目录中文件的忽略。  
       
@@ -779,19 +819,19 @@ dir1
 ```bash  
 dir/  
 !dir1/1.txt # 不生效  
-```  
+```
       
 ## 忽略目录中的文件  
 ```bash  
 dir/*  
-```  
+```
       
 不会忽略目录，因此后续可以为目录中的特定文件加规则：  
 ```bash  
 # 忽略 `dir` 目录中全部文件，但排除 `dir1/file2.txt` 文件。  
 dir1/*  
 !dir1/file2.txt  
-```  
+```
   
 有一个 test 目录，希望忽略 test 目录中全部文件，但排除 test/03/3.txt  
 ```bash  
@@ -805,7 +845,7 @@ test/02:
   
 test/03:  
 3.txt  
-```  
+```
   
 应该应用如下规则：  
 ```bash  
@@ -813,7 +853,7 @@ test/03:
 !/test/03  
 /test/03/*  
 !/test/03/3.txt  
-```  
+```
   
 查看结果：  
 ```bash  
@@ -851,7 +891,7 @@ Changes to be committed:
         modified:   .gitignore  
         new file:   .gitignore.swp  
         new file:   test/03/3.txt  
-```  
+```
       
 ## `*` 匹配任意除了 / 外的字符  
 > The pattern foo/*, matches foo/test.json (a regular file), foo/bar (a directory), but it does not match foo/bar/hello.c (a regular file), as the asterisk in the pattern does not match bar/hello.c which has a slash in it.  
@@ -860,24 +900,24 @@ Changes to be committed:
       
 ```bash  
 *.txt  
-```  
+```
 匹配结果：  
 ```bash  
 file1.txt：会被匹配并忽略。  
 file2.txt：会被匹配并忽略。  
 dir1/file3.txt：会被匹配并忽略。  
 dir1/subdir/file4.txt：会被匹配并忽略。  
-```  
+```
       
 ```bash  
 dir1/*  
-```  
+```
 根据官方讲解，匹配结果应该如下：  
 ```bash  
 dir1/file1.txt：会被匹配并忽略。  
 dir1/file2.log：会被匹配并忽略。  
 dir1/subdir/file3.txt：不会被匹配并忽略（因为 * 只匹配 dir1 目录中的直接子文件，不匹配 subdir/file3.txt）。  
-```  
+```
 测试发现 `dir1` 目录及其子目录的文件都被，因为匹配的目录 `subdir` 后，`subdir` 目录中全部内容都被忽略，不会再检查 `subdir` 子目录中是否还有匹配规则。  
       
 ## `?` 匹配任意一个除了 / 外的一个字符  
@@ -913,14 +953,14 @@ dir1/subdir/file3.txt：不会被匹配并忽略（因为 * 只匹配 dir1 目�
 !/foo  
 /foo/*  
 !/foo/bar  
-```  
+```
   
 ## 忽略目录下文件但排除子目录  
   
 ```bash  
 /dir/*  
 !/dir/**/  
-```  
+```
 仅忽略当前 `.gitignore` 所在目录下 `dir` 目录中的文件，但不忽略 `dir` 目录中的子目录及其文件。  
       
 ## 应用 `.gitignore` 规则  
@@ -953,19 +993,19 @@ HEAD is the pointer to the current branch reference, which is in turn a pointer 
 - **查看 `HEAD`**：  
   ```bash  
   cat .git/HEAD  
-  ```  
+  ```
   这个命令显示 `HEAD` 文件的内容，通常是一个指向当前分支的引用。  
       
 - **检出 `HEAD`**：  
   ```bash  
   git checkout HEAD  
-  ```  
+  ```
   这个命令将工作目录恢复到 `HEAD` 指向的提交状态。  
       
 - **比较 `HEAD`**：  
   ```bash  
   git diff HEAD  
-  ```  
+  ```
   这个命令显示自 `HEAD` 指向的提交以来工作目录中的更改。  
       
 ## 查看当前分支的 `HEAD`  
@@ -975,7 +1015,7 @@ HEAD is the pointer to the current branch reference, which is in turn a pointer 
       
 ```bash  
 git log -1  
-```  
+```
       
 这个命令显示最近一次提交的详细信息，包括提交哈希、作者、日期和提交信息。  
       
@@ -985,7 +1025,7 @@ git log -1
       
 ```bash  
 git show HEAD  
-```  
+```
       
 这个命令显示 `HEAD` 指向的提交的详细信息，包括更改的内容。  
       
@@ -995,7 +1035,7 @@ git show HEAD
       
 ```bash  
 git rev-parse HEAD  
-```  
+```
       
 这个命令输出 `HEAD` 指向的提交的哈希值。  
       
@@ -1005,7 +1045,7 @@ git rev-parse HEAD
       
 ```bash  
 cat .git/HEAD  
-```  
+```
       
 这个命令显示 `HEAD` 文件的内容，通常是一个指向当前分支的引用，如 `ref: refs/heads/main`。  
       
@@ -1015,7 +1055,7 @@ cat .git/HEAD
       
 ```bash  
 git status  
-```  
+```
       
 这个命令显示当前分支的状态，包括 `HEAD` 指向的提交和任何未提交的更改。  
       
@@ -1054,7 +1094,7 @@ git status
 bash  
 ```bash  
 git checkout -b new-branch  
-```  
+```
       
 ## 使用场景  
       
@@ -1069,7 +1109,6 @@ git checkout -b new-branch
       
       
 ## `HEAD` 的重要性  
-      
       
 - **版本控制的基础**：`HEAD` 是 Git 版本控制的核心，它决定了你正在工作的版本和状态。  
 - **分支和合并**：在分支和合并操作中，`HEAD` 用于确定当前的工作基础和合并的目标。  
@@ -1103,25 +1142,25 @@ The index is your proposed next commit. We’ve also been referring to this conc
 - **添加文件到索引**：  
   ```bash  
   git add <file>  
-  ```  
+  ```
   这个命令将指定文件的更改添加到索引中。  
       
 - **查看索引内容**：  
   ```bash  
   git ls-files --stage  
-  ```  
+  ```
   这个命令显示索引中的文件及其状态。  
       
 - **重置索引**：  
   ```bash  
   git reset <file>  
-  ```  
+  ```
   这个命令将指定文件从索引中移除，但保留工作目录中的更改。  
       
 - **清空索引**：  
   ```bash  
   git reset  
-  ```  
+  ```
   这个命令清空索引，移除所有暂存的更改。  
       
 ## 索引与工作目录  
@@ -1140,7 +1179,7 @@ The index is your proposed next commit. We’ve also been referring to this conc
       
 you have your working directory (also commonly referred to as the “working tree”).  
       
-在 Git 中，"working directory"（工作目录）和 "working tree"（工作树）是两个密切相关但略有不同的概念。它们都涉及到你在本地检出的文件和目录，但它们的含义和用途有所不同。以下是关于这两个概念的详细讲解：  
+在 Git 中，"working directory"（工作目录）和 "working tree"（工作树）是两个密切相关但略有不同的概念。它们都涉及到你在本地检出的文件和目录，但它们的含义和用途有所不同。
       
 1. **定义**：工作目录是指你当前正在工作的目录，它是你检出的文件和目录的集合。当你克隆一个仓库或检出一个分支时，Git 会在你的本地文件系统中创建一个工作目录。  
 2. **内容**：工作目录包含了项目的文件和目录，这些文件和目录是你从 Git 仓库中检出的。你可以在这个目录中编辑文件、添加新文件或删除文件。  
@@ -1176,7 +1215,7 @@ you have your working directory (also commonly referred to as the “working tre
 lx@lx MINGW64 /d/Documents/git_test04 (main2)  
 $ git remote  
 origin  
-```  
+```
       
 ## 查看远程仓库URL  
 ```bash  
@@ -1184,33 +1223,33 @@ lx@lx MINGW64 /d/Documents/git_test04 (main2)
 $ git remote -vv  
 origin  https://github.com/lxwcd/git_test.git (fetch)  
 origin  https://github.com/lxwcd/git_test.git (push)  
-```  
+```
       
 ## 添加远程仓库  
 ```bash  
 git remote add <name> <url>  
-```  
+```
 添加一个新的远程仓库引用，`<name>` 是远程仓库的短名称，`<url>` 是远程仓库的 URL。  
       
 ## 删除远程仓库  
 ```bash  
 git remote remove <name>  
-```  
+```
       
 ## 重命名远程仓库  
 ```bash  
 git remote rename <old-name> <new-name>  
-```  
+```
       
 ## 设置远程仓库 URL  
 ```bash  
 git remote set-url <name> <new-url>  
-```  
+```
       
 ## 添加本地远程仓库  
 ```bash  
 git remote add local-origin file:///d/Documents/git_test  
-```  
+```
 - 将 `D:/Documents/git_test` 仓库添加为远程仓库，别名为 `local-origin`。  
       
 # git clone  
@@ -1219,13 +1258,13 @@ git remote add local-origin file:///d/Documents/git_test
 ## 克隆默认分支  
 ```bash  
 git clone https://github.com/user/repo.git  
-```  
+```
 这将克隆 `user/repo` 仓库的默认分支（通常是 `master` 或 `main`）到本地。  
       
 ## 克隆远程仓库的特定分支  
 ```bash  
 git clone -b develop https://github.com/user/repo.git  
-```  
+```
 这将克隆 `user/repo` 仓库的 `develop` 分支，这个分支必须是远程仓库已经存在的分支。  
 克隆完后本地会创建一个和远程 `develop` 对应的分支，同时也会克隆远程仓库的其他分支。  
       
@@ -1251,24 +1290,24 @@ $ git branch -a
   remotes/origin/branch01  
   remotes/origin/main  
   remotes/origin/tb01  
-```  
+```
       
 ## 克隆不包含标签  
 ```bash  
 git clone --no-tags https://github.com/user/repo.git  
-```  
+```
 这将克隆仓库，但不包括任何标签。  
       
 ## 浅克隆  
 ```bash  
 git clone --depth 1 https://github.com/user/repo.git  
-```  
+```
 这将创建一个浅克隆，只包含最新的提交（即最近一次提交的历史）。  
       
 ## 仅克隆远程仓库指定分支  
 ```bash  
 git clone --branch new-branch --single-branch https://github.com/user/repo.git  
-```  
+```
 这将克隆 `user/repo` 仓库，并检查出 `new-branch` 分支，本地看不到远程仓库的其他分支。  
       
 ```bash  
@@ -1294,12 +1333,12 @@ $ git branch -a
 lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test02 (tb01)  
 $ git branch -vv  
 * tb01 f9e71d6 [origin/tb01] Update test01.txt  
-```  
+```
       
 ## 克隆并初始化所有子模块  
 ```bash  
 git clone --recurse-submodules https://github.com/user/repo.git  
-```  
+```
 这将克隆仓库以及所有子模块。  
 `git clone --recurse-submodules https://github.com/user/repo.git` 这个命令用于克隆一个包含子模块的 Git 仓库，并且初始化并克隆所有的子模块。  
       
@@ -1324,7 +1363,7 @@ git clone --recurse-submodules https://github.com/user/repo.git
 ## 创建裸仓库  
 ```bash  
 git clone --bare https://github.com/user/repo.git  
-```  
+```
 这将创建一个裸仓库，即没有工作目录的仓库，通常用于作为其他仓库的镜像。  
       
 > Make a bare Git repository. That is, instead of creating <directory> and placing the administrative files in <directory>/.git, make the <directory> itself the $GIT_DIR. This obviously implies the --no-checkout because there is nowhere to check out the working tree. Also the branch heads at the remote are copied directly to corresponding local branch heads, without mapping them to refs/remotes/origin/. When this option is used, neither remote-tracking branches nor the related configuration variables are created.  
@@ -1332,7 +1371,7 @@ git clone --bare https://github.com/user/repo.git
 ## 创建镜像仓库  
 ```bash  
 git clone --mirror https://github.com/user/repo.git  
-```  
+```
 和创建裸仓库类似，但还包含远程分支的引用。  
       
 > Set up a mirror of the source repository. This implies --bare. Compared to --bare, --mirror not only maps local branches of the source to local branches of the target, it maps all refs (including remote-tracking branches, notes etc.) and sets up a refspec configuration such that all these refs are overwritten by a git remote update in the target repository.  
@@ -1340,7 +1379,7 @@ git clone --mirror https://github.com/user/repo.git
 ## 不检出 HEAD  
 ```bash  
 git clone --no-checkout https://github.com/user/repo.git  
-```  
+```
 这将克隆仓库，但不会检出 HEAD 对应的工作目录。  
       
 `git clone --no-checkout <repository-url>` 命令会从 `<repository-url>` 指定的远程仓库克隆一个空目录，其中包含远程仓库的所有分支和标签的引用，但不包含任何工作目录中的文件。  
@@ -1348,13 +1387,13 @@ git clone --no-checkout https://github.com/user/repo.git
 ## 使用模板克隆  
 ```bash  
 git clone --template=/path/to/template https://github.com/user/repo.git  
-```  
+```
 这将使用指定的模板目录来初始化新仓库。  
       
 ## 设置配置变量  
 ```bash  
 git clone --config user.name="Your Name" https://github.com/user/repo.git  
-```  
+```
 这将在克隆时设置仓库的用户名称。  
       
 ### 使用场景  
@@ -1375,7 +1414,7 @@ git clone --config user.name="Your Name" https://github.com/user/repo.git
 ## 稀疏检出  
 ```bash  
 git clone --sparse https://github.com/user/repo.git  
-```  
+```
 这将使用稀疏检出克隆仓库，只检出顶级目录中的文件。  
       
 ## 克隆部分目录到本地  
@@ -1385,31 +1424,31 @@ git clone --sparse https://github.com/user/repo.git
 git clone --depth 1 --filter=blob:none --no-checkout https://github.com/lxwcd/linux.git  
 cd linux  
 git checkout main -- notes/shell_scripts  
-```  
+```
       
 ## 仅克隆仓库中的文件  
 如果不想远程仓库的目录，只将目录内的文件克隆到本地当前目录下，则如下：  
 ```bash  
 git clone https://github.com/lxwcd/cpp.git .  
-```  
+```
             
 ## 克隆仓库到新目录  
 将远程仓库克隆到指定目录并且修改仓库名字为 `new_folder`：  
 ```bash  
 git clone https://github.com/lxwcd/learnVim.git /usr/local/src/new_folder  
-```  
+```
             
 也可以指定多级目录，如果不存在，则自动创建  
 ```bash  
 git clone https://github.com/lxwcd/learnVim.git /usr/local/src/1/2/3/new_folder  
-```  
+```
       
 ## file 协议克隆  
 在 Git 中，`file` 协议用于通过本地文件系统路径克隆或访问仓库。`file` 协议的使用方式与通过网络协议（如 `http`、`https`、`git`）克隆仓库类似，但它专门用于本地文件系统。  
       
 ```bash  
 file:///path/to/repo  
-```  
+```
 - **`file://`**：这是协议前缀，表示使用文件系统路径。  
 - **`/`**：在 Unix-like 系统中，路径从根目录开始，因此使用三个斜杠 `///`。  
 - **`/path/to/repo`**：这是仓库的路径。  
@@ -1417,7 +1456,7 @@ file:///path/to/repo
 ## 克隆本地仓库  
 ```bash  
 git clone file:///d/Documents/git_test /d/Documents/git_test_03  
-```  
+```
 - 源路径：`file:///d/Documents/git_test`，表示 `D:/Documents/git_test` 仓库。  
 - 目标路径：`/d/Documents/git_test_03`，表示克隆到 `D:/Documents/git_test_03` 目录。  
       
@@ -1439,7 +1478,7 @@ git clone file:///d/Documents/git_test /d/Documents/git_test_03
 ## 初始化当前目录  
 ```bash  
 git init  
-```  
+```
       
 执行 `git init` 后，当前目录（或指定目录）将包含一个新的 `.git` 目录，其中包含以下内容：  
       
@@ -1451,13 +1490,13 @@ git init
 ## 初始化指定目录  
 ```bash  
 git init <directory>  
-```  
+```
 这个命令将指定目录初始化为一个 Git 仓库。如果目录不存在，Git 会尝试创建它。  
       
 ## 创建裸仓库  
 ```bash  
 git init --bare  
-```  
+```
 创建一个裸仓库（bare repository），这种仓库没有工作目录，通常用于服务器上的中央仓库。  
       
 # git status 检查文件状态  
@@ -1513,7 +1552,7 @@ Untracked files:
         0002-commit-C.patch  
         0002-update-fix_B.patch  
         1.patch  
-```  
+```
       
 ## -s, --short 显示简短的状态信息  
 不显示文件的具体更改内容。  
@@ -1529,7 +1568,7 @@ A  git.md
 ?? 0002-commit-C.patch  
 ?? 0002-update-fix_B.patch  
 ?? 1.patch  
-```  
+```
       
 ## -u, --untracked-files[=<mode>] 显示未跟踪的文件  
 `<mode>` 可以是 `no`, `normal`, 或 `all`  
@@ -1553,7 +1592,7 @@ A  git.md
 ?? 0002-commit-C.patch  
 ?? 0002-update-fix_B.patch  
 ?? 1.patch  
-```  
+```
       
 ## --ignored 显示被忽略的文件  
 > [Git - git-status Documentation](https://git-scm.com/docs/git-status#Documentation/git-status.txt---ignoredltmodegt)  
@@ -1573,7 +1612,7 @@ A  git.md
 ?? 0002-commit-C.patch  
 ?? 0002-update-fix_B.patch  
 ?? 1.patch  
-```  
+```
       
 ## 输出未被跟踪的文件名  
 ```bash  
@@ -1600,7 +1639,7 @@ $ git status -s |  grep "??" | cut -d" " -f2
 0002-update-fix_B.patch  
 1.patch  
 2.txt  
-```  
+```
     
 # Author and Committer  
 > [Why is git AuthorDate different from CommitDate?](https://stackoverflow.com/questions/11856983/why-is-git-authordate-different-from-commitdate)  
@@ -1629,13 +1668,13 @@ Commit:     lxwcd <15521168075@163.com>
 CommitDate: Sun Feb 9 21:00:08 2025 +0800  
     
     add files and modify author  
-```  
+```
     
 ```bash  
 lx@lx MINGW64 /d/Documents/git_test04 (main3)  
 $ git log --pretty=format:"%h %an %ad" fix_C -1  
 b3e36b5 John Sun Feb 9 20:46:40 2025 +0800  
-```  
+```
 %h：提交的哈希值（短格式）  
 %an：作者名称（Author Name）  
 %ad：作者时间（Author Date）  
@@ -1645,7 +1684,7 @@ b3e36b5 John Sun Feb 9 20:46:40 2025 +0800
 lx@lx MINGW64 /d/Documents/git_test04 (fix_D)  
 $ date  
 2025年02月 9日 21:17:02  
-```  
+```
     
 ```bash  
 lx@lx MINGW64 /d/Documents/git_test04 (fix_D)  
@@ -1654,7 +1693,7 @@ $ git commit --date="2025-01-02 14:00:00" -m "Fix bug" --author="Alice <ALice@16
  Author: Alice <ALice@163.com>  
  Date: Thu Jan 2 14:00:00 2025 +0800  
  1 file changed, 1 insertion(+)  
-```  
+```
     
 查看日志，Author Date 被修改为指定时间，但 commit date 为当前时间。  
 ```bash  
@@ -1667,7 +1706,7 @@ Commit:     lxwcd <15521168075@163.com>
 CommitDate: Sun Feb 9 21:17:51 2025 +0800  
     
     Fix bug  
-```  
+```
     
 ### git cherry-pick 不会修改 Author date  
 `git cherry-pick` 没有使用 `--no-commit` 选项，且没有冲突，不会修改作者时间戳，但会更新提交时间。  
@@ -1683,7 +1722,7 @@ Commit:     lxwcd <15521168075@163.com>
 CommitDate: Sun Feb 9 20:46:40 2025 +0800  
     
     add files and modify author  
-```  
+```
     
 `git cherry-pick` 应用该提交到 fix_B 分支：  
 ```bash  
@@ -1693,7 +1732,7 @@ $ git cherry-pick fix_C
  Author: John <John@163.com>  
  Date: Sun Feb 9 20:46:40 2025 +0800  
  24 files changed, 390 insertions(+)  
-```  
+```
     
 查看 fix_B 分支的提交记录，发现提交时间更新了，但 Author Date 没有更新：  
 ```cpp  
@@ -1706,7 +1745,7 @@ Commit:     lxwcd <15521168075@163.com>
 CommitDate: Sun Feb 9 21:00:08 2025 +0800  
     
     add files and modify author  
-```  
+```
     
 ### git cherry-pick 解决冲突后不修改 Author Date  
 `git cherry-pick` 如果有冲突，根据提示和 git status 查看的状态打开冲突文件解决冲突。  
@@ -1724,7 +1763,7 @@ hint: You can instead skip this commit with "git cherry-pick --skip".
 hint: To abort and get back to the state before "git cherry-pick",  
 hint: run "git cherry-pick --abort".  
 hint: Disable this message with "git config advice.mergeConflict false"  
-```  
+```
     
 ```bash  
 lx@lx MINGW64 /d/Documents/git_test04 (main2_01|CHERRY-PICKING)  
@@ -1740,7 +1779,7 @@ Unmerged paths:
         both modified:   test01.txt  
     
 no changes added to commit (use "git add" and/or "git commit -a")  
-```  
+```
     
 解决冲突后 `git add` 将文件添加到暂存区，然后 `git cherry-pick --continue` 继续执行 cherry-pick 操作，这时会打开窗口写提交日志信息，默认显示原始的日志，可以直接使用或者修改日志 message：  
 ```bash  
@@ -1767,7 +1806,7 @@ modify test01.txt , add C
 # Changes to be committed:  
 #	modified:   test01.txt  
 #  
-```  
+```
     
 完成后查看日志发现 Author Date 没有被修改，但 Commit Date 更新为当前时间：  
 ```bash  
@@ -1780,7 +1819,7 @@ Commit:     lxwcd <15521168075@163.com>
 CommitDate: Sun Feb 9 22:32:24 2025 +0800  
     
     modify test01.txt , add C  
-```  
+```
     
 ### git cherry-pick --no-commit 修改 Author date  
 如果 git cherry-pick --no-commit 则会自己提交，因此改变作者信息和时间：  
@@ -1796,14 +1835,14 @@ Commit:     lxwcd <15521168075@163.com>
 CommitDate: Sun Feb 9 20:46:40 2025 +0800  
     
     add files and modify author  
-```  
+```
     
 `git cherry-pick` 应用该提交到 main3 分支：  
 ```bash  
 lx@lx MINGW64 /d/Documents/git_test04 (main3)  
 $ git cherry-pick fix_C --no-commit  
     
-```  
+```
     
 手动提交：  
 ```cpp  
@@ -1811,7 +1850,7 @@ lx@lx MINGW64 /d/Documents/git_test04 (main3)
 $ git commit -m "cherry-pick fix_C and commit manually"  
 [main3 d228105] cherry-pick fix_C and commit manually  
  24 files changed, 390 insertions(+)  
-```  
+```
     
 查看日志发现作者时间戳和提交时间戳都更新了：  
 ```bash  
@@ -1824,7 +1863,7 @@ Commit:     lxwcd <15521168075@163.com>
 CommitDate: Sun Feb 9 21:05:30 2025 +0800  
     
     cherry-pick fix_C and commit manually  
-```  
+```
     
 ### git rebase 和 git cherry-pick 影响相同  
     
@@ -1846,14 +1885,14 @@ Commit:     lxwcd <15521168075@163.com>
 CommitDate: Sun Feb 9 20:46:40 2025 +0800  
     
     add files and modify author  
-```  
+```
     
 或者：  
 ```bash  
 lx@lx MINGW64 /d/Documents/git_test04 (fix_D)  
 $ git log --pretty=format:"%h %cn %cd" fix_C -1  
 b3e36b5 lxwcd Sun Feb 9 20:46:40 2025 +0800  
-```  
+```
     
 %cn：提交者名称（Committer Name）  
 %cd：提交者时间（Committer Date）  
@@ -1892,7 +1931,7 @@ You can think of this as a set operation. Commits reachable from any of the comm
 - **`--pretty=format:"<format>"`**：自定义输出格式。例如：  
   ```bash  
   git log --pretty=format:"%h - %an, %ar : %s"  
-  ```  
+  ```
   这个命令自定义输出格式，显示提交哈希、作者、日期和提交信息。  
 - **`--oneline`**：每个提交显示为一行，包含提交哈希和提交信息。  
 - **`--graph`**：以图形方式显示提交历史，帮助理解分支和合并关系。  
@@ -1929,18 +1968,18 @@ Commit:     lxwcd <15521168075@163.com>
 CommitDate: Sun Feb 9 22:44:33 2025 +0800  
     
     modify 2.txt, change author date  
-```  
+```
     
 ## 查看当前分支所有提交  
 ```bash  
 git log  
-```  
+```
 默认按照时间顺序，从最新的开始显示。  
       
 ## 查看特定分支的提交  
 ```bash  
 git log <branch-name>  
-```  
+```
 这个命令显示指定分支的提交历史。  
       
 ## 查看特定分支的过去某个提交  
@@ -1955,14 +1994,14 @@ b93b033 Revert "add test02.txt and test03.txt"
 dc76ad7 Revert "update test01.txt: add main"  
 16ac277 update test01.txt: add main  
 03d14ae (HEAD -> main3, origin/main, origin/HEAD, main) update main test01.txt  
-```  
+```
       
 查看 main2 分支的第 6 个父提交：  
 ```bash  
 lx@lx MINGW64 /d/Documents/git_test04 (main3)  
 $ git log --oneline main2~6 -1  
 03d14ae (HEAD -> main3, origin/main, origin/HEAD, main) update main test01.txt  
-```  
+```
       
 ## 查看特定分支的过去部分提交  
       
@@ -1976,7 +2015,7 @@ b93b033 Revert "add test02.txt and test03.txt"
 dc76ad7 Revert "update test01.txt: add main"  
 16ac277 update test01.txt: add main  
 03d14ae (HEAD -> main3, origin/main, origin/HEAD, main) update main test01.txt  
-```  
+```
       
 查看 main2 分支的第 2 个父提交和之后的 3 个提交：  
 ```bash  
@@ -1985,12 +2024,12 @@ $ git log --oneline main2~2 -3
 006fed4 Reapply "update test01.txt: add main"  
 b93b033 Revert "add test02.txt and test03.txt"  
 dc76ad7 Revert "update test01.txt: add main"  
-```  
+```
       
 ## 指定输出日志数目  
 ```bash  
 git log -3  
-```  
+```
 输出日志显示最新的 3 条  
       
 ## 查看提交差异 --patch  
@@ -2015,7 +2054,7 @@ index cd7fb11..a821b44 100644
  b  
  C  
 +001  
-```  
+```
       
 这将显示最新两个提交的详细差异，包括文件的增删改。  
 其中 a 表示该提交前的版本，b 表示该提交后的版本。  
@@ -2034,7 +2073,7 @@ Date:   Thu Jan 9 13:09:24 2025
       
  demo/test.md | 4 ++--  
  1 file changed, 2 insertions(+), 2 deletions(-)  
-```  
+```
 这将显示每个提交修改的文件列表、文件数量变化以及添加和删除的行数统计。  
       
 ## 简短 stat 信息  
@@ -2050,7 +2089,7 @@ Date:   Sun Jan 12 21:22:45 2025 +0800
     update fix_B  
       
  3 files changed, 4 insertions(+), 1 deletion(-)  
-```  
+```
       
 ## 自定义格式 --pretty  
 > [Git - Viewing the Commit History](https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History#pretty_format)  
@@ -2068,7 +2107,7 @@ Commit:     lxwcd <15521168075@163.com>
 CommitDate: Sun Feb 9 20:46:40 2025 +0800  
     
     add files and modify author  
-```  
+```
     
 ### 查看 Author Date  
 > [Git - Viewing the Commit History](https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History#pretty_format)  
@@ -2083,13 +2122,13 @@ Commit:     lxwcd <15521168075@163.com>
 CommitDate: Sun Feb 9 21:00:08 2025 +0800  
     
     add files and modify author  
-```  
+```
     
 ```bash  
 lx@lx MINGW64 /d/Documents/git_test04 (main3)  
 $ git log --pretty=format:"%h %an %ad" fix_C -1  
 b3e36b5 John Sun Feb 9 20:46:40 2025 +0800  
-```  
+```
 %h：提交的哈希值（短格式）  
 %an：作者名称（Author Name）  
 %ad：作者时间（Author Date）  
@@ -2107,14 +2146,14 @@ Commit:     lxwcd <15521168075@163.com>
 CommitDate: Sun Feb 9 20:46:40 2025 +0800  
     
     add files and modify author  
-```  
+```
     
 或者：  
 ```bash  
 lx@lx MINGW64 /d/Documents/git_test04 (fix_D)  
 $ git log --pretty=format:"%h %cn %cd" fix_C -1  
 b3e36b5 lxwcd Sun Feb 9 20:46:40 2025 +0800  
-```  
+```
     
 %cn：提交者名称（Committer Name）  
 %cd：提交者时间（Committer Date）  
@@ -2122,19 +2161,19 @@ b3e36b5 lxwcd Sun Feb 9 20:46:40 2025 +0800
 ### 哈希值 - 作者，相对日期 : message  
 ```bash  
 $ git log --pretty=format:"%h - %an, %ar : %s"  
-```  
+```
 ```bash  
 lx@lx MINGW64 /d/Documents/git_test (fix_B)  
 $ git log --pretty=format:"%h - %an, %ar : %s" -1  
 51da54a - lxwcd, 7 days ago : update fix_B  
-```  
+```
       
 ### 哈希值 - 作者，绝对日期 : message  
 ```bash  
 lx@lx MINGW64 /d/Documents/git_test (fix_B)  
 $ git log --pretty=format:"%h - %an, %ad : %s" -1  
 51da54a - lxwcd, Sun Jan 12 21:22:45 2025 +0800 : update fix_B  
-```  
+```
       
 ## ASCII 图形显示历史 --graph  
       
@@ -2151,7 +2190,7 @@ $ git log --pretty=format:"%h %s" --graph
 |/  
 * d6016bc Require time for xmlschema  
 *  11d191e Merge branch 'defunkt' into local  
-```  
+```
       
 ## 显示提交的引用信息 --decorate  
 从 Git 2.10 版本开始，`--decorate` 选项默认是开启的。  
@@ -2159,14 +2198,14 @@ $ git log --pretty=format:"%h %s" --graph
 lx@lx MINGW64 /d/Documents/git_test (fix_B)  
 $ git log --oneline -1  
 51da54a (HEAD -> fix_B) update fix_B  
-```  
+```
       
 如果希望关闭 `--decorate` 选项，可以使用 `--no-decorate`：  
 ```bash  
 lx@lx MINGW64 /d/Documents/git_test (fix_B)  
 $ git log --oneline --no-decorate -1  
 51da54a update fix_B  
-```  
+```
 这个命令会显示最近一次提交的详细信息，但不会显示指向该提交的引用名称。  
       
 假设有以下提交历史：  
@@ -2174,7 +2213,7 @@ $ git log --oneline --no-decorate -1
 A -- B -- C -- D -- E  
        \         /  
         F-------G  
-```  
+```
 执行 `git log --decorate -1`：  
 ```bash  
 commit 9aaa1c654b076de24c529ce46d3c4d95211a2871 (HEAD -> fix_B, branch01)  
@@ -2182,7 +2221,7 @@ Author: lxwcd <15521168075@163.com>
 Date:   Thu Dec 19 21:43:41 2024 +0800  
       
     fix B  
-```  
+```
       
 在这个例子中：  
 - `9aaa1c654b076de24c529ce46d3c4d95211a2871` 是当前提交的哈希值。  
@@ -2198,14 +2237,13 @@ Date:   Thu Dec 19 21:43:41 2024 +0800
       
 ```bash  
 $ git log --since="2 weeks ago"  
-```  
-    
+```
       
 ### 绝对时间  
 ```bash  
 git log --since="2024-12-01" --until="2024-12-31"  
 git log --since="2024-12-01 00:00:00" --until="2024-12-31 23:59:59"  
-```  
+```
       
 ### 相对时间  
       
@@ -2217,7 +2255,7 @@ git log --since="1 hour ago"
 git log --since="1 minute ago"  
 git log --since="2 weeks ago" --until="1 week ago"  
 git log --since="yesterday" --until="today"  
-```  
+```
     
 ### 示例  
 新建一个提交记录，修改 Author Date 使其和 Commit Date 不同  
@@ -2227,7 +2265,7 @@ $ git commit --date="5 days ago" -m "modify 2.txt, change author date"
 [fix_C 9d7b614] modify 2.txt, change author date  
  Date: Tue Feb 4 22:44:33 2025 +0800  
  1 file changed, 1 insertion(+)  
-```  
+```
     
 查看日志：  
 ```bash  
@@ -2257,7 +2295,7 @@ Commit:     lxwcd <15521168075@163.com>
 CommitDate: Sat Feb 1 21:31:08 2025 +0800  
     
     modify 2.txt  
-```  
+```
     
 筛选 Commit Date 在 2025 年 2 月 1 日之后的日志，即最新的两个日志，最新的提交 Author Date 不符合，但仍会筛选：  
 ```bash  
@@ -2278,7 +2316,7 @@ Commit:     lxwcd <15521168075@163.com>
 CommitDate: Sun Feb 9 20:46:40 2025 +0800  
     
     add files and modify author  
-```  
+```
     
 ## --author-date-order 根据 Author Date 筛选日志 (?)  
 > [Git - git-log Documentation](https://git-scm.com/docs/git-log#Documentation/git-log.txt---author-date-order)  
@@ -2303,7 +2341,7 @@ Commit:     lxwcd <15521168075@163.com>
 CommitDate: Sun Feb 9 22:44:33 2025 +0800  
     
     modify 2.txt, change author date  
-```  
+```
     
 这里没有按照 Author Date 的顺序排序？  
     
@@ -2318,7 +2356,7 @@ For example, in a commit history like this:
 ---1----2----4----7  
     \	             \  
      3----5----6----8---  
-```  
+```
     
 where the numbers denote the order of commit timestamps, git rev-list and friends with --date-order show the commits in the timestamp order: 8 7 6 5 4 3 2 1.  
     
@@ -2330,7 +2368,7 @@ With --topo-order, they would show 8 6 5 3 7 4 2 1 (or 8 7 4 2 6 5 3 1); some ol
       
 ```bash  
 $ git log --author="Scott Chacon" --grep="version"  
-```  
+```
       
 这将显示所有作者为“Scott Chacon”且提交信息中包含“version”的提交。  
       
@@ -2345,7 +2383,7 @@ $ git log --oneline  -- test02.txt
 b3852e1 (origin/branch01) local git rebase  test test02.txt  
 e67a0f3 add test02.txt and test03.txt  
 332de10 update file  
-```  
+```
       
 ## 查看特定内容的日志 -S  
 `git log -S` 选项是一个非常有用的过滤器，用于查找那些改变了指定字符串出现次数的提交。  
@@ -2361,7 +2399,7 @@ $ git log --oneline -S "function_name"
 e67a0f3 add test02.txt and test03.txt  
 332de10 update file  
 470dcf0 add files  
-```  
+```
       
 这个命令会列出所有添加或删除了 `function_name` 这个字符串的提交。  
       
@@ -2370,7 +2408,7 @@ e67a0f3 add test02.txt and test03.txt
       
 ```bash  
 git log -G"frotz\(nitfol"  
-```  
+```
       
 > While git log -G"frotz\(nitfol" will show this commit, git log -S"frotz\(nitfol" --pickaxe-regex will not (because the number of occurrences of that string did not change).  
       
@@ -2403,7 +2441,7 @@ $ git log --oneline --graph -15
 * e67a0f3 add test02.txt and test03.txt  
 * 332de10 update file  
 * 470dcf0 add files  
-```  
+```
       
 如上面 `a00fc7a` 合并提交，其 first parent 为 `03d14ae`，其 second parent 为 `099b5e`。  
       
@@ -2417,7 +2455,7 @@ $ git log --oneline --graph --first-parent -15
 * e67a0f3 add test02.txt and test03.txt  
 * 332de10 update file  
 * 470dcf0 add files  
-```  
+```
       
 ### 查看合并提交的多个父提交  
 ```bash  
@@ -2431,7 +2469,7 @@ Date:   Sun Jan 19 18:34:59 2025 +0800
     Merge branch 'fix_B'  
       
  12 files changed, 322 insertions(+)  
-```  
+```
       
 从 `Merge: 03d14ae 099b5e1` 可以看出，03d14ae 为 first parent, 099b5e1 为 second parent。  
       
@@ -2457,7 +2495,7 @@ $ git log --oneline --graph --no-merges -15
 * e67a0f3 add test02.txt and test03.txt  
 * 332de10 update file  
 * 470dcf0 add files  
-```  
+```
       
 排除合并后的提交：  
 ```bash  
@@ -2480,13 +2518,13 @@ $ git log --oneline --graph -15
 * e67a0f3 add test02.txt and test03.txt  
 * 332de10 update file  
 * 470dcf0 add files  
-```  
+```
       
 ## 查看不同分支差异  
       
 ```bash  
 $ git log foo bar ^baz  
-```  
+```
       
 上面命令查看那些可达于 foo 或 bar 分支，但不可达于 baz 的提交。即列出那些在 foo 或 bar 分支上存在，但在 baz 分支上不存在的提交。  
       
@@ -2495,16 +2533,40 @@ $ git log foo bar ^baz
 ### git log branch1..branch2  
       
 ```bash  
-$ git log origin..HEAD --oneline  
-```  
+$ git log origin/demo..HEAD --oneline  
+```
       
-HEAD 当前分支最新提交相对于 origin 分支最新提交的提交记录，即 HEAD 有但 origin 没有的提交记录  
+当前分支最新提交相对于 origin/demo 分支最新提交的差异提交记录，即 HEAD 有但 origin/demo 没有的提交记录  
       
 和下面命令功能相同：  
 ```bash  
 $ git log HEAD ^origin --oneline  
-```  
+```
       
+## 查看分支的创建时间
+origin/develop 和 origin/demo 分支分叉的时间为 origin/demo 创建时间
+
+```bash
+lx@lx MINGW64 /d/src_git/IND400_demo (demo_new)
+$ git show $(git merge-base origin/develop origin/demo) --stat
+commit 581700b08431084e2de5fc21dd3b4f69868ea687
+Author: lxwcd <15521168075@163.com>  
+Date:   Sun Jan 19 18:34:59 2025 +0800  
+      
+    Merge branch 'fix_B'  
+
+Author: Alice <.Zhu@mt.com>
+
+ 1 file changed, 17 insertions(+), 14 deletions(-)
+```
+
+## 查看最后一次打标签的时间
+```bash
+输出时间
+git log -1 --format="%ai" $(git describe --tags --abbrev=0 origin/demo 2>/dev/null) 2>/dev/null 
+git log -1 --shortstat $(git describe --tags --abbrev=0 origin/demo) 
+```
+
 # git show  
 > [Git - git-show Documentation](https://git-scm.com/docs/git-show)  
       
@@ -2521,7 +2583,7 @@ $ git log HEAD ^origin --oneline
 ## 查看当前分支最新提交的详细信息  
 ```bash  
 git show  
-```  
+```
 输出最新提交修改的文件内容  
       
 ## 查看当前分支最新提交的详细信息  
@@ -2548,7 +2610,7 @@ Date:   Sun Jan 19 18:34:59 2025 +0800
  test02.txt              |   2 +  
  test05.txt              |   1 +  
  12 files changed, 322 insertions(+)  
-```  
+```
       
 ## 查看特定提交的信息  
 ```bash  
@@ -2556,7 +2618,7 @@ lx@lx MINGW64 /d/Documents/git_test (fix_B)
 $ git log --oneline -2  
 099b5e1 (HEAD -> fix_B) update test files' '  
 51da54a update fix_B  
-```  
+```
       
 查看上面第二个提交的文件名的修改情况：  
 ```bash  
@@ -2576,7 +2638,7 @@ lx@lx MINGW64 /d/Documents/git_test (fix_B)
 $ git log --oneline -2  
 099b5e1 (HEAD -> fix_B) update test files' '  
 51da54a update fix_B  
-```  
+```
       
 ## --name-only  
 仅显示提交中涉及的文件名列表。  
@@ -2601,7 +2663,7 @@ Date:   Sun Jan 19 18:33:57 2025 +0800
 2.txt  
 git.md  
 test01.txt  
-```  
+```
 上面显示最新提价涉及的文件名。  
       
 ## --name-status  
@@ -2627,7 +2689,7 @@ A       1.patch
 A       2.txt  
 A       git.md  
 M       test01.txt  
-```  
+```
       
 ## --stat  
 显示提交的统计信息，包括每个文件的增删行数和文件状态。  
@@ -2644,6 +2706,9 @@ M       test01.txt
 ## --full-index  
 显示差异时，显示完整的索引信息。  
       
+# git describe
+> [Git - git-describe Documentation](https://git-scm.com/docs/git-describe) 
+
 # git merge-base 查找分支的共同祖先  
 > [Git - git-merge-base Documentation](https://git-scm.com/docs/git-merge-base)  
       
@@ -2716,7 +2781,7 @@ The result of git merge-base --octopus A B C is 2, because 2 is the best common 
       
 ```bash  
 git diff  
-```  
+```
 这个命令显示自上次提交以来**未暂存**的更改。  
 不包括没有被跟踪的文件。  
 如果文件已暂存，不会查看到。  
@@ -2734,7 +2799,7 @@ index cd7fb11..a821b44 100644
  b  
  C  
 +001  
-```  
+```
       
 - a 暂存区，旧版本  
 - b 工作区，最新版本，比 a 多了已修改但未暂存的内容  
@@ -2743,7 +2808,7 @@ index cd7fb11..a821b44 100644
 lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (fix_B)  
 $ ll test01.txt  
 -rw-r--r-- 1 lx 197121 56 12月 21 22:10 test01.txt  
-```  
+```
 - `@@ -4,3 +4,4 @@ local modify test01.txt`  
 a 版本的修改从第 4 行开始，共 3 行  
 b 版本的修改为第 4 行开始，共 4 行  
@@ -2752,11 +2817,11 @@ b 版本的修改为第 4 行开始，共 4 行
 ## 比较已暂存的文件和最新提交的差异  
 ```bash  
 git diff --cached  
-```  
+```
 或者  
 ```bash  
 git diff --staged  
-```  
+```
 这些命令显示已暂存的更改与上次提交的差异。  
 不会查看到没有暂存的文件差异。  
       
@@ -2788,7 +2853,7 @@ index cd7fb11..a821b44 100644
  b  
  C  
 +001  
-```  
+```
 a 表示最新的提交版本，旧版本  
 b 表示暂存区的版本，新版本，已修改且已暂存的版本  
       
@@ -2816,7 +2881,7 @@ index 8de02e1..98bbcac 100644
 \ No newline at end of file  
 +local git rebase002  
 +002  
-```  
+```
       
 工作区中跟踪的文件，已暂存和未暂存的文件和最新提交的差异都能看到。  
 a 表示最新的提交版本，旧版本  
@@ -2835,7 +2900,7 @@ index cd7fb11..a821b44 100644
  b  
  C  
 +001  
-```  
+```
       
 a 表示最新的提交版本  
 b 表示工作目录的版本  
@@ -2857,7 +2922,7 @@ index 4c19859..a821b44 100644
 +b  
 +C  
 +001  
-```  
+```
       
 a 为指定的提交版本  
 b 为当前工作目录，包括未暂存的修改，不包括未跟踪的文件  
@@ -2877,7 +2942,7 @@ index 4c19859..a821b44 100644
 +b  
 +C  
 +001  
-```  
+```
       
 a 为指定的提交版本  
 b 为当前工作目录已暂存的文件修改  
@@ -2885,7 +2950,7 @@ b 为当前工作目录已暂存的文件修改
 ## 比较两个提交  
 ```bash  
 git diff <commit1> <commit2>  
-```  
+```
 这个命令比较两个提交之间的差异。顺序不同则结果不同。  
       
 ```bash  
@@ -2902,7 +2967,7 @@ index 4c19859..cd7fb11 100644
 +A  
 +b  
 +C  
-```  
+```
       
 a 为 332de10 提交版本  
 b 为当前分支最新提交。  
@@ -2922,7 +2987,7 @@ index cd7fb11..4c19859 100644
 -A  
 -b  
 -C  
-```  
+```
       
 a 为当前分支最新提交。  
 b 为 332de10 提交版本  
@@ -2943,7 +3008,7 @@ index 5c232c3..cd7fb11 100644
 -B  
 +b  
  C  
-```  
+```
       
 a 为 HEAD^ 上一次提交版本  
 b 为 HEAD 最新提交版本  
@@ -2953,11 +3018,11 @@ b 为 HEAD 最新提交版本
       
 ```bash  
 git diff <branch1> <branch2>  
-```  
+```
 或者等价于：  
 ```bash  
 git diff <branch1>..<branch2>  
-```  
+```
       
 这个顺序则 a 为 branch1 版本，b 为 branch2。  
 查看的是两个分支的最新提交的差异。  
@@ -2965,7 +3030,7 @@ git diff <branch1>..<branch2>
 如果调换顺序，则 a 和 b 的版本也调换：  
 ```bash  
 git diff <branch2> <branch1>  
-```  
+```
 这个顺序则 a 为 branch2 版本，b 为 branch1。  
       
 ## 比较一个分支相对于另一个分支的差异  
@@ -2973,18 +3038,18 @@ git diff <branch2> <branch1>
       
 ```bash  
 git diff <branch1>...<branch2>  
-```  
+```
       
 这个命令显示从 `branch1` 和 `branch2` 的共同祖先到 `branch2` 的所有差异。  
 即从两个分支开始分叉后，branch2 上所有的提交内容相对共同祖先的差异。  
 查看差异中 a 为两个分支共同的祖先，b 为 branch2 最新提交。  
       
-注意和 ```git diff <branch1>..<branch2>``` 的区别，两个点号表示两个分支最新提交的差异。  
+注意和 ```git diff <branch1>..<branch2>```的区别，两个点号表示两个分支最新提交的差异。  
       
 ## 查看差异的文件名  
 ```bash  
 $ git diff --name-only  
-```  
+```
       
 ## 比较工作目录和 stash 中特定文件差别  
 ```bash  
@@ -3004,7 +3069,7 @@ index d494af0..86e607d 100644
  add main test01.txt  
 -stash test01.txt  
 +000 modify after stash test01  
-```  
+```
       
 a 为 stash@{0} 的版本  
 b 为当前工作目录  
@@ -3022,7 +3087,7 @@ index d494af0..9d86808 100644
  B  
  add main test01.txt  
 -stash test01.txt  
-```  
+```
       
 a 为 stash@{0}  
 b 为暂存区  
@@ -3030,7 +3095,7 @@ b 为暂存区
 ## 查看当前最新提交和 stash 的差异  
 ```bash  
 git diff stash@{0} HEAD  
-```  
+```
       
 a 为 stash@{0}  
 b 为HEAD  
@@ -3038,17 +3103,17 @@ b 为HEAD
 ## 查看两个分支某个文件的差异  
 ```bash  
 git diff <branch1> <branch2> -- <file-path>  
-```  
+```
       
 要查看两个分支中某个文件夹的差异：  
 ```bash  
 git diff <branch1> <branch2> -- <folder-path>  
-```  
+```
       
 ## 比较标签  
 ```bash  
 git diff <tag1> <tag2>  
-```  
+```
 这个命令比较两个标签之间的差异。  
       
 ## git diff --base` 比较合并冲突中的文件版本  
@@ -3060,7 +3125,7 @@ git diff <tag1> <tag2>
       
 ```bash  
 git diff --base <file>  
-```  
+```
 这条命令会显示文件 `<file>` 的基线版本与当前工作目录中的版本之间的差异。  
       
 ## git diff 导出补丁文件  
@@ -3079,7 +3144,7 @@ index cd7fb11..a821b44 100644
       
 lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (fix_B)  
 $ git diff HEAD^ HEAD -- test01.txt > ../test01.patch  
-```  
+```
 将一个仓库中的某个文件的最新修改生产补丁文件。  
       
 在另一个仓库应用该补丁文件：  
@@ -3095,7 +3160,7 @@ C
       
 lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test_02 (fix_B)  
 $ git apply ../test01.patch  
-```  
+```
       
 # git format-patch 生成补丁文件  
 > [Git - git-format-patch Documentation](https://git-scm.com/docs/git-format-patch)  
@@ -3108,7 +3173,7 @@ $ git apply ../test01.patch
 lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (fix_B)  
 $ git format-patch HEAD^  
 0001-update-fix_B.patch  
-```  
+```
       
 ## 生成最近两次提交的补丁文件  
       
@@ -3117,20 +3182,20 @@ lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (fix_B)
 $ git log --oneline -2  
 51da54a (HEAD -> fix_B) update fix_B  
 9aaa1c6 (branch01) fix B  
-```  
+```
       
 ```bash  
 lx@LAPTOP-VB238NKA MINGW64 /d/Documents/git_test (fix_B)  
 $ git format-patch HEAD^^  
 0001-fix-B.patch  
 0002-update-fix_B.patch  
-```  
+```
       
 ## 生成指定提交范围的补丁文件  
       
 ```bash  
 git format-patch <start-commit>..<end-commit>  
-```  
+```
       
 这条命令会生成从 `<start-commit>` 到 `<end-commit>` 之间的所有提交的补丁文件。  
 例如，生成从 `abc123` 到 `def456` 之间的所有提交的补丁文件：  
@@ -3143,13 +3208,13 @@ $ git format-patch --output-directory=../patch c433384cd^..910b59afe
 ../patch/0001-modify-test01.md.patch  
 ../patch/0002-modify-test02.patch  
 ../patch/0003-modify-test03.patch  
-```  
+```
       
 ## 生成某个提交以来的所有补丁文件  
       
 ```bash  
 git format-patch <commit>  
-```  
+```
       
 这条命令会生成从指定提交以来的所有提交的补丁文件，但不包括指定的提交。  
       
@@ -3157,7 +3222,7 @@ git format-patch <commit>
       
 ```bash  
 git format-patch --root <commit>  
-```  
+```
       
 这条命令会生成从仓库的根到指定提交的所有补丁文件。  
       
@@ -3167,7 +3232,7 @@ git format-patch --root <commit>
       
 ```bash  
 git format-patch --stdout <commit> > output.patch  
-```  
+```
       
 这条命令会将补丁文件输出到标准输出，并重定向到 `output.patch` 文件中。  
       
@@ -3175,7 +3240,7 @@ git format-patch --stdout <commit> > output.patch
       
 ```bash  
 git format-patch --mbox <commit>  
-```  
+```
       
 这条命令会以 mbox 格式输出补丁文件，适合通过电子邮件发送。  
       
@@ -3183,7 +3248,7 @@ git format-patch --mbox <commit>
       
 ```bash  
 git format-patch --raw <commit>  
-```  
+```
       
 这条命令会以原始格式输出补丁文件，适合向非 Git 存储库应用补丁。  
       
@@ -3191,7 +3256,7 @@ git format-patch --raw <commit>
       
 ```bash  
 git format-patch --numbered <commit>  
-```  
+```
       
 ### 使用 --subject-prefix 自定义补丁文件前缀  
       
@@ -3200,7 +3265,7 @@ git format-patch --numbered <commit>
 **命令**：  
 ```bash  
 git format-patch --subject-prefix="MY_PATCH" <commit>  
-```  
+```
       
 这条命令会生成补丁文件，文件名前缀为 `MY_PATCH`。例如，生成的文件名可能是 `0001-MY_PATCH-commit-message.patch`。  
       
@@ -3210,7 +3275,7 @@ git format-patch --subject-prefix="MY_PATCH" <commit>
       
 ```bash  
 git format-patch --subject-prefix="MY_PATCH" --output-directory=/path/to/patches --suffix=.txt HEAD^  
-```  
+```
       
 这条命令会生成从 `HEAD^` 到 `HEAD` 之间的所有提交的补丁文件，文件名前缀为 `MY_PATCH`，后缀为 `.txt`，并保存到 `/path/to/patches` 目录中。生成的文件名可能是 `0001-MY_PATCH-commit-message.txt`。  
       
@@ -3220,7 +3285,7 @@ git format-patch --subject-prefix="MY_PATCH" --output-directory=/path/to/patches
       
 ```bash  
 git format-patch --numbered-files <commit>  
-```  
+```
       
 这条命令会生成补丁文件，文件名仅为数字，例如 `0001.patch`、`0002.patch` 等。  
       
@@ -3230,7 +3295,7 @@ git format-patch --numbered-files <commit>
       
 ```bash  
 git format-patch --suffix=.txt <commit>  
-```  
+```
       
 这条命令会生成补丁文件，文件名后缀为 `.txt`，例如 `0001-commit-message.txt`。  
       
@@ -3240,7 +3305,7 @@ git format-patch --suffix=.txt <commit>
       
 ```bash  
 git apply /path/to/mypatch.patch  
-```  
+```
       
 这条命令会将 `mypatch.patch` 文件中的更改应用到当前工作目录中。  
 如果应用成功，会看到提示信息。  
@@ -3251,13 +3316,13 @@ git apply /path/to/mypatch.patch
 for patch in ../patch/*.patch; do  
     git apply "$patch"  
 done  
-```  
+```
       
 ## git am 应用补丁文件  
       
 ```bash  
 git am /path/to/mypatch.patch  
-```  
+```
       
 这条命令会将 `mypatch.patch` 文件作为新的提交应用到当前分支中。  
 如果补丁文件应用成功，Git 会自动创建一个新的提交，其中包含补丁中的更改。  
@@ -3287,7 +3352,7 @@ index e36953d..6ea0285 100644
  222  
  fix_c  
 +111  
-```  
+```
     
 下面 2.txt 的 111 内容是上面提交修改的，显示的是 Author Date，而不是 Committer Date：  
 ```bash  
@@ -3297,7 +3362,7 @@ f54dd265 (lxwcd 2025-01-19 21:13:50 +0800 1) 222
 69cf6cc1 (lxwcd 2025-02-01 21:31:08 +0800 2) fix_c  
 91b0e3c6 (Alice 2025-01-02 14:00:00 +0800 3) 111  
 0cda0f60 (lxwcd 2025-02-09 21:25:57 +0800 4) 222  
-```  
+```
     
 # git checkout  
 > [Git - git-checkout Documentation](https://git-scm.com/docs/git-checkout)  
@@ -3307,7 +3372,7 @@ f54dd265 (lxwcd 2025-01-19 21:13:50 +0800 1) 222
 ## 切换分支  
 ```bash  
 git checkout <branch-name>  
-```  
+```
       
 如果分支已存在，则切换到该分支。  
 如果分支不存在，但分支名在远程仓库存在，则创建并切换到该分支，且设置本地该分支跟踪远程对应名字的分支，相当于执行 `git checkout -b <branch-name> origin/<branch-name>`。  
@@ -3315,58 +3380,58 @@ git checkout <branch-name>
 ## 创建新分支并切换  
 ```bash  
 git checkout -b <new-branch-name>  
-```  
+```
 或者在较新版本的 Git 中：  
 ```bash  
 git switch -c <new-branch-name>  
-```  
+```
 这些命令会创建一个新的分支，并立即切换到这个分支。  
       
 ## 基于远程分支创建新分支并切换  
 ```bash  
 git checkout -b <new-branch-name> origin/<branch-name>  
-```  
+```
 这个命令会创建一个新的分支，并将其设置为跟踪远程分支 `origin/<branch-name>`。  
       
 ## 检出特定文件到工作目录  
 ```bash  
 git checkout <branch-name> -- <file-path>  
-```  
+```
 这个命令会从 `<branch-name>` 分支检出 `<file-path>` 文件到当前工作目录，替换本地的文件。  
       
 ## 检出特定提交到工作目录  
 ```bash  
 git checkout <commit-hash> -- <file-path>  
-```  
+```
 这个命令会从 `<commit-hash>` 提交检出 `<file-path>` 文件到当前工作目录。  
       
 ## 检出特定提交到新分支  
 ```bash  
 git checkout <commit-hash> -b <new-branch-name>  
-```  
+```
 这个命令会创建一个新的分支 `<new-branch-name>` 并检出 `<commit-hash>` 提交的内容到这个新分支。  
       
 ## 恢复已修改但未暂存的文件  
 ```bash  
 git checkout -- <file-path>  
-```  
+```
 这个命令会将 `<file-path>` 文件恢复到最近一次提交的状态，放弃本地的修改。  
 检出最新提交的相应文件替换当前工作目录的文件。  
       
 ## 恢复已暂存的文件  
 ```bash  
 git restore --staged -- <file-path>  
-```  
+```
 或者：  
 ```bash  
 git checkout -- <file-path>  
-```  
+```
 这些命令会将 `<file-path>` 文件从暂存区取消暂存，恢复到工作目录的状态。  
       
 ## 检出标签对应的版本  
 ```bash  
 git checkout <tag-name>  
-```  
+```
 这个命令会检出包含 `<tag-name>` 标签的提交，通常用于检出某个特定的发布版本。  
       
 ## 有冲突时指定使用版本  
@@ -3385,7 +3450,7 @@ From https://github.com/lxwcd/git_test
 Auto-merging 2.txt  
 CONFLICT (content): Merge conflict in 2.txt  
 Automatic merge failed; fix conflicts and then commit the result.  
-```  
+```
       
 查看当前工作目录的状态，可以看见有个文件处于冲突中，待解决：  
 ```bash  
@@ -3406,7 +3471,7 @@ Unmerged paths:
       
 no changes added to commit (use "git add" and/or "git commit -a")  
       
-```  
+```
       
 查看冲突文件的内容：  
 ```bash  
@@ -3417,7 +3482,7 @@ $ cat 2.txt
 =======  
 222  
 >>>>>>> f54dd265ddebde6a06e2ea619a0588d2b1555945  
-```  
+```
       
 `<<<<<<< HEAD` 表示下方表示当前版本  
 `=======` 表示分隔符，下方内容为冲突版本的内容  
@@ -3432,7 +3497,7 @@ Updated 1 path from the index
 lx@lx MINGW64 /d/Documents/git_test03 (fix_B|MERGING)  
 $ cat 2.txt  
 222  
-```  
+```
       
 ### 使用本地版本  
 ```bash  
@@ -3443,26 +3508,26 @@ Updated 1 path from the index
 lx@lx MINGW64 /d/Documents/git_test03 (fix_B|MERGING)  
 $ cat 2.txt  
 22  
-```  
+```
       
 ### 添加到暂存区  
 选择版本后，将这些文件添加到暂存区：  
       
 ```bash  
 git add <file-path>  
-```  
+```
       
 ### 继续合并  
 如果你已经解决了所有文件的冲突，你可以继续完成合并操作：  
       
 ```bash  
 git commit -m "message"  
-```  
+```
       
 或者  
 ```bash  
 git merge --continue  
-```  
+```
       
 # git checkout 和 git cherry-pick  
 `git checkout <commit-hash> -- <file-path>` 命令和 `git cherry-pick` 命令都可以用来将更改应用到当前分支，但它们的目的和行为有所不同。  
@@ -3482,54 +3547,54 @@ git merge --continue
 ## 创建分支  
 ```bash  
 git branch <branch-name>  
-```  
+```
 这个命令会创建一个新分支，但不会切换到该分支。  
       
 ## 创建并切换分支  
 ```bash  
 git checkout -b <branch-name>  
-```  
+```
 或者在某些 Git 版本中：  
 ```bash  
 git switch -c <branch-name>  
-```  
+```
 这些命令会创建一个新分支并立即切换到该分支。  
       
 ## 列出所有本地分支  
 ```bash  
 git branch  
-```  
+```
 这个命令会列出所有的本地分支。  
       
 ## 列出所有远程分支  
 ```bash  
 git branch -r  
-```  
+```
 这个命令会列出所有的远程分支。  
       
 ## 列出所有本地和远程分支  
 ```bash  
 git branch -a  
-```  
+```
 这个命令会列出所有的本地分支和远程分支。  
       
 ## 显示当前分支  
 ```bash  
 git branch --show-current  
-```  
+```
 或者使用 `git rev-parse --abbrev-ref HEAD`。  
 这个命令会显示当前检出的分支名称。  
       
 ## 删除分支  
 ```bash  
 git branch -d <branch-name>  
-```  
+```
 这个命令会删除一个已经完全合并到当前分支的本地分支。如果分支未完全合并，Git 会阻止删除以防止数据丢失。  
       
 ## 强制删除分支  
 ```bash  
 git branch -D <branch-name>  
-```  
+```
 这个命令会强制删除一个分支，无论它是否已经合并。  
       
 ## 重命名分支  
@@ -3543,7 +3608,7 @@ git branch -D <branch-name>
       
 ```bash  
 git branch -m <old-name> <new-name>  
-```  
+```
 这个命令会将分支 `<old-name>` 重命名为 `<new-name>`。  
       
 ### git branch -M  
@@ -3556,7 +3621,7 @@ git branch -m <old-name> <new-name>
 ## 设置上游分支  
 ```bash  
 git branch -u <remote-branch>  
-```  
+```
 或者使用 `git branch --set-upstream-to <remote-branch>`。  
 这个命令会设置当前分支跟踪指定的远程分支。  
       
@@ -3570,7 +3635,7 @@ $ git branch -vv
 * fix_B     f54dd26 [origin/fix_B] update 2.txt 222  
   main      a00fc7a [origin/main: ahead 10] Merge branch 'fix_B'  
   tb01      f9e71d6 [origin/tb01] Update test01.txt  
-```  
+```
       
 - 显示所有分支及其上游信息  
 - `*` 表示当前分支的对应关系  
@@ -3581,7 +3646,7 @@ $ git branch -vv
 lx@lx MINGW64 /d/Documents/git_test (fix_B)  
 $ git branch -vv | grep "*"  
 * fix_B     f54dd26 [origin/fix_B] update 2.txt 222  
-```  
+```
       
 ## 包含已合并/未合并信息  
       
@@ -3602,7 +3667,7 @@ $ git branch --no-merged
   branch01  
   fix_B  
   tb01  
-```  
+```
       
 将 `branch01` 分支合并到 `main` 分支后查看：  
 ```bash  
@@ -3610,19 +3675,19 @@ lx@lx MINGW64 /d/Documents/git_test03 (main)
 $ git branch --merged  
   branch01  
 * main  
-```  
+```
       
 ## 删除远程跟踪分支  
 ```bash  
 git branch -dr <remote/branch>  
-```  
+```
 这条命令会删除本地的远程跟踪分支。但并不会直接删除远程仓库中的分支，只是删除了本地对远程分支的跟踪信息。  
       
 ## 删除本地分支的上游分支设置  
       
 ```bash  
 git branch --unset-upstream my-branch  
-```  
+```
       
 # git switch  
 `git switch` 是 Git 2.23 版本引入的命令，用于切换分支。这个命令的作用与 `git checkout` 类似，但提供了更清晰的语义和错误检查。  
@@ -3632,21 +3697,21 @@ git branch --unset-upstream my-branch
 ## 切换到已存在的分支  
 ```bash  
 git switch <branch-name>  
-```  
+```
       
 ## 创建并切换新分支  
     
 ### 依据当前分支创建新分支  
 ```bash  
 git switch -c <new-branch-name>  
-```  
+```
     
 新分支和当前分支一摸一样  
     
 ### 依据其他分支创建新分支  
 ```bash  
 git switch -c <新分支名> <来源分支名>  
-```  
+```
     
 ```bash  
 lx@lx MINGW64 /d/Documents/git_test04 (fix_C)  
@@ -3665,14 +3730,14 @@ $ git branch -vv
   main2    3b671ba [origin/main: ahead 9, behind 19] modify test01.txt , add C  
   main2_01 f537c63 modify test01.txt , add C  
   main3    d228105 [origin/main: ahead 6, behind 19] cherry-pick fix_C and commit manually  
-```  
+```
       
 和 `git checkout -b <new-branch> <existing-branch>` 相同功能。  
     
 ## 强制创建新分支  
 ```bash  
 git switch -C <new-branch>  
-```  
+```
       
 如果 `<new-branch>` 已经存在，它将被重置为 `<start-point>`。  
 这相当于先执行 `git branch -f <new-branch>` 然后执行 `git switch <new-branch>`。  
@@ -3682,23 +3747,23 @@ git switch -C <new-branch>
       
 ```bash  
 git switch --track origin/feature  
-```  
+```
 或者使用 `-t` 选项：  
 ```bash  
 git switch -t origin/feature  
-```  
+```
 创建一个新的本地 `feature` 分支，并立即设置它跟踪远程的 `origin/feature` 分支。  
       
 也可以使用下面方法：  
 ```bash  
 git checkout -b feature origin/feature  
-```  
+```
       
 ## 使用 `-d` 或 `--detach` 参数切换到一个提交  
       
 ```bash  
 git switch -d <commit-hash>  
-```  
+```
       
 分离的HEAD 允许你直接切换到任何提交，而不需要创建一个分支。切换后所做的修改，提交，甚至 push 到远程都不会影响其他分支。  
 切换到其他分支后拉取远程仓库的最新代码，之前分离 HEAD 后 Push 的内容看不到提交记录。  
@@ -3706,24 +3771,24 @@ git switch -d <commit-hash>
 ## 快速切换回前一个分支  
 ```bash  
 git switch -  
-```  
+```
       
 ## 从远程分支创建同名的本地分支并关联远程分支  
 ```bash  
 git switch testmaster  
-```  
+```
 这会拉取远程分支到本地，并建立远程分支和本地分支的关联关系。  
       
 ## 创建孤儿分支  
 ```bash  
 git switch --orphan <new-branch>  
-```  
+```
 这会创建一个新的孤儿分支，并删除所有跟踪的文件。  
       
 ## 使用 `--recurse-submodules` 更新所有初始化的子模块  
 ```bash  
 git switch --recurse-submodules <branch>  
-```  
+```
 这会根据超级项目中记录的提交更新所有活动子模块的内容。  
       
 # git add  
@@ -3753,23 +3818,23 @@ git switch --recurse-submodules <branch>
 ## 暂存文件  
 ```bash  
 git add <file1> <file2> ...  
-```  
+```
 这个命令将多个文件的更改添加到暂存区。  
       
 ## 暂存所有更改  
 ```bash  
 git add .  
-```  
+```
 或者  
 ```bash  
 git add --all  
-```  
+```
 这些命令将所有更改（包括新文件和修改的文件）添加到暂存区。  
       
 ## 使用通配符  
 ```bash  
 git add *.cpp *.h  
-```  
+```
       
 ## 交互式暂存  
       
@@ -3785,7 +3850,7 @@ git add *.cpp *.h
 lx@lx MINGW64 /d/Documents/git_test03 (main)  
 $ git add . --dry-run  
 add 'test03.txt'  
-```  
+```
       
 # git commit  
 > [Git - git-commit Documentation](https://git-scm.com/docs/git-commit)  
@@ -3807,13 +3872,13 @@ add 'test03.txt'
 ## 指定提交信息 -m  
 ```bash  
 git commit -m "Commit message"  
-```  
+```
 使用 `-m` 选项可以直接在命令行中指定提交信息。  
       
 ## 提交所有更改 -am  
 ```bash  
 git commit -a -m  
-```  
+```
 使用 `-a` 选项会自动将所有已跟踪文件的更改添加到暂存区并提交，但不包括新文件。  
       
 ## 修改最后一次提交 --amend  
@@ -3825,7 +3890,7 @@ git commit -a -m
 - 如果修改提交内容后不更新提交日志，可以加 `--no-edit` 选项。  
 ```bash  
 git commit --amend --no-edit  
-```  
+```
     
 ### 不修改 Author Date 但更新 Commit Date  
     
@@ -3837,7 +3902,7 @@ $ git commit --author="Bob <Bob@163.com>" --date="3 hours ago" -m "modify test01
  Author: Bob <Bob@163.com>  
  Date: Sun Feb 9 18:58:12 2025 +0800  
  1 file changed, 1 insertion(+)  
-```  
+```
     
 ```bash  
 lx@lx MINGW64 /d/Documents/git_test04 (main2)  
@@ -3849,7 +3914,7 @@ Commit:     lxwcd <15521168075@163.com>
 CommitDate: Sun Feb 9 21:58:12 2025 +0800  
     
     modify test01.txt, add 22  
-```  
+```
     
 修改提交记录：  
 ```bash  
@@ -3859,7 +3924,7 @@ $ git commit --amend --no-edit
  Author: Bob <Bob@163.com>  
  Date: Sun Feb 9 18:58:12 2025 +0800  
  1 file changed, 2 insertions(+)  
-```  
+```
     
 查看日志发现作者日期没变，但提交日期变了。  
 ```bash  
@@ -3872,7 +3937,7 @@ Commit:     lxwcd <15521168075@163.com>
 CommitDate: Sun Feb 9 22:01:53 2025 +0800  
     
     modify test01.txt, add 22  
-```  
+```
     
 ### --reset-author 重置作者信息  
     
@@ -3887,7 +3952,7 @@ Commit:     lxwcd <15521168075@163.com>
 CommitDate: Sun Feb 9 21:58:12 2025 +0800  
     
     modify test01.txt, add 22  
-```  
+```
     
 修改提交记录，且重置作者信息：  
 ```bash  
@@ -3902,7 +3967,7 @@ lx@lx MINGW64 /d/Documents/git_test04 (main2_01)
 $ git commit --amend --reset-author --no-edit  
 [main2_01 d4d8db7] modify test01.txt, add 22  
  1 file changed, 2 insertions(+)  
-```  
+```
     
 查看日志发现作者重置为当前用户，作者日期更新为当前日期，提交日期也更新了。  
 ```bash  
@@ -3915,7 +3980,7 @@ Commit:     lxwcd <15521168075@163.com>
 CommitDate: Sun Feb 9 22:07:46 2025 +0800  
     
     modify test01.txt, add 22  
-```  
+```
       
 ### 注意事项  
 - **重写历史**：  
@@ -3928,7 +3993,7 @@ CommitDate: Sun Feb 9 22:07:46 2025 +0800
 ## 从文件读取提交日志 -F  
 ```bash  
 git commit -F commit_msg.txt  
-```  
+```
     
 ## 输入多行提交日志  
 可以直接 git commit，这样会进入一个输入界面，输入多行提交日志。  
@@ -3941,7 +4006,7 @@ $ git commit -F - <<EOF
 > EOF  
 [feature c433384cd] modify test.md  
  1 file changed, 1 insertion(+), 1 deletion(-)  
-```  
+```
       
 - `-F`：这个选项用于指定提交信息的来源。通常 `-F` 后面跟一个文件名，表示从文件中读取提交信息。  
 - `-`：在这里，`-` 表示从标准输入（stdin）读取提交信息。这意味着提交信息将从命令行中直接输入，而不是从文件中读取。  
@@ -3952,7 +4017,7 @@ $ git commit -F - <<EOF
 在提交时指定一个不同于当前 Git 配置的作者信息时，可以使用 `--author` 参数。 例如代表别人提交代码时。  
 ```bash  
 --author="<name> <email>"  
-```  
+```
     
 ```bash  
 lx@lx MINGW64 /d/Documents/git_test04 (fix_C)  
@@ -3960,7 +4025,7 @@ $ git commit --author="John <John@163.com>" -m "add files and modify author"
 [fix_C b3e36b5] add files and modify author  
  Author: John <John@163.com>  
  24 files changed, 390 insertions(+)  
-```  
+```
     
 查看日志，提交者信息不变：  
 ```bash  
@@ -3973,7 +4038,7 @@ Commit:     lxwcd <15521168075@163.com>
 CommitDate: Sun Feb 9 20:46:40 2025 +0800  
     
     add files and modify author  
-```  
+```
     
 作者时间（Author Date） 和 提交者时间（Committer Date） 都是当前时间。  
 作者信息（Author Name 和 Author Email） 是你指定的 John Doe <john.doe@example.com>。  
@@ -3985,7 +4050,7 @@ CommitDate: Sun Feb 9 20:46:40 2025 +0800
 lx@lx MINGW64 /d/Documents/git_test04 (fix_D)  
 $ date  
 2025年02月 9日 21:17:02  
-```  
+```
     
 ```bash  
 lx@lx MINGW64 /d/Documents/git_test04 (fix_D)  
@@ -3994,7 +4059,7 @@ $ git commit --date="2025-01-02 14:00:00" -m "Fix bug" --author="Alice <ALice@16
  Author: Alice <ALice@163.com>  
  Date: Thu Jan 2 14:00:00 2025 +0800  
  1 file changed, 1 insertion(+)  
-```  
+```
     
 查看日志，Author Date 被修改为指定时间，但 commit date 为当前时间。  
 ```bash  
@@ -4007,7 +4072,7 @@ Commit:     lxwcd <15521168075@163.com>
 CommitDate: Sun Feb 9 21:17:51 2025 +0800  
     
     Fix bug  
-```  
+```
     
 ## --reset-author 重置提交作者信息  
 > When used with -C/-c/--amend options, or when committing after a conflicting cherry-pick, declare that the authorship of the resulting commit now belongs to the committer. This also renews the author timestamp.  
@@ -4060,17 +4125,17 @@ CommitDate: Sun Feb 9 21:17:51 2025 +0800
 ## 删除单个文件  
 ```bash  
 git rm <file>  
-```  
+```
       
 ## 删除多个文件  
 ```bash  
 git rm <file1> <file2> ...  
-```  
+```
       
 ## 删除目录  
 ```bash  
 git rm -r <directory>  
-```  
+```
 使用 `-r` 选项可以递归地删除目录及其内容。  
       
 ## git rm --cached 保留文件到工作目录  
@@ -4080,7 +4145,7 @@ git rm -r <directory>
 删除全部已暂存的文件以及目录，但保留工作区：  
 ```bash  
 git rm -rf --cached .  
-```  
+```
       
 ### 用途  
 - 不想跟踪特定的文件或文件夹，例如大型数据文件、自动生成的文件或者敏感信息。  
@@ -4110,19 +4175,19 @@ git rm -rf --cached .
 ## 重命名文件  
 ```bash  
 git mv <old-name> <new-name>  
-```  
+```
 这个命令将 `<old-name>` 文件重命名为 `<new-name>`。  
       
 ## 移动文件  
 ```bash  
 git mv <file> <directory>  
-```  
+```
 这个命令将 `<file>` 移动到 `<directory>` 目录中。  
       
 ## 移动目录  
 ```bash  
 git mv <old-directory> <new-directory>  
-```  
+```
 这个命令将 `<old-directory>` 目录重命名为 `<new-directory>`。  
       
 # git reflog  
@@ -4144,7 +4209,7 @@ fc003e8 (HEAD -> main) HEAD@{0}: commit: rename 1.txt to 11.txt:wq
 e43f274 HEAD@{1}: checkout: moving from orb to main  
 f9e71d6 (origin/tb01, tb01) HEAD@{2}: checkout: moving from main to tb01  
 e43f274 HEAD@{3}: checkout: moving from 0676fcbfe8e0b54b47d8bf168d440febb5abe0b8 to main  
-```  
+```
       
 这里 `HEAD@{n}` 表示 HEAD 在过去第 n 次操作时的位置。  
       
@@ -4153,38 +4218,38 @@ e43f274 HEAD@{3}: checkout: moving from 0676fcbfe8e0b54b47d8bf168d440febb5abe0b8
       
 ```bash  
 git reflog show <ref>  
-```  
+```
       
 ## list  
 列出所有有对应 reflog 的引用。  
 ```bash  
 git reflog list  
-```  
+```
       
 ## expire  
 修剪旧的 reflog 条目，可以指定时间来删除过时的日志条目。  
 ```bash  
 git reflog expire [--expire=<time>] [--expire-unreachable=<time>] [--all]  
-```  
+```
       
 ## delete  
 删除单个 reflog 条目，需要指定确切的条目。  
       
 ```bash  
 git reflog delete <ref>@{<specifier>}  
-```  
+```
       
 ## exists  
 检查某个引用是否有 reflog。  
 ```bash  
 git reflog exists <ref>  
-```  
+```
       
 ## 基于时间的引用  
 `git reflog` 支持基于时间的引用，例如 `HEAD@{1.day.ago}` 表示 HEAD 在一天前的位置。  
 ```bash  
 git diff main@{0} main@{1.day.ago}  
-```  
+```
 这个命令比较了 `main` 分支当前状态和一天前的状态。  
       
       
@@ -4209,12 +4274,12 @@ git diff main@{0} main@{1.day.ago}
 撤销最新的提交：  
 ```bash  
 git reset --soft HEAD^  
-```  
+```
       
 撤销最近的三次提交：  
 ```bash  
 git reset --soft HEAD~3  
-```  
+```
       
 ### 使用场景  
       
@@ -4259,7 +4324,7 @@ lx@lx MINGW64 /d/Documents/git_test03 (main)
 $ git log --oneline -2  
 e43f274 (HEAD -> main) Merge branch 'branch01'  
 03d14ae (origin/main, origin/HEAD) update main test01.txt  
-```  
+```
       
 #### 使用 `git reflog`  
       
@@ -4271,7 +4336,7 @@ $ git log --oneline -3
 36c7d37 (HEAD -> main) update new  
 e43f274 Merge branch 'branch01'  
 03d14ae (origin/main, origin/HEAD) update main test01.txt  
-```  
+```
       
 ```bash  
 lx@lx MINGW64 /d/Documents/git_test03 (main)  
@@ -4280,7 +4345,7 @@ $ git reflog -4
 e43f274 HEAD@{1}: reset: moving to HEAD^  
 5e51d74 HEAD@{2}: commit: update  
 e43f274 HEAD@{3}: reset: moving to HEAD^  
-```  
+```
       
 可以看见在 `5e51d74` 提交后，进行 reset，因此 HEAD 又变成 `e43f274`，然后又继续有新的提交。  
       
@@ -4291,7 +4356,7 @@ e43f274 HEAD@{3}: reset: moving to HEAD^
 ```bash  
 lx@lx MINGW64 /d/Documents/git_test03 (main)  
 $ git restore --staged .  
-```  
+```
       
 ## 撤销未暂存的修改 git restore  
       
@@ -4299,7 +4364,7 @@ $ git restore --staged .
 ```bash  
 lx@lx MINGW64 /d/Documents/git_test03 (main)  
 $ git restore .  
-```  
+```
       
 ## 撤销未暂存的修改 git restore  
       
@@ -4319,12 +4384,12 @@ Changes not staged for commit:
   (use "git add <file>..." to update what will be committed)  
   (use "git restore <file>..." to discard changes in working directory)  
         modified:   test03.txt  
-```  
+```
       
 ```bash  
 lx@lx MINGW64 /d/Documents/git_test03 (main)  
 $ git restore .  
-```  
+```
       
 ```bash  
 lx@lx MINGW64 /d/Documents/git_test03 (main)  
@@ -4336,14 +4401,14 @@ Your branch is ahead of 'origin/main' by 5 commits.
 Changes to be committed:  
   (use "git restore --staged <file>..." to unstage)  
         modified:   test02.txt  
-```  
+```
       
 ## 撤销工作目录全部修改 git reset  
       
 让工作目录和 HEAD 一致  
 ```bash  
 git reset --hard HEAD  
-```  
+```
       
 ## Reset a single file in the index  
 > [Git - git-reset Documentation](https://git-scm.com/docs/git-reset#Documentation/git-reset.txt-Resetasinglefileintheindex)  
@@ -4365,12 +4430,12 @@ $ git log --oneline -3
 36c7d37 (HEAD -> main) update new  
 e43f274 Merge branch 'branch01'  
 03d14ae (origin/main, origin/HEAD) update main test01.txt  
-```  
+```
       
 撤销最新一次提交  
 ```bash  
 git revert HEAD  
-```  
+```
       
 查看历史记录，发现过去的历史没有改变，只是新增了撤销的记录：  
 ```bash  
@@ -4379,7 +4444,7 @@ $ git log --oneline -3
 fabbb86 (HEAD -> main) Revert "update new"  
 36c7d37 update new  
 e43f274 Merge branch 'branch01'  
-```  
+```
       
 撤销后可以用 `git push` 推送到远程仓库。  
       
@@ -4388,7 +4453,7 @@ e43f274 Merge branch 'branch01'
       
 ```bash  
 git restore [<options>] [--source=<tree>] [--staged] [--worktree] [--] <pathspec>…  
-```  
+```
       
 1. **恢复工作目录文件**：`git restore` 用于将工作目录中的文件恢复到某个特定的状态。这可以是从 `HEAD`、索引（暂存区）或其他指定的源。  
 2. **恢复索引内容**：使用 `--staged` 选项可以恢复索引（暂存区）的内容。  
@@ -4416,25 +4481,25 @@ git restore [<options>] [--source=<tree>] [--staged] [--worktree] [--] <pathspec
 已暂存的文件，希望取消暂存，但保持文件在工作目录中不变：  
 ```bash  
 git restore --staged hello.c  
-```  
+```
       
 ## 恢复暂存区的全部文件  
       
 ```bash  
 git restore --staged .  
-```  
+```
       
 ## 恢复暂存区的部分文件  
       
 ```bash  
 git restore --staged *.cpp  
-```  
+```
       
 ## 恢复暂存区和工作目录的全部已跟踪的文件  
       
 ```bash  
 $ git restore --source=HEAD --staged --worktree .  
-```  
+```
       
 不会修改未跟踪的文件  
       
@@ -4442,7 +4507,7 @@ $ git restore --source=HEAD --staged --worktree .
       
 ```bash  
 $ git restore --source=origin/main~2 test01.txt  
-```  
+```
 将指定文件恢复到 `origin/main` 分支的当前提交的前 2 个提交的版本，且恢复的是工作目录，不影响暂存区。  
       
 # git revert  
@@ -4482,7 +4547,7 @@ $ git restore --source=origin/main~2 test01.txt
 ## 撤销最新的提交  
 ```bash  
 git revert HEAD  
-```  
+```
       
 ## 撤销特定的提交  
       
@@ -4494,7 +4559,7 @@ dc76ad7 (HEAD -> main2) Revert "update test01.txt: add main"
 03d14ae (origin/main, origin/HEAD, main) update main test01.txt  
 737c5b7 commit B  
 e67a0f3 add test02.txt and test03.txt  
-```  
+```
       
 如撤销上面最后一个提交，执行以下命令：  
 ```bash  
@@ -4508,7 +4573,7 @@ $ git log --oneline -5 | tail -n1 | cut -d" " -f1 | xargs git revert
  Date: Mon Jan 20 20:50:14 2025 +0800  
  2 files changed, 1 insertion(+), 2 deletions(-)  
  delete mode 100644 test03.txt  
-```  
+```
       
 撤销后查看日志，多了一个撤销的记录：  
 ```bash  
@@ -4521,7 +4586,7 @@ dc76ad7 Revert "update test01.txt: add main"
 737c5b7 commit B  
 e67a0f3 add test02.txt and test03.txt  
 332de10 update file  
-```  
+```
       
 ## 撤销一系列提交  
 - `git revert <commit>^..<commit>`：撤销从第一个提交到第二个提交之间的所有提交。  
@@ -4530,12 +4595,12 @@ e67a0f3 add test02.txt and test03.txt
 ## 撤销操作但不创建提交  
 ```bash  
 git revert --no-commit abc123  
-```  
+```
       
 ## 撤销操作并编辑提交信息：  
 ```bash  
 git revert --edit abc123  
-```  
+```
       
 # git apply  
       
@@ -4543,7 +4608,7 @@ git revert --edit abc123
       
 ```bash  
 git apply <patch-file>  
-```  
+```
       
 其中 `<patch-file>` 是补丁文件的路径。执行此命令后，Git 会根据补丁文件的内容对当前工作目录中的文件进行修改。  
       
@@ -4564,20 +4629,20 @@ git apply <patch-file>
       
 ```bash  
 git apply patchfile.diff  
-```  
+```
 这会将 `patchfile.diff` 中的差异应用到当前工作目录中的对应文件。  
       
 ## 检查补丁是否可应用  
 ```bash  
 git apply --check patchfile.diff  
-```  
+```
 这会检查 `patchfile.diff` 是否可以成功应用到当前工作目录中的文件，但不会实际应用补丁。  
       
 ## 应用补丁并添加到索引  
       
 ```bash  
 git apply --index patchfile.diff  
-```  
+```
 这会将补丁应用到索引中，而不仅仅是工作目录中的文件。  
       
 # git stash  
@@ -4612,7 +4677,7 @@ stash@{0}: modify test.md
 stash@{1}: modify 1.md  
 stash@{2}: modify 2.md  
 stash@{3}: modify 3.md  
-```  
+```
       
 ## git stash push 保存工作状态  
 git stash 和 git stash push 效果相同。  
@@ -4625,13 +4690,13 @@ git stash 和 git stash push 效果相同。
       
 ```bash  
 git stash push -m "WIP: Implement login feature"  
-```  
+```
       
 ### `-p` 或 `--patch` 交互存储  
       
 ```bash  
 git stash push -p  
-```  
+```
       
 ### `-k` 或 `--keep-index` 保留暂存区的更改  
       
@@ -4639,7 +4704,7 @@ git stash push -p
       
 ```bash  
 git stash push -k  
-```  
+```
       
 ### `-u` 或 `--include-untracked` 包含未跟踪的文件  
 默认情况下，`git stash push` 只会保存已被追踪的文件的更改。  
@@ -4649,13 +4714,13 @@ git stash push -k
       
 ```bash  
 git stash push -a  
-```  
+```
       
 ### `-q` 或 `--quiet` 静默执行  
       
 ```bash  
 git stash push -q  
-```  
+```
 使用这个选项后，命令执行时不会输出任何信息。  
       
 ### `--pathspec-from-file=<file>` 从文件读取  
@@ -4663,20 +4728,20 @@ git stash push -q
       
 ```bash  
 git stash push --pathspec-from-file=pathspecs.txt  
-```  
+```
       
 ### `--`  
 这个选项用于消除歧义，将路径规范与选项分开。  
       
 ```bash  
 git stash push -- path/to/file  
-```  
+```
 使用这个选项后，`path/to/file` 会被视为路径规范，而不是选项。  
       
 ## git stash save  
 ```bash  
 git stash save "optional message"  
-```  
+```
 这个命令会保存当前的工作状态到一个 stash 中，并清理工作目录。如果省略 `"optional message"`，Git 会自动生成一个消息。  
 不会保存未被跟踪的文件。  
       
@@ -4684,40 +4749,40 @@ git stash save "optional message"
       
 ```bash  
 git diff HEAD --name-only | grep -E "*/demo/*" | xargs git stash push -m "stash demo files" --  
-```  
+```
 或：  
 ```bash  
 git status --porcelain | cut -d" " -f3- | grep -E "*/demo/*" | xargs git stash push -m "stash demo files" --  
-```  
+```
       
 ## git stash list 列出所有 stash  
 ```bash  
 git stash list  
-```  
+```
 这个命令会列出所有的 stash，每个 stash 前面都有一个标识符，如 `stash@{0}`。  
       
 ## git stash apply 应用 stash  
 ```bash  
 git stash apply  
-```  
+```
 这个命令会应用最近的 stash 到当前工作目录。  
       
 也可以指定一个 stash 来应用：  
 ```bash  
 git stash apply stash@{n}  
-```  
+```
 其中 `n` 是 stash 的索引号，最新的 stash 编号为 0，编号最大的为最先 stash 的内容。  
       
 ## git stash drop 删除 stash  
 ```bash  
 git stash drop stash@{n}  
-```  
+```
 这个命令会删除指定的 stash。  
       
 ## git stash pop 应用 stash 并删除  
 ```bash  
 git stash pop  
-```  
+```
 这个命令会应用最近的 stash 并从 stash 列表中删除它。  
       
 ## git stash show 预览 stash 内容  
@@ -4728,7 +4793,7 @@ $ git stash show stash@{0}
  test01.txt | 31 +++----------------------------  
  test03.txt |  1 +  
  3 files changed, 4 insertions(+), 29 deletions(-)  
-```  
+```
       
 ## 仅查看 stash 中文件名  
 ```bash  
@@ -4737,7 +4802,7 @@ $ git stash show stash@{0} --name-only
 2.txt  
 test01.txt  
 test03.txt  
-```  
+```
       
 ## 比较 stash 与当前工作目录差异  
 ```bash  
@@ -4758,7 +4823,7 @@ index c200906..91bc947 100644
  222  
 +22  
 +2  
-```  
+```
       
 - a 版本为工作目录版本  
 - b 版本为 stash 中的版本  
@@ -4770,7 +4835,7 @@ index c200906..91bc947 100644
 lx@lx MINGW64 /d/Documents/git_test03 (test)  
 $ cat 2.txt  
 222  
-```  
+```
       
 应用 `stash@{1}` 中的 2.txt 版本：  
 ```bash  
@@ -4782,21 +4847,21 @@ $ cat 2.txt
 222  
 22  
 2  
-```  
+```
       
 ### 强制覆盖  
 ```bash  
 git checkout --force stash@{0} -- <file-path>  
-```  
+```
 或者：  
 ```bash  
 git checkout -f stash@{0} -- <file-path>  
-```  
+```
       
 ## git stash clear 删除全部 stash 记录  
 ```bash  
 git stash clear  
-```  
+```
       
 ## 找回被删除的 stash 记录  
 > [How to undo git stash clear](https://stackoverflow.com/a/57095939/24889953)  
@@ -4812,7 +4877,7 @@ Checking objects: 100% (33/33), done.
 c66245f On fix_B: test  
 c78d607 WIP on fix_B: c188c3c Merge branch 'fix_B' of https://github.com/lxwcd/git_test into fix_B  
 d0bd729 WIP on fix_B: c188c3c Merge branch 'fix_B' of https://github.com/lxwcd/git_test into fix_B  
-```  
+```
       
 根据日志的输出的 message 找到被删除的 stash，即 `9964b1`。  
       
@@ -4824,7 +4889,7 @@ $ git update-ref --create-reflog refs/stash 99641b1 -m "restore stash : stash te
 lx@lx MINGW64 /d/Documents/git_test03 (test)  
 $ git stash list  
 stash@{0}: restore stash : stash test  
-```  
+```
       
 # git fetch  
 > [Git - git-fetch Documentation](https://git-scm.com/docs/git-fetch)  
@@ -4845,19 +4910,19 @@ stash@{0}: restore stash : stash test
 ## 获取远程仓库的所有分支的最新状态  
 ```bash  
 git fetch origin  
-```  
+```
       
 ## 获取特定远程分支的最新状态  
 ```bash  
 git fetch origin develop  
-```  
+```
 这个命令只会获取 `origin` 远程仓库的 `develop` 分支的最新状态。  
       
 ## 获取远程特定分支并映射到本地分支  
       
 ```bash  
 git fetch origin src:dst  
-```  
+```
       
 - src 为源端，即远程分支  
 - dst 为目的端，即本地分支  
@@ -4866,12 +4931,12 @@ git fetch origin src:dst
 lx@lx MINGW64 /d/Documents/git_test03 (test)  
 $ git fetch origin fix_B:test  
 fatal: refusing to fetch into branch 'refs/heads/test' checked out at 'D:/Documents/git_test03'  
-```  
+```
       
 ## 删除远程不存在的分支引用 --prune  
 ```bash  
 git fetch --prune  
-```  
+```
       
 从远程仓库获取最新信息的同时， 清除远程跟踪分支中不再存在于远程仓库的分支。  
       
@@ -4891,7 +4956,7 @@ git fetch --prune
 推送到远程仓库的特定分支，而不是本地分支的同名分支：  
 ```bash  
 git push <remote> <local-branch>:<remote-branch>  
-```  
+```
 - `<remote>`：远程仓库的名称  
       
 将本地 test 分支推送到远程的 test 分支，且设置跟踪状态，远程分支不存在则会在远程仓库中创建该分支：  
@@ -4906,7 +4971,7 @@ remote:
 To https://github.com/lxwcd/git_test.git  
  * [new branch]      HEAD -> test  
 branch 'test' set up to track 'origin/test'.  
-```  
+```
       
 - `:` 前为源分支，即本地分支  
 - `:` 后为目的分支，即远程分支  
@@ -4917,40 +4982,40 @@ branch 'test' set up to track 'origin/test'.
 推送所有本地分支到远程仓库：  
 ```bash  
 git push --all <remote>  
-```  
+```
       
 ## 推送所有标签  
       
 如果想要推送所有本地标签到远程仓库，可以使用：  
 ```bash  
 git push --tags <remote>  
-```  
+```
       
 ## 强制推送  
       
 ```bash  
 git push --force <remote> <branch>  
-```  
+```
 或者：  
 ```bash  
 git push -f <remote> <branch>  
-```  
+```
       
 ## 删除远程分支  
       
 ```bash  
 git push <remote> --delete <branch>  
-```  
+```
 或者：  
 ```bash  
 git push <remote> :<branch>  
-```  
+```
       
 ## 推送特定提交  
       
 ```bash  
 git push <remote> <commit>:<branch>  
-```  
+```
       
 # git pull  
 > [Git - git-pull Documentation](https://git-scm.com/docs/git-pull)  
@@ -4961,32 +5026,32 @@ git push <remote> <commit>:<branch>
 ## 从远程仓库拉取最新代码并合并到当前分支  
 ```bash  
 git pull origin master  
-```  
+```
 这个命令会从远程仓库 `origin` 的 `master` 分支拉取最新的代码，并尝试与当前分支合并。  
       
 如果当前分支已经设置跟踪远程分支，可以省略远程分支名：  
 ```bash  
 git pull origin  
-```  
+```
       
 如果当前分支只跟踪一个远程分支，可以完全省略参数：  
 ```bash  
 git pull  
-```  
+```
       
 ## --rebase  
       
 使用 `rebase` 代替 `merge` 来合并更改：  
 ```bash  
 git pull --rebase origin master  
-```  
+```
       
 ## --ff-only  
       
 只允许快进式合并，不允许产生新合并提交：  
 ```bash  
 git pull --ff-only origin master  
-```  
+```
 如果无法进行快进式合并，命令会失败。  
       
 ## --no-rebase  
@@ -4994,63 +5059,63 @@ git pull --ff-only origin master
 覆盖配置选项，强制使用 `merge` 而不是 `rebase`：  
 ```bash  
 git pull --no-rebase origin master  
-```  
+```
       
 ## --no-commit  
       
 拉取后不自动提交合并的结果：  
 ```bash  
 git pull --no-commit origin master  
-```  
+```
       
 ## --allow-unrelated-histories  
       
 允许合并没有共同历史记录的分支：  
 ```bash  
 git pull --allow-unrelated-histories origin master  
-```  
+```
       
 ## --tags  
       
 拉取远程仓库的标签：  
 ```bash  
 git pull --tags origin master  
-```  
+```
       
 ## --prune  
       
 拉取后清除本地不存在于远程仓库的分支：  
 ```bash  
 git pull --prune origin master  
-```  
+```
       
 ## --recurse-submodules  
       
 递归地拉取和更新子模块：  
 ```bash  
 git pull --recurse-submodules origin master  
-```  
+```
       
 ## --depth  
       
 指定拉取的历史记录深度，减少拉取的数据量，加快拉取速度：  
 ```bash  
 git pull --depth=1 origin master  
-```  
+```
       
 ## --verbose  
       
 详细输出拉取的过程：  
 ```bash  
 git pull --verbose origin master  
-```  
+```
       
 ## --progress  
       
 显示拉取进度：  
 ```bash  
 git pull --progress origin master  
-```  
+```
       
 # git rebase  
 > [git rebase | Atlassian Git Tutorial](https://www.atlassian.com/git/tutorials/rewriting-history/git-rebase)  
@@ -5075,7 +5140,7 @@ git rebase 的行为和 git cherry-pick 的效果相同，如果合并过程中�
 lx@lx MINGW64 /d/Documents/git_test04 (fix_D)  
 $ git branch -vv | grep "*"  
 * fix_D      2c28453 [fix_C: ahead 3, behind 4] modify test01.txt  
-```  
+```
     
 可见当前分支落后待合并分支 4 提交记录，超前待合并分支 3 提交记录。  
     
@@ -5088,7 +5153,7 @@ $ git log fix_C..HEAD --oneline
 2c28453 (HEAD -> fix_D) modify test01.txt  
 0cda0f6 modify 2.txt  
 91b0e3c Fix bug  
-```  
+```
     
 ### git rebase 合并  
 进行 rebase 操作，可以看到第一个在 fix_C 分支基础上应用 `91b0e3c Fix bug` 这个提交，且发生冲突：  
@@ -5112,7 +5177,7 @@ Could not apply 91b0e3c... Fix bug
     
 lx@lx MINGW64 /d/Documents/git_test04 (fix_D|REBASE 1/3)  
 $  
-```  
+```
     
 可见 2.txt 文件冲突，可以用 git status 看到：  
 ```bash  
@@ -5136,7 +5201,7 @@ Unmerged paths:
         both modified:   2.txt  
     
 no changes added to commit (use "git add" and/or "git commit -a")  
-```  
+```
     
 ### 解决冲突  
 根据实际需求，和提示的冲突文件名：  
@@ -5153,7 +5218,7 @@ fix_c
 =======  
 111  
 >>>>>>> 91b0e3c (Fix bug)  
-```  
+```
 - 可以 `git checkout --ours 2.txt` 或者 `git checkout --theirs 2.txt` 直接指定使用自己或者对方版本  
 ```bash  
 lx@lx MINGW64 /d/Documents/git_test04 (fix_D|REBASE 1/3)  
@@ -5165,7 +5230,7 @@ $ cat 2.txt
 222  
 fix_c  
 111  
-```  
+```
     
 ### git add 添加解决完冲突的文件  
 ```bash  
@@ -5187,7 +5252,7 @@ You are currently rebasing branch 'fix_D' on '09cfa35'.
 Changes to be committed:  
   (use "git restore --staged <file>..." to unstage)  
         modified:   2.txt  
-```  
+```
     
 根据提示，第一个提交应用完成，接着会继续应用剩下两个提交。  
     
@@ -5225,7 +5290,7 @@ index e36953d..6ea0285 100644
  222  
  fix_c  
 +111  
-```  
+```
     
 重新提交该记录后 Author 变成自己：  
 ```bash  
@@ -5243,7 +5308,7 @@ Commit:     lxwcd <15521168075@163.com>
 CommitDate: Mon Feb 10 00:13:44 2025 +0800  
     
     rebase 91b0e3c Fix bug and fix confict  
-```  
+```
     
 ## git rebase -i 交互变基  
 ```bash  
@@ -5281,7 +5346,7 @@ pick 2c28453 modify test01.txt
 #  
 # However, if you remove everything, the rebase will be aborted.  
 #  
-```  
+```
     
 可以修改 rebase 的顺序等。  
     
@@ -5294,7 +5359,7 @@ pick 2c28453 modify test01.txt
 ```bash  
 pick 1fc6c95 Patch A  
 reword 6b2481b Patch B  
-```  
+```
     
 保存并退出后，Git 会暂停在 6b2481b 提交，编辑提交日志的 message。  
     
@@ -5303,7 +5368,7 @@ reword 6b2481b Patch B
 ```bash  
 reword 67bcef2 modify 2.txt  
 edit 6f95c1c modify test01.txt  
-```  
+```
 保存并退出后，Git 会暂停在 6f95c1c 提交，可以使用 git commit --amend 修改提交内容。  
 ```bash  
 lx@lx MINGW64 /d/Documents/git_test04 (fix_D_03|REBASE 3/3)  
@@ -5322,7 +5387,7 @@ nothing to commit, working tree clean
     
 lx@lx MINGW64 /d/Documents/git_test04 (fix_D_03|REBASE 3/3)  
 $  
-```  
+```
     
 ### s, squash <commit>  
 将指定的提交合并到前一个提交中。  
@@ -5331,7 +5396,7 @@ $
 pick 01c7623 rebase 91b0e3c Fix bug and fix confict  
 pick 67bcef2 modify 2.txt  
 squash 6f95c1c modify test01.txt  
-```  
+```
     
 当合并 `67bcef2` 时会进入一个编辑界面，将 `6f95c1c` 提交一起合并到 `67bcef2` 中：  
 ```Bash  
@@ -5360,7 +5425,7 @@ modify test01.txt
 #	modified:   2.txt  
 #	modified:   test01.txt  
 #  
-```  
+```
     
 ### f, fixup [-C | -c] <commit>  
 将指定的提交合并到前一个提交中，但不保留当前提交的消息。  
@@ -5369,7 +5434,7 @@ modify test01.txt
 pick 01c7623 rebase 91b0e3c Fix bug and fix confict  
 pick 67bcef2 modify 2.txt  
 fixup 6f95c1c modify test01.txt  
-```  
+```
     
 保存并退出后，Git 会将 `6f95c1c` 的内容合并到 `67bcef2` 中，但不会提示编辑提交消息。  
 最后查看日志看到最后两个提交记录的 message 为倒数第二个日志的提交 message。且 Author 信息更新。  
@@ -5380,7 +5445,7 @@ fixup 6f95c1c modify test01.txt
 ```bash  
 pick 1fc6c95 Patch A  
 exec echo "Running a command"  
-```  
+```
     
 保存并退出后，Git 会在应用 1fc6c95 提交后运行 echo "Running a command"。  
     
@@ -5390,7 +5455,7 @@ exec echo "Running a command"
 ```bash  
 pick 1fc6c95 Patch A  
 break  
-```  
+```
     
 保存并退出后，Git 会在应用 1fc6c95 提交后暂停，可以手动处理（如 git commit --amend）。  
     
@@ -5400,7 +5465,7 @@ break
 ```bash  
 pick 1fc6c95 Patch A  
 drop 6b2481b Patch B  
-```  
+```
     
 保存并退出后，Git 会删除 6b2481b 提交。  
     
@@ -5410,7 +5475,7 @@ drop 6b2481b Patch B
 ```bash  
 pick 1fc6c95 Patch A  
 label mylabel  
-```  
+```
     
 保存并退出后，Git 会在应用 1fc6c95 提交后为当前的 HEAD 添加一个标签 mylabel。  
     
@@ -5421,7 +5486,7 @@ label mylabel
 pick 1fc6c95 Patch A  
 label mylabel  
 reset mylabel  
-```  
+```
 保存并退出后，Git 会在应用 1fc6c95 提交后将 HEAD 重置到 mylabel。  
     
 ### m, merge [-C <commit> | -c <commit>] <label>  
@@ -5430,7 +5495,7 @@ reset mylabel
 ```bash  
 pick 1fc6c95 Patch A  
 merge -c 6b2481b mylabel  
-```  
+```
     
 保存并退出后，Git 会创建一个合并提交，使用 6b2481b 的提交消息。  
     
@@ -5440,7 +5505,7 @@ merge -c 6b2481b mylabel
 ```bash  
 pick 1fc6c95 Patch A  
 update-ref refs/heads/mybranch  
-```  
+```
     
 保存并退出后，Git 会在应用 1fc6c95 提交后更新 refs/heads/mybranch。  
     
@@ -5468,12 +5533,12 @@ update-ref refs/heads/mybranch
 1. **切换到 `feature` 分支**：  
    ```bash  
    git checkout feature  
-   ```  
+   ```
       
 2. **执行 `git rebase --onto` 命令**：  
    ```bash  
    git rebase --onto master A feature  
-   ```  
+   ```
    这个命令的意思是：“从 `feature` 分支的起始提交 A 开始，将所有提交重新应用到 `master` 分支上。”  
       
 3. **结果**：  
@@ -5496,8 +5561,19 @@ update-ref refs/heads/mybranch
 > [Git - git-merge Documentation](https://git-scm.com/docs/git-merge#Documentation/git-merge.txt---no-commit)  
       
 不自动提交  
+
+## --ff
+> [Git - git-merge Documentation](https://git-scm.com/docs/git-merge#Documentation/git-merge.txt---ff) 
+
+Specifies how a merge is handled when the merged-in history is already a descendant of the current history. --ff is the default unless merging an annotated (and possibly signed) tag that is not stored in its natural place in the refs/tags/ hierarchy, in which case --no-ff is assumed.
+
+With --ff, when possible resolve the merge as a fast-forward (only update the branch pointer to match the merged branch; do not create a merge commit). When not possible (when the merged-in history is not a descendant of the current history), create a merge commit.
+
+With --no-ff, create a merge commit in all cases, even when the merge could instead be resolved as a fast-forward.
+
+With --ff-only, resolve the merge as a fast-forward when possible. When not possible, refuse to merge and exit with a non-zero status.
     
-## --ff 快速前进（fast-forward）  
+## --ff-only 快速前进（fast-forward）  
 > [Git Merge | Atlassian Git Tutorial](https://www.atlassian.com/git/tutorials/using-branches/git-merge)  
 > [Git Fast-Forward VS Non-Fast-Forward](https://leimao.github.io/blog/Git-Fast-Forward-VS-Non-Fast-Forward/)  
       
@@ -5519,18 +5595,18 @@ git fast-forward（快进合并）主要适用于本地分支落后于待合并�
 A -- B -- C [main]  
           \  
            D -- E [feature]  
-```  
-在这个场景中，feature 分支是从 main 分支的 B 提交处创建的，并且 main 分支没有新的提交。此时，feature 分支的提交历史是 main 分支的直接延续。可以执行fast-forward 合并。  
+```
+在这个场景中，feature 分支是从 main 分支的 C 提交处创建的，并且 main 分支没有新的提交。此时，feature 分支的提交历史是 main 分支的直接延续。可以执行fast-forward 合并。  
 bash复制  
 ```bash  
 git checkout main  
 git merge feature --ff-only  
-```  
+```
       
 Git 会采用 fast-forward 策略，结果如下：  
 ```bash  
 A -- B -- C -- D -- E [main, feature]  
-```  
+```
       
 main 分支的指针直接移动到 feature 分支的最新提交 E 上。  
 没有创建新的合并提交，历史保持线性。  
@@ -5544,7 +5620,7 @@ $ git branch -vv
   main  03d14ae [origin/main: ahead 2, behind 19] update main test01.txt  
   main2 a47ac74 [origin/main: ahead 8, behind 19] Revert "update main test01.txt"  
   main3 ee19c9a [origin/main: ahead 5, behind 19] Revert "add test02.txt and test03.txt"  
-```  
+```
       
 执行 fast-forward 合并将失败。  
 ```bash  
@@ -5560,19 +5636,19 @@ hint:   git rebase
 hint:  
 hint: Disable this message with "git config advice.diverging false"  
 fatal: Not possible to fast-forward, aborting.  
-```  
+```
       
 ## --squash 合并多个提交记录为一个提交记录  
 git merge --squash 的主要作用是将一个分支上的所有提交合并为一个单独的提交，并将这些更改应用到当前分支上。它不会创建合并提交，而是将所有更改暂存为一次新的提交。这常用于清理历史记录，将多个提交合并为一个。  
       
 ```bash  
 git merge --squash feature  
-```  
+```
 这会将 feature 分支上的所有更改合并到当前分支，但不会自动创建一个新的提交。  
       
 ```bash  
 git commit -m "Squash commit: Merge feature branch changes"  
-```  
+```
       
 ## --abort  
       
@@ -5585,7 +5661,56 @@ git commit -m "Squash commit: Merge feature branch changes"
       
 # git prune  
 > [Git - git-prune Documentation](https://git-scm.com/docs/git-prune)  
-      
+
+`git prune` 是 Git 中一个用于清理本地仓库中过期引用的命令。它主要用于删除不再存在的远程分支的本地引用，以及清理那些不再需要的引用。
+
+Git 中的每个分支、标签和提交都有一个引用（reference）。这些引用存储在 `.git/refs/` 目录下。随着时间的推移，可能会有一些引用变得过期。例如，当远程仓库中的分支被删除时，本地仓库中仍然会保留这个分支的引用，直到明确清理。
+
+`git prune` 的作用就是清理这些过期的引用。
+
+1. **基本用法**
+  * `git prune` 用于清理本地仓库中不再存在的远程分支的引用。
+  * 默认情况下，它只作用于远程仓库的引用，不会删除本地分支。
+
+2. **指定远程仓库**
+  * `git prune <remote>` 可以指定清理某个远程仓库的引用。
+  * 例如，`git prune origin` 会清理 origin 远程仓库中不再存在的引用。
+
+| 命令                        | 说明                                                                   |
+| --------------------------- | ---------------------------------------------------------------------- |
+| `git prune`                 | 清理本地仓库中不再存在的远程分支的引用                                 |
+| `git prune --dry-run`       | 模拟清理过程，显示哪些引用将被清理，但不会实际删除                     |
+| `git prune -v`              | 在清理过程中显示详细信息，包括删除的引用                               |
+| `git prune --all`           | 清理所有远程仓库的引用（不常见，通常使用 `git remote prune <remote>`） |
+| `git remote prune <remote>` | 清理指定远程仓库的引用，与 `git prune <remote>` 功能类似，但更明确     |
+
+* 通常不需要频繁使用 `git prune`，因为 Git 会在特定情况下自动执行清理操作，例如通过 `git fetch` 或 `git remote update` 等命令。
+* 如果希望在每次 `git fetch` 时自动清理过期引用，可以在配置中启用 `fetch.prune` 选项：
+
+```bash
+git config --global fetch.prune true
+```
+
+## 示例
+
+1. 假设远程仓库中有一个分支 `feature-branch` 被删除了，但本地仓库中仍然保留这个分支的引用。
+2. 使用 `git prune origin` 来清理这个过期的引用：
+```bash
+git prune origin
+```
+或者使用 `git remote prune origin`：
+```bash
+git remote prune origin
+```
+3. 为了查看清理过程中删除了哪些引用，可以添加 `-v` 选项：
+```bash
+git prune -v origin
+```
+
+## 与 `git fetch --prune` 的关系
+* `git fetch --prune` 是一个更常用的命令，它在获取远程仓库的更新时，同时清理本地仓库中过期的远程分支引用。
+* 它与 `git prune` 的功能类似，但在实际使用中更方便，因为它在获取更新的同时进行清理。
+
 # git cherry-pick  
 > [Git - git-cherry-pick Documentation](https://git-scm.com/docs/git-cherry-pick)  
       
@@ -5603,7 +5728,7 @@ $ git log --oneline -5 fix_B
 171d25c update 2.txt 22  
 f54dd26 update 2.txt 222  
 15f80f2 (HEAD -> test, origin/test) update test02.txt  
-```  
+```
       
 想 pick 上面 5 个提交，且按照原始的顺序：  
       
@@ -5618,7 +5743,7 @@ f54dd26
       
 lx@lx MINGW64 /d/Documents/git_test03 (test)  
 $ git log --oneline -5 fix_B  | tac | cut -d" " -f1 | xargs git cherry-pick --no-commit  
-```  
+```
       
 ## pick 其他分支的特定提交  
       
@@ -5626,13 +5751,13 @@ pick main2 分支的最新提交：
 ```bash  
 lx@lx MINGW64 /d/Documents/git_test04 (main3)  
 $ git cherry-pick main2  
-```  
+```
       
 pick main2 分支的第 5 个父提交：  
 ```bash  
 lx@lx MINGW64 /d/Documents/git_test04 (main3)  
 $ git cherry-pick main2~5  
-```  
+```
       
 ## 不产生提交记录 --no-commit  
       
@@ -5647,7 +5772,7 @@ cbf4932
       
 lx@lx MINGW64 /d/Documents/git_test03 (test)  
 $ git log --oneline -1 main | cut -d" " -f1  | xargs git cherry-pick --no-commit  
-```  
+```
       
 修改会在暂存区，不产生提交记录。  
       
@@ -5662,7 +5787,7 @@ $ git log --oneline -6 origin/main
 e67a0f3 add test02.txt and test03.txt  
 332de10 update file  
 470dcf0 add files  
-```  
+```
       
 查看本分支落后 main2 分支的记录：  
 ```bash  
@@ -5674,18 +5799,18 @@ ca44b51 Revert "update test01.txt: add main"
 b93b033 Revert "add test02.txt and test03.txt"  
 dc76ad7 Revert "update test01.txt: add main"  
 16ac277 update test01.txt: add main  
-```  
+```
       
 应用落后的这些提交，按照原始顺序：  
 ```bash  
 lx@lx MINGW64 /d/Documents/git_test04 (main3)  
 $ git cherry-pick ..main2  
-```  
+```
 或者：  
 ```bash  
 lx@lx MINGW64 /d/Documents/git_test04 (main3)  
 $ git cherry-pick ^HEAD main2  
-```  
+```
       
 查看新的提交，看到最新的 6 次提交即为 pick 的提交，仅 hash 值不同，message 相同：  
 ```bash  
@@ -5699,7 +5824,7 @@ ed7571e Revert "update test01.txt: add main"
 3a37c60 update test01.txt: add main  
 03d14ae (origin/main, origin/HEAD, main) update main test01.txt  
 737c5b7 commit B  
-```  
+```
       
 ## pick 其他分支连续的提交  
       
@@ -5707,7 +5832,7 @@ pick main2 分支从第 5 个父提交到第 3 个父提交：
 ```bash  
 lx@lx MINGW64 /d/Documents/git_test04 (main3)  
 $ git cherry-pick main2~6..main2~3  
-```  
+```
       
 这里不包括起始提交 main2~6。  
       
@@ -5722,7 +5847,7 @@ b93b033 Revert "add test02.txt and test03.txt"
 dc76ad7 Revert "update test01.txt: add main"  
 16ac277 update test01.txt: add main  
 03d14ae (HEAD -> main3, origin/main, origin/HEAD, main) update main test01.txt  
-```  
+```
       
 本分支初始提交记录：  
 ```bash  
@@ -5731,7 +5856,7 @@ $ git log --oneline -3
 03d14ae (HEAD -> main3, origin/main, origin/HEAD, main) update main test01.txt  
 737c5b7 commit B  
 e67a0f3 add test02.txt and test03.txt  
-```  
+```
       
 本分支合并后的提交记录：  
 ```bash  
@@ -5742,7 +5867,7 @@ ee19c9a (HEAD -> main3) Revert "add test02.txt and test03.txt"
 396ebec update test01.txt: add main  
 03d14ae (origin/main, origin/HEAD, main) update main test01.txt  
 737c5b7 commit B  
-```  
+```
       
 ## 解决冲突  
 git cherry-pick 解决冲突后不修改 Author Date。  
@@ -5761,7 +5886,7 @@ hint: You can instead skip this commit with "git cherry-pick --skip".
 hint: To abort and get back to the state before "git cherry-pick",  
 hint: run "git cherry-pick --abort".  
 hint: Disable this message with "git config advice.mergeConflict false"  
-```  
+```
     
 ```bash  
 lx@lx MINGW64 /d/Documents/git_test04 (main2_01|CHERRY-PICKING)  
@@ -5777,7 +5902,7 @@ Unmerged paths:
         both modified:   test01.txt  
     
 no changes added to commit (use "git add" and/or "git commit -a")  
-```  
+```
     
 解决冲突后 `git add` 将文件添加到暂存区，然后 `git cherry-pick --continue` 继续执行 cherry-pick 操作，这时会打开窗口写提交日志信息，默认显示原始的日志，可以直接使用或者修改日志 message：  
 ```bash  
@@ -5804,7 +5929,7 @@ modify test01.txt , add C
 # Changes to be committed:  
 #	modified:   test01.txt  
 #  
-```  
+```
     
 完成后查看日志发现 Author Date 没有被修改，但 Commit Date 更新为当前时间：  
 ```bash  
@@ -5817,7 +5942,7 @@ Commit:     lxwcd <15521168075@163.com>
 CommitDate: Sun Feb 9 22:32:24 2025 +0800  
     
     modify test01.txt , add C  
-```  
+```
     
 # 忽略本地已经被跟踪文件的修改  
 > [How to ignore files already managed by Git: how to use assume-unchanged and skip-worktree](https://tips.madoromi.org/en/git-ignore-assume-unchanged-skip-worktree/)  
@@ -5835,7 +5960,7 @@ CommitDate: Sun Feb 9 22:32:24 2025 +0800
       
 ```bash  
 git update-index --skip-worktree <file>  
-```  
+```
       
 这个命令会更新索引，告诉 Git 忽略 `<file>` 文件的本地更改。  
       
@@ -5845,13 +5970,13 @@ git update-index --skip-worktree <file>
       
 ```bash  
 git update-index --no-skip-worktree <file>  
-```  
+```
       
 ### 使用远程最新的版本  
 ```bash  
 git update-index --no-skip-worktree <file>  
 git pull  
-```  
+```
       
 ### 查看所有被 `skip-worktree` 的文件  
       
@@ -5859,14 +5984,14 @@ git pull
       
 ```bash  
 git ls-files -v | grep '^S'  
-```  
+```
       
 这将列出所有被 Git 跟踪的文件，以及它们各自的属性。带有 `S` 前缀的文件表示被设置了 `skip-worktree` 属性。  
       
 ### 查看某个文件是否被 `skip-worktree`  
 ```bash  
 git ls-files -v | grep '^S' | grep 'file.cpp'  
-```  
+```
       
 ### 使用场景  
       
@@ -5908,20 +6033,20 @@ git ls-files -v | grep '^S' | grep 'file.cpp'
 ### **标记文件为 assume-unchanged**  
 ```bash  
 git update-index --assume-unchanged <file>  
-```  
+```
 这会告诉 Git 忽略 `<file>` 文件的后续更改。  
       
 ### **取消标记**  
 ```bash  
 git update-index --no-assume-unchanged <file>  
-```  
+```
 这会取消对 `<file>` 文件的 “假定未更改” 标记，并让 Git 开始跟踪和提交对该文件的更改。  
       
 ### 查看被标记的文件  
 如果你想要查看哪些文件被标记为 `assume-unchanged`，可以使用以下命令：  
 ```bash  
 git ls-files -v | grep "^h"  
-```  
+```
 这会列出所有标记为 `assume-unchanged` 的文件，其中 `h` 表示文件被标记为 `assumed-unchanged`。  
       
 ### 注意事项  
@@ -5943,6 +6068,89 @@ git ls-files -v | grep "^h"
 > [GitHub - newren/git-filter-repo: Quickly rewrite git repository history (filter-branch replacement)](https://github.com/newren/git-filter-repo)  
 > [Removing sensitive data from a repository - GitHub Docs](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository)  
       
+# git tag
+
+## 1. 查看标签
+首先，你需要查看仓库中所有的标签，以确定你想要获取的标签名称。可以使用以下命令：
+```bash
+git tag
+```
+这个命令会列出仓库中所有的标签。如果你只想查看特定分支上的标签，可以结合 `git log` 命令来查看。例如：
+```bash
+git log <branch-name> --decorate --simplify-by-decoration
+```
+这个命令会显示分支的提交历史，并且只显示带有标签的提交记录。
+
+## 2. 检出（Checkout）标签
+找到你想要的标签后，可以使用 `git checkout` 命令来检出该标签对应的代码。例如：
+```bash
+git checkout <tag-name>
+```
+执行这个命令后，Git 会将工作目录切换到该标签对应的提交版本。此时，HEAD 会处于分离状态（detached HEAD），因为标签指向的是一个具体的提交，而不是分支。
+
+## 3. 查看代码
+此时，你已经切换到了标签对应的代码版本，可以像平时一样查看代码。例如，你可以使用以下命令查看文件内容：
+```bash
+cat <file-name>
+```
+或者使用文本编辑器打开文件查看。
+
+## 4. 如果需要保存代码
+如果你需要将这个标签的代码保存下来，有以下几种方法：
+- **创建一个新的分支**
+  如果你需要在这个标签的基础上进行进一步的开发，可以创建一个新的分支。例如：
+  ```bash
+  git checkout -b <new-branch-name> <tag-name>
+  ```
+  这样，新的分支会从标签对应的提交开始，你可以在这个分支上进行新的提交。
+
+- **复制代码到其他位置**
+  如果你只需要将代码保存到本地的某个目录，可以使用文件操作命令。例如：
+  ```bash
+  cp -r . /path/to/save
+  ```
+  这会将当前目录（标签对应的代码）复制到指定的路径。
+
+## 5. 返回到其他分支
+完成操作后，如果你想返回到其他分支，可以使用：
+```bash
+git checkout <branch-name>
+```
+例如：
+```bash
+git checkout main
+```
+这会将工作目录切换回主分支。
+
+## 示例
+假设有一个仓库，分支名为 `feature`，标签名为 `v1.0`，你可以按照以下步骤操作：
+
+1. 查看标签：
+   ```bash
+   git tag
+   ```
+   假设输出中有 `v1.0`。
+
+2. 检出标签：
+   ```bash
+   git checkout v1.0
+   ```
+
+3. 查看代码：
+   ```bash
+   cat README.md
+   ```
+
+4. 如果需要保存代码，创建新分支：
+   ```bash
+   git checkout -b v1.0-feature v1.0
+   ```
+
+5. 返回到主分支：
+   ```bash
+   git checkout main
+   ```
+
 # 常用案例  
       
 ## git fetch -p 更新远程信息  
@@ -5952,7 +6160,7 @@ git ls-files -v | grep "^h"
       
 ```bash  
 git add *.cpp *.h  
-```  
+```
       
 ## 复制当前分支  
     
@@ -5960,7 +6168,7 @@ git add *.cpp *.h
     
 ```bash  
 git switch -c <新分支名>  
-```  
+```
     
 注意先保证当前分支工作区干净，如果有未暂存的修改，不希望提交，可以 git stash 先暂存；或者 git commit 提交后，在新分支 `git reset --hard HEAD^` 丢弃该提交记录。  
     
@@ -5968,52 +6176,52 @@ git switch -c <新分支名>
     
 ```bash  
 git switch -c <新分支名> <来源分支名>  
-```  
+```
 或者  
 ```bash  
 git checkout -b <new-branch> <existing-branch>  
-```  
+```
     
 如创建一个 bug 分支依据远程最新 develop 分支：  
 ```bash  
 git fetch -p  
 git checkout b fix_bug origin/develop  
-```  
+```
     
 ## 显示已跟踪被修改的文件名  
 ```bash  
 git diff HEAD --name-only  
-```  
+```
       
 ## 筛选已跟踪被修改的文件  
       
 ```bash  
 git diff HEAD --name-only | grep -E "*/demo/*"  
-```  
+```
 或：  
 ```bash  
 git status --porcelain | cut -d" " -f3- | grep -E "*/demo/*"  
-```  
+```
       
 ## 筛选已跟踪被修改的特定后缀文件  
       
 ```bash  
 git diff HEAD --name-only |  grep -E "\.(cpp|h)$"  
-```  
+```
 或：  
 ```bash  
 git status --porcelain | cut -d" " -f3- |  grep -E "\.(cpp|h)$"  
-```  
+```
       
 ## git stash 过滤文件保存  
       
 ```bash  
 git diff HEAD --name-only | grep -E "*/demo/*" | xargs git stash push -m "stash demo files" --  
-```  
+```
 或：  
 ```bash  
 git status --porcelain | cut -d" " -f3- | grep -E "*/demo/*" | xargs git stash push -m "stash demo files" --  
-```  
+```
       
 ## 输出未被跟踪的文件名  
 ```bash  
@@ -6040,58 +6248,58 @@ $ git status -s |  grep "??" | cut -d" " -f2
 0002-update-fix_B.patch  
 1.patch  
 2.txt  
-```  
+```
       
 ## 恢复工作目录到最新提交  
       
 ### git stash  
 ```bash  
 git stash push -m "message"  
-```  
+```
       
 如果有没有被跟踪的文件，希望一起存起来：  
 ```bash  
 git stash push --all -m "message"  
-```  
+```
       
 ### git checkout  
 恢复已跟踪的文件：  
 ```bash  
 git checkout HEAD -- .  
-```  
+```
       
 再删除没有被跟踪的文件：  
 ```bash  
 git clean -fd  
-```  
+```
       
 ### git reset  
       
 恢复已跟踪的文件：  
 ```bash  
 git reset --hard HEAD  
-```  
+```
       
 再删除没有被跟踪的文件：  
 ```bash  
 git clean -fd  
-```  
+```
 或者：  
 ```bash  
 $ git status --short | grep "??" | cut -d" " -f2 | xargs rm -rf  
-```  
+```
       
 ### git restore  
       
 恢复已跟踪的文件：  
 ```bash  
 $ git restore --source=HEAD --staged --worktree .  
-```  
+```
       
 再删除没有被跟踪的文件：  
 ```bash  
 git clean -fd  
-```  
+```
       
 ## 有冲突时指定使用版本  
       
@@ -6109,7 +6317,7 @@ From https://github.com/lxwcd/git_test
 Auto-merging 2.txt  
 CONFLICT (content): Merge conflict in 2.txt  
 Automatic merge failed; fix conflicts and then commit the result.  
-```  
+```
       
 查看当前工作目录的状态，可以看见有个文件处于冲突中，待解决：  
 ```bash  
@@ -6130,7 +6338,7 @@ Unmerged paths:
       
 no changes added to commit (use "git add" and/or "git commit -a")  
       
-```  
+```
       
 查看冲突文件的内容：  
 ```bash  
@@ -6141,7 +6349,7 @@ $ cat 2.txt
 =======  
 222  
 >>>>>>> f54dd265ddebde6a06e2ea619a0588d2b1555945  
-```  
+```
       
 `<<<<<<< HEAD` 表示下方表示当前版本  
 `=======` 表示分隔符，下方内容为冲突版本的内容  
@@ -6156,7 +6364,7 @@ Updated 1 path from the index
 lx@lx MINGW64 /d/Documents/git_test03 (fix_B|MERGING)  
 $ cat 2.txt  
 222  
-```  
+```
       
 ### 使用本地版本  
 ```bash  
@@ -6167,26 +6375,26 @@ Updated 1 path from the index
 lx@lx MINGW64 /d/Documents/git_test03 (fix_B|MERGING)  
 $ cat 2.txt  
 22  
-```  
+```
       
 ### 添加到暂存区  
 选择版本后，将这些文件添加到暂存区：  
       
 ```bash  
 git add <file-path>  
-```  
+```
       
 ### 继续合并  
 如果你已经解决了所有文件的冲突，你可以继续完成合并操作：  
       
 ```bash  
 git commit -m "message"  
-```  
+```
       
 或者  
 ```bash  
 git merge --continue  
-```  
+```
       
 ## 合并 feature 分支合并到主干分支  
     
@@ -6194,7 +6402,7 @@ git merge --continue
 - 拉取远程仓库主分支到本地  
 ```bash  
 git checkout -b dev origin/dev  
-```  
+```
 - git switch -c 复制当前分支到新分支进行合并操作  
 如果当前分支工作目录不干净，可以 git stash 保持未提交的信息；  
 或者 git commmit 提交，然后到新分支后 git reset --hard HEAD^ 撤销提交。  
@@ -6202,7 +6410,7 @@ git checkout -b dev origin/dev
 ```bash  
 git branch -u origin/dev  
 git branch -vv  
-```  
+```
 - 如果 feature 分支仅自己使用，且只有超前主分支的记录，无落后记录，则可以用 git rebase 或者 git merge -ff 合并。  
 - 如果 feature 分支仅自己使用，有超前主分支的记录，也有落后记录，则可以用 git rebase 尝试合并，如果有冲突则中途解决冲突。  
 - 如果 feature 分支是自己和其他人合作开发的分支，比主分支有超前和落后的记录，则可以先用 git rebase 尝试合并，看是否有冲突。  
@@ -6231,12 +6439,96 @@ git branch -vv
 本地合并以后，将本地 feature 分支推送到远程仓库且在远程仓库新建 featrue 分支：  
 ```bash  
 git push -u origin HEAD:feature  
-```  
+```
     
 ### PR 通过后合并到远程仓库主分支策略  
 PR 经过验证后真正合并到远程仓库时，可能远程仓库主分支又有了新的提交记录，这时可以在本地拉取远程仓库主分支，再将 feature 分支尝试合并到主分支，如 git rebase，如果没有冲突，则可以在远程仓库选择 git rebase 合并方案。  
 如果有冲突。则本地进行合并，并解决冲突后，重新推送到远程仓库进行 PR。  
   
+# git 多人协作
+
+## 更新远程仓库
+```bash
+git fetch -p
+```
+
+## 新建 feature 分支
+以远程仓库最新 develop 分支为基础新建 feature 分支：
+```bash
+git checkout -b feature origin/develop
+```
+
+## 修改 feature 分支
+
+### 容易冲突的文件单独创建提交记录并提 PR
+对于容易冲突的文件，如工程文件，多语言文件等，修改后单独创建提交记录，可以提前提 PR，这些文件的修改编译通过后提前尽快合并到主分支，防止后面合并时冲突。
+
+工程文件，可以先建好文件，内容为空，或者注释掉，先将文件加入工程中，单独创建提交记录并提 PR。
+如果提 PR 时有其他 PR 也修改了这些文件，或者像稍后合并，则将这些冲突提交单独创建提交记录，方便后面合并解决冲突。
+
+## feature 本地与远程仓库主分支合并
+feature 分支修改完后，准备提 PR 之前，先更新远程仓库主分支的代码并拉取到本地，然后将当前分支合并到主分支，如果有冲突解决冲突。
+
+## 整理提交记录
+在本地修改后，可以修改部分就先进行提交，后面继续补充修改后，如果希望和上一个使用同样的提交记录，则可以用 [git commit --amend](#git-commit) 合并到上一个提交记录。
+
+如果之前的提交已经推送到远程仓库的 feature 分支，则需要用 [git push --force](#强制推送) 强制覆盖远程仓库 feature 分支。
+
+### 查看 feature 分支和待合并的主分支的提交差异
+```bash
+git fetch -p
+git branch -u origin/develop
+git branch -vv
+```
+上面操作可以看到当前分支超前和落后远程多少提交。如果具体想看远程超强的提交记录，用 [git log](#git-log-查看日志) 命令。
+```bash
+git log HEAD..origin/develop --oneline
+```
+
+### 创建 feature 分支的副本分支
+进行合并前，最好创建一个当前分支的副本分支，用该分支进行合并测试，这样合并出错后可以切换回原来分支：
+```cpp
+git swich -c feature_copy
+```
+
+### 在 feature-copy 分支进行合并测试
+可以先用 git rebase 的方式合并到主干分支，这样不会影响主干分支的提交记录，且不会创建额外分支历史。
+```bash
+git rebase origin/develop
+```
+
+如果直接合并有冲突，且是工程文件或者多语言文件等的冲突，这种必须使用主干的版本，再将自己的修改重新添加，这是可以用 [git cherry-pick](#git-cherry-pick) 合并。
+
+```bash
+git cherry-pick <commit-id>
+// 等待需要添加冲突文件，手动添加
+git add <file>
+git commit -m "message"
+// 继续用 git cherry-pick 合并
+git cherry-pick <commit-id>
+```
+注意按照原来的提交顺序合并。
+
+如果是其他文件的冲突，需要在冲突的文件中每个地方判断解决，具体见[有冲突时指定使用版本](#有冲突时指定使用版本)。
+
+如果有冲突，解决冲突后，用 git rebase --continue 继续合并。
+
+或者希望终止合并，则用 git rebase --abort。
+
+## 将合并后的本地分支推送到远程仓库
+```bash
+git push -u origin HEAD:feature
+```
+
+## 提 PR
+
+## PR 通过后合并到远程仓库主分支
+PR　通过后，将远程的 feature 分支合并到远程仓库主分支。
+
+这时可能远程仓库的主分支又有了新的提交记录，因此可以在本地按照上面的方式进行合并尝试，看是否有冲突，如果无，且能用 git rebase 合并，则选择 git rebase 合并方案。  
+
+有冲突则需要本地处理冲突后才能进行合并。
+
 # git subtree  
 > [Just a moment...](https://stackoverflow.com/questions/32407634/when-to-use-git-subtree)   
 > [Git Subtree: Alternative to Git Submodule | Atlassian Git Tutorial](https://www.atlassian.com/git/tutorials/git-subtree)   
@@ -6254,49 +6546,45 @@ git subtree 是 Git 的一个强大功能，用于将一个外部代码库（子
 将外部仓库的代码添加到主仓库的指定目录中。  
 ```bash  
 git subtree add --prefix=<目录路径> <仓库地址> <分支>  
-```  
+```
   
 例如，将 child-repo 仓库的 master 分支添加到 parent-repo 仓库的 features 目录中：  
 ```bash  
 git subtree add --prefix=features https://github.com/child-repo/child-repo.git master  
-```  
-
-## 提交子树代码
-修改子树中的文件后，和普通文件一样 commit 提交。
-
+```
 ## 更新子树  
 将外部仓库的最新更改同步到主仓库的子树目录中。  
 ```bash  
 git subtree pull --prefix=<目录路径> <仓库地址> <分支>  
-```  
+```
   
 例如，更新 features 目录中的代码：  
 ```bash  
 git subtree pull --prefix=features https://github.com/child-repo/child-repo.git master  
-```  
+```
   
 ## 推送子树更改  
 将对子树目录的更改推送到外部仓库。  
 ```bash  
 git subtree push --prefix=<目录路径> <仓库地址> <分支>  
-```  
+```
   
 例如，将 features 目录中的更改推送到 child-repo 仓库：  
 ```bash  
 git subtree push --prefix=features https://github.com/child-repo/child-repo.git master  
-```  
+```
   
 ## 分离子树  
 将子树目录的更改提取到一个临时分支中，便于后续操作。  
   
 ```bash  
 git subtree split --prefix=<目录路径> -b <临时分支名>  
-```  
+```
   
 例如，提取 features 目录的更改到临时分支 temp-branch：  
 ```bash  
 git subtree split --prefix=features -b temp-branch  
-```  
+```
   
 # git subtree VS git submodule  
 git subtree 和 git submodule 都是 Git 提供的用于管理子项目的工具，但它们在功能、使用方式和适用场景上有显著的区别。  
@@ -6363,20 +6651,19 @@ git subtree 和 git submodule 都是强大的工具，但它们在功能和使�
 不用 very magic 模式：  
 ```bash  
 %s/\(\S\)\s\{2,\}$/\1/g  
-```  
+```
             
 用 very magic 模式：  
 ```bash  
 %s/\v(\S)\s{2,}$/\1/g  
-```  
+```
             
 可用 `:set list` 查看文本  
             
 ### sed 处理  
 ```bash  
 sed -rn '/^ *$/!s/\s{2,}$//p'  
-```  
+```
             
 # 不能提交到远程仓库管理的文件  
 windows 中为一个文件建立硬链接，然后将链接文件用 git 管理，git push 上传到远程仓库时失败  
-          
