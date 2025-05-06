@@ -2710,6 +2710,138 @@ M       test01.txt
 # git describe
 > [Git - git-describe Documentation](https://git-scm.com/docs/git-describe) 
 
+`git describe` 是 Git 中一个非常有用的命令，用于生成一个人类可读的字符串，描述当前代码库的状态。它通常基于最近的 Git 标签（tag）和当前提交的哈希值，提供一种简洁的方式标识代码版本（尤其是在开发分支或未打标签的提交中）。
+
+```bash
+git describe [选项] [提交或分支]
+```
+
+`git describe` 会找到距离指定提交（默认为当前 `HEAD`）**最近的标签**，并生成一个描述字符串，格式通常为：
+```
+<最近标签>-<距离该标签的提交次数>-g<提交哈希缩写>
+```
+
+```bash
+$ git describe origin/main
+L_Demo_V1.02
+```
+- `L_Demo_V1.02`：最近的标签。
+
+### **常用选项详解**
+
+#### **1. `--tags`：包含轻量标签**
+默认情况下，`git describe` 只查找附注标签（annotated tags）。使用 `--tags` 会同时包含轻量标签（lightweight tags）。
+```bash
+git describe --tags
+```
+
+#### **2. `--abbrev=<n>`：控制哈希缩写长度**
+指定提交哈希的缩写长度（默认 7 字符）。
+```bash
+git describe --abbrev=4  # 输出如 v1.0-1-gabcd
+```
+
+#### **3. `--dirty`：标记工作目录脏状态**
+如果工作目录有未提交的修改，添加 `-dirty` 后缀。
+```bash
+git describe --dirty  # 输出如 v1.0-1-gabc1234-dirty
+```
+
+#### **4. `--always`：无标签时的回退**
+如果没有找到任何标签，默认会报错。使用 `--always` 会强制输出提交哈希作为备选。
+```bash
+git describe --always  # 输出如 abc1234
+```
+
+#### **5. `--long`：强制显示完整格式**
+即使当前提交直接指向标签，也强制显示完整的描述格式。
+```bash
+git describe --long    # 输出如 v1.0-0-gabc1234
+```
+
+#### **6. `--match <pattern>`：过滤标签**
+仅匹配符合通配符模式的标签。
+```bash
+git describe --match "v*"  # 只匹配以 v 开头的标签
+```
+
+---
+
+### **使用场景示例**
+
+#### **1. 快速查看当前版本**
+```bash
+git describe
+# 输出示例: v2.1.0-5-gabc1234
+```
+- 表示当前提交基于标签 `v2.1.0`，之后有 5 次提交，当前哈希为 `abc1234`。
+
+#### **2. 生成版本号（用于构建系统）**
+在构建脚本中使用 `git describe` 自动生成版本号：
+```bash
+VERSION=$(git describe --tags --dirty)
+echo "Building version: $VERSION"
+# 输出示例: Building version: v1.3.0-2-gabc1234-dirty
+```
+
+#### **3. 定位未打标签的提交**
+如果当前提交没有对应的标签：
+```bash
+git describe --tags --always
+# 输出示例: abc1234 或 v1.2-3-gabc1234
+```
+
+#### **4. 结合 `git log` 查看详细历史**
+```bash
+git log $(git describe --abbrev=0)..HEAD --oneline
+```
+- 显示自最近标签以来的所有提交。
+
+---
+
+### **高级用法**
+
+#### **1. 指定特定提交**
+描述某个历史提交的状态：
+```bash
+git describe abc1234  # 查看提交 abc1234 的描述
+```
+
+#### **2. 忽略某些提交**
+若某些提交不适合生成版本号（如合并提交），可通过 `--exclude` 排除：
+```bash
+git describe --exclude "*beta*"  # 忽略包含 "beta" 的标签
+```
+
+#### **3. 结合 CI/CD 管道**
+在 CI/CD 中自动生成版本号：
+```yaml
+# GitLab CI 示例
+variables:
+  VERSION: $(git describe --tags --always)
+script:
+  - echo "Deploying version: $VERSION"
+```
+
+---
+
+### **注意事项**
+1. **标签命名规范**：建议使用语义化版本（如 `v1.2.3`），便于 `git describe` 正确排序。
+2. **轻量标签 vs 附注标签**：
+   - 默认仅查找附注标签，轻量标签需配合 `--tags`。
+3. **无标签时的行为**：默认报错，可通过 `--always` 回退到提交哈希。
+4. **跨分支标签**：若标签在其他分支，需确保拉取到本地（`git fetch --tags`）。
+
+---
+
+### **总结**
+`git describe` 是 Git 中用于生成版本描述的核心工具，尤其适合以下场景：
+- 自动化构建系统中生成唯一版本号。
+- 快速定位代码版本（无需依赖显式标签）。
+- 结合 CI/CD 管道实现动态版本管理。
+
+# git tag
+
 # git merge-base 查找分支的共同祖先  
 > [Git - git-merge-base Documentation](https://git-scm.com/docs/git-merge-base)  
       
