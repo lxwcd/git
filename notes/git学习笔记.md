@@ -1078,6 +1078,8 @@ git status
 - **示例**：`git log HEAD~3` 会显示 `HEAD` 的第三个父提交的详细信息。  
       
 ## Detached HEAD  
+> [Git - git-checkout Documentation](https://git-scm.com/docs/git-checkout#_detached_head) 
+
 > In Git, a detached head occurs when you check out a commit directly using its hash instead of a branch name. This leaves your repository’s HEAD pointer pointing directly at that commit, rather than being linked to a specific branch. To view the history and changes made in a detached head, use git log or git show. If you want to see the differences between the current detached head and another branch, use git diff <branch>. A detached head can be a useful temporary state for exploring specific commits or features, but it’s essential to merge those changes back into a branch before sharing them with others.  
       
 在 Git 中，detached HEAD 状态是指 HEAD 指针直接指向一个具体的提交，而不是指向一个分支。这种状态通常在以下几种情况下发生：  
@@ -1181,9 +1183,9 @@ you have your working directory (also commonly referred to as the “working tre
       
 在 Git 中，"working directory"（工作目录）和 "working tree"（工作树）是两个密切相关但略有不同的概念。它们都涉及到你在本地检出的文件和目录，但它们的含义和用途有所不同。
       
-1. **定义**：工作目录是指你当前正在工作的目录，它是你检出的文件和目录的集合。当你克隆一个仓库或检出一个分支时，Git 会在你的本地文件系统中创建一个工作目录。  
-2. **内容**：工作目录包含了项目的文件和目录，这些文件和目录是你从 Git 仓库中检出的。你可以在这个目录中编辑文件、添加新文件或删除文件。  
-3. **更改跟踪**：当你在工作目录中进行更改时，这些更改不会立即被 Git 跟踪。你需要使用 `git add` 将更改添加到暂存区（索引），然后使用 `git commit` 提交这些更改。  
+1. **定义**：工作目录是指当前正在工作的目录，它是检出的文件和目录的集合。当克隆一个仓库或检出一个分支时，Git 会在本地文件系统中创建一个工作目录。  
+2. **内容**：工作目录包含了项目的文件和目录，这些文件和目录是从 Git 仓库中检出的。可以在这个目录中编辑文件、添加新文件或删除文件。  
+3. **更改跟踪**：当在工作目录中进行更改时，这些更改不会立即被 Git 跟踪。需要使用 `git add` 将更改添加到暂存区（索引），然后使用 `git commit` 提交这些更改。  
       
 - **检出分支或提交**：使用 `git checkout <branch>` 或 `git checkout <commit>` 检出不同的分支或提交，Git 会更新工作目录和工作树以反映所检出的状态。  
 - **查看状态**：使用 `git status` 查看工作目录和工作树的状态，了解哪些文件已被修改但尚未提交。  
@@ -2457,7 +2459,7 @@ $ git log --oneline --graph --first-parent -15
 * 470dcf0 add files  
 ```
       
-### 查看合并提交的多个父提交  
+## 查看合并提交的多个父提交  
 ```bash  
 lx@lx MINGW64 /d/Documents/git_test (main)  
 $ git show a00fc7a --shortstat  
@@ -2540,29 +2542,12 @@ $ git log origin/demo..HEAD --oneline
       
 和下面命令功能相同：  
 ```bash  
-$ git log HEAD ^origin --oneline  
-```
-      
-## 查看分支的创建时间
-origin/develop 和 origin/demo 分支分叉的时间为 origin/demo 创建时间
-
-```bash
-lx@lx MINGW64 /d/src_git/IND400_demo (demo_new)
-$ git show $(git merge-base origin/develop origin/demo) --stat
-commit 581700b08431084e2de5fc21dd3b4f69868ea687
-Author: lxwcd <15521168075@163.com>  
-Date:   Sun Jan 19 18:34:59 2025 +0800  
-      
-    Merge branch 'fix_B'  
-
-Author: Alice <.Zhu@mt.com>
-
- 1 file changed, 17 insertions(+), 14 deletions(-)
+$ git log HEAD ^origin/demo --oneline  
 ```
 
 ## 查看最后一次打标签的时间
 ```bash
-输出时间
+# 输出时间
 git log -1 --format="%ai" $(git describe --tags --abbrev=0 origin/demo 2>/dev/null) 2>/dev/null 
 git log -1 --shortstat $(git describe --tags --abbrev=0 origin/demo) 
 ```
@@ -2706,9 +2691,6 @@ M       test01.txt
 ## --full-index  
 显示差异时，显示完整的索引信息。  
       
-# git describe
-> [Git - git-describe Documentation](https://git-scm.com/docs/git-describe) 
-
 # git merge-base 查找分支的共同祖先  
 > [Git - git-merge-base Documentation](https://git-scm.com/docs/git-merge-base)  
       
@@ -2721,6 +2703,21 @@ For example, with this topology:
 ---o---1---o---o---o---A  
       
 the merge base between A and B is 1.  
+
+origin/develop 和 origin/demo 分支分叉的时间为 origin/demo 创建时间:
+```bash
+lx@lx MINGW64 /d/src_git/IND400_demo (demo_new)
+$ git show $(git merge-base origin/develop origin/demo) --stat
+commit 581700b08431084e2de5fc21dd3b4f69868ea687
+Author: lxwcd <15521168075@163.com>  
+Date:   Sun Jan 19 18:34:59 2025 +0800  
+      
+    Merge branch 'fix_B'  
+
+Author: Alice <.Zhu@mt.com>
+
+ 1 file changed, 17 insertions(+), 14 deletions(-)
+```
       
 ## 多个分支的共同祖先  
 Given three commits A, B, and C, git merge-base A B C will compute the merge base between A and a hypothetical commit M, which is a merge between B and C. For example, with this topology:  
@@ -3045,7 +3042,7 @@ git diff <branch1>...<branch2>
 查看差异中 a 为两个分支共同的祖先，b 为 branch2 最新提交。  
       
 注意和 ```git diff <branch1>..<branch2>```的区别，两个点号表示两个分支最新提交的差异。  
-      
+
 ## 查看差异的文件名  
 ```bash  
 $ git diff --name-only  
@@ -3110,6 +3107,44 @@ git diff <branch1> <branch2> -- <file-path>
 git diff <branch1> <branch2> -- <folder-path>  
 ```
       
+## a 、b 的版本的记忆  
+> **`a` 总是参照物（旧基准），`b` 总是变动方（新状态）**  
+> 参照物取决于命令参数，变动方取决于比较目标
+
+| **命令**                     | `a` (---) 版本    | `b` (+++) 版本  | 记忆要点                   |
+| ---------------------------- | ----------------- | --------------- | -------------------------- |
+| `git diff`                   | 暂存区 (旧)       | **工作区** (新) | 默认比较：暂存区 vs 工作区 |
+| `git diff --cached`          | **最新提交** (旧) | 暂存区 (新)     | `--cached` 以提交为基准    |
+| `git diff HEAD`              | **最新提交** (旧) | 工作区 (新)     | `HEAD` 指向提交            |
+| `git diff <commit>`          | **指定提交** (旧) | 工作区 (新)     | 提交哈希作为旧基准         |
+| `git diff <commit> --cached` | **指定提交** (旧) | 暂存区 (新)     | 组合使用时提交总是旧基准   |
+| `git diff commitA commitB`   | **commitA** (旧)  | commitB (新)    | 顺序决定新旧               |
+
+
+### 1. 确定参照物（旧版本 `a`）
+- **无参数** → 暂存区（`git diff`）
+- **有 `--cached/--staged`** → 最新提交（除非指定提交）
+- **有提交引用** → 该提交版本（如 `HEAD`/`332de10`）
+- **双提交参数** → 第一个提交（`git diff A B` 中 A 是旧）
+
+### 2. 确定变动方（新版本 `b`）
+- **无附加参数** → 工作区（含未暂存修改）
+- **有 `--cached`** → 暂存区（已暂存修改）
+- **双提交参数** → 第二个提交（`git diff A B` 中 B 是新）
+
+### 3. 理解箭头方向
+```diff
+- a/file  // 参照物（起点）
++ b/file  // 变动目标（终点）
+```
+> **所有差异显示都是 `b` 相对于 `a` 的变化**  
+> 即："如何从 `a` 变成 `b`"
+> 💡 终极口诀：**左旧右新，上旧下新**  
+> - 命令参数中 **左侧/第一个** 是 `a`（旧）
+> - 输出中 **`---` 在上** 是 `a`（旧），**`+++` 在下** 是 `b`（新）
+
+      
+
 ## 比较标签  
 ```bash  
 git diff <tag1> <tag2>  
@@ -3765,7 +3800,7 @@ git checkout -b feature origin/feature
 git switch -d <commit-hash>  
 ```
       
-分离的HEAD 允许你直接切换到任何提交，而不需要创建一个分支。切换后所做的修改，提交，甚至 push 到远程都不会影响其他分支。  
+分离的HEAD 允许直接切换到任何提交，而不需要创建一个分支。切换后所做的修改，提交，甚至 push 到远程都不会影响其他分支。  
 切换到其他分支后拉取远程仓库的最新代码，之前分离 HEAD 后 Push 的内容看不到提交记录。  
       
 ## 快速切换回前一个分支  
@@ -4895,7 +4930,6 @@ stash@{0}: restore stash : stash test
 > [Git - git-fetch Documentation](https://git-scm.com/docs/git-fetch)  
 > [Git Fetch | What is Git Fetch and How to Use it | Learn Git](https://www.youtube.com/watch?v=uEEcw1s_wWk&ab_channel=GitKraken)  
       
-      
 1. **获取远程更新**：`git fetch` 用于从远程仓库下载最新的提交、分支和标签信息。  
 2. **不自动合并**：与 `git pull` 不同，`git fetch` 只是下载更新，不会自动合并到你的当前分支。这允许在合并之前检查远程更改。  
 3. **更新远程跟踪分支**：`git fetch` 会更新本地的远程跟踪分支（如 `origin/master`），使其反映远程仓库的当前状态。  
@@ -5017,105 +5051,110 @@ git push <remote> :<branch>
 git push <remote> <commit>:<branch>  
 ```
       
-# git pull  
-> [Git - git-pull Documentation](https://git-scm.com/docs/git-pull)  
-      
-`git pull` 用于将远程仓库的更改拉取到本地仓库。  
-它实际上是一个组合命令，等同于 `git fetch` 后跟 `git merge`。  
-      
-## 从远程仓库拉取最新代码并合并到当前分支  
-```bash  
-git pull origin master  
-```
-这个命令会从远程仓库 `origin` 的 `master` 分支拉取最新的代码，并尝试与当前分支合并。  
-      
-如果当前分支已经设置跟踪远程分支，可以省略远程分支名：  
-```bash  
-git pull origin  
-```
-      
-如果当前分支只跟踪一个远程分支，可以完全省略参数：  
-```bash  
-git pull  
-```
-      
-## --rebase  
-      
-使用 `rebase` 代替 `merge` 来合并更改：  
-```bash  
-git pull --rebase origin master  
-```
-      
-## --ff-only  
-      
-只允许快进式合并，不允许产生新合并提交：  
-```bash  
-git pull --ff-only origin master  
-```
-如果无法进行快进式合并，命令会失败。  
-      
-## --no-rebase  
-      
-覆盖配置选项，强制使用 `merge` 而不是 `rebase`：  
-```bash  
-git pull --no-rebase origin master  
-```
+# git merge  
+> [Git - git-merge Documentation](https://git-scm.com/docs/git-merge)  
       
 ## --no-commit  
+> [Git - git-merge Documentation](https://git-scm.com/docs/git-merge#Documentation/git-merge.txt---no-commit)  
       
-拉取后不自动提交合并的结果：  
+不自动提交  
+
+## --ff
+> [Git - git-merge Documentation](https://git-scm.com/docs/git-merge#Documentation/git-merge.txt---ff) 
+
+Specifies how a merge is handled when the merged-in history is already a descendant of the current history. --ff is the default unless merging an annotated (and possibly signed) tag that is not stored in its natural place in the refs/tags/ hierarchy, in which case --no-ff is assumed.
+
+With --ff, when possible resolve the merge as a fast-forward (only update the branch pointer to match the merged branch; do not create a merge commit). When not possible (when the merged-in history is not a descendant of the current history), create a merge commit.
+
+With --no-ff, create a merge commit in all cases, even when the merge could instead be resolved as a fast-forward.
+
+With --ff-only, resolve the merge as a fast-forward when possible. When not possible, refuse to merge and exit with a non-zero status.
+    
+## --ff-only 快速前进
+> [Git Merge | Atlassian Git Tutorial](https://www.atlassian.com/git/tutorials/using-branches/git-merge)  
+> [Git Fast-Forward VS Non-Fast-Forward](https://leimao.github.io/blog/Git-Fast-Forward-VS-Non-Fast-Forward/)  
+      
+> A Fast-Forward merge occurs when the branch you are merging into (often main or master) has not diverged from the branch you are merging (often a feature branch). In other words, the commit history of the target branch is a strict subset of the branch being merged. In a Fast-Forward merge, Git simply moves the pointer of the target branch forward to the latest commit on the branch being merged. No new merge commit is created; the history is linear.  
+      
+> A Non-Fast-Forward (No-FF) merge happens when the target branch has diverged from the branch being merged or when you explicitly choose to create a merge commit. In this case, Git creates a new commit that represents the merging of the two branches. Git creates a new merge commit that has two parent commits: one from the target branch and one from the branch being merged. The merge commit is a snapshot of the merged work, preserving the history of both branches.  
+      
+- **快速前进（fast-forward）**：当本地分支落后于远程分支且本地分支没有超前远程分支时，Git 可以安全地将本地分支的指针向前移动到远程分支的最新提交，即为快速前进。这种情况下，没有新的合并提交产生，因为历史是线性的。  
+- **非快速前进**：如果远程分支有新的提交分叉，你的本地分支不是远程分支的直接祖先，那么 Git 无法通过快速前进来更新本地分支。这时，Git 需要创建一个新的合并提交，将两个分支的历史合并在一起。  
+      
+git fast-forward（快进合并）主要适用于本地分支落后于待合并分支，并且没有超前的部分。  
+它要求合并的分支历史是线性的，即待合并的分支的提交历史是当前分支的直接延续。  
+      
+**条件**：  
+**线性历史**：待合并的分支的提交历史是当前分支的直接延续。  
+**没有新的本地提交**：当前分支没有新的提交，或者当前分支的提交历史完全包含在待合并的分支中。  
+      
 ```bash  
-git pull --no-commit origin master  
+A -- B -- C [main]  
+          \  
+           D -- E [feature]  
+```
+在这个场景中，feature 分支是从 main 分支的 C 提交处创建的，并且 main 分支没有新的提交。此时，feature 分支的提交历史是 main 分支的直接延续。可以执行fast-forward 合并。  
+bash复制  
+```bash  
+git checkout main  
+git merge feature --ff-only  
 ```
       
-## --allow-unrelated-histories  
-      
-允许合并没有共同历史记录的分支：  
+Git 会采用 fast-forward 策略，结果如下：  
 ```bash  
-git pull --allow-unrelated-histories origin master  
+A -- B -- C -- D -- E [main, feature]  
 ```
       
-## --tags  
+main 分支的指针直接移动到 feature 分支的最新提交 E 上。  
+没有创建新的合并提交，历史保持线性。  
       
-拉取远程仓库的标签：  
+如果本地比待合并分支有新的提交：  
 ```bash  
-git pull --tags origin master  
+lx@lx MINGW64 /d/Documents/git_test04 (fix_C)  
+$ git branch -vv  
+  fix_B a3df94d [origin/fix_B] Merge branch 'fix_B' of https://github.com/lxwcd/git_test into fix_B  
+* fix_C 69cf6cc [origin/fix_B: ahead 1, behind 2] modify 2.txt  
+  main  03d14ae [origin/main: ahead 2, behind 19] update main test01.txt  
+  main2 a47ac74 [origin/main: ahead 8, behind 19] Revert "update main test01.txt"  
+  main3 ee19c9a [origin/main: ahead 5, behind 19] Revert "add test02.txt and test03.txt"  
 ```
       
-## --prune  
-      
-拉取后清除本地不存在于远程仓库的分支：  
+执行 fast-forward 合并将失败。  
 ```bash  
-git pull --prune origin master  
+lx@lx MINGW64 /d/Documents/git_test04 (fix_C)  
+$ git merge origin/fix_B --ff-only  
+hint: Diverging branches can't be fast-forwarded, you need to either:  
+hint:  
+hint:   git merge --no-ff  
+hint:  
+hint: or:  
+hint:  
+hint:   git rebase  
+hint:  
+hint: Disable this message with "git config advice.diverging false"  
+fatal: Not possible to fast-forward, aborting.  
 ```
       
-## --recurse-submodules  
+## --squash 合并多个提交记录为一个提交记录  
+git merge --squash 的主要作用是将一个分支上的所有提交合并为一个单独的提交，并将这些更改应用到当前分支上。它不会创建合并提交，而是将所有更改暂存为一次新的提交。这常用于清理历史记录，将多个提交合并为一个。  
       
-递归地拉取和更新子模块：  
 ```bash  
-git pull --recurse-submodules origin master  
+git merge --squash feature  
+```
+这会将 feature 分支上的所有更改合并到当前分支，但不会自动创建一个新的提交。  
+      
+```bash  
+git commit -m "Squash commit: Merge feature branch changes"  
 ```
       
-## --depth  
+## --abort  
       
-指定拉取的历史记录深度，减少拉取的数据量，加快拉取速度：  
-```bash  
-git pull --depth=1 origin master  
-```
+## --continue  
       
-## --verbose  
+## -X 合并策略  
+> [Git - git-merge Documentation](https://git-scm.com/docs/git-merge#_merge_strategies)  
       
-详细输出拉取的过程：  
-```bash  
-git pull --verbose origin master  
-```
-      
-## --progress  
-      
-显示拉取进度：  
-```bash  
-git pull --progress origin master  
-```
+### ort  
       
 # git rebase  
 > [git rebase | Atlassian Git Tutorial](https://www.atlassian.com/git/tutorials/rewriting-history/git-rebase)  
@@ -5554,110 +5593,107 @@ update-ref refs/heads/mybranch
       
 通过这种方式，`git rebase --onto` 允许你在不合并提交记录的情况下，将一个分支上的更改应用到另一个分支上，使得项目的历史更加清晰和线性。  
       
-# git merge  
-> [Git - git-merge Documentation](https://git-scm.com/docs/git-merge)  
+
+# git pull  
+> [Git - git-pull Documentation](https://git-scm.com/docs/git-pull)  
+      
+`git pull` 用于将远程仓库的更改拉取到本地仓库。  
+它实际上是一个组合命令，等同于 `git fetch` 后跟 `git merge`。  
+      
+## 从远程仓库拉取最新代码并合并到当前分支  
+```bash  
+git pull origin master  
+```
+这个命令会从远程仓库 `origin` 的 `master` 分支拉取最新的代码，并尝试与当前分支合并。  
+      
+如果当前分支已经设置跟踪远程分支，可以省略远程分支名：  
+```bash  
+git pull origin  
+```
+      
+如果当前分支只跟踪一个远程分支，可以完全省略参数：  
+```bash  
+git pull  
+```
+      
+## --rebase  
+      
+使用 `rebase` 代替 `merge` 来合并更改：  
+```bash  
+git pull --rebase origin master  
+```
+      
+## --ff-only 快速前进 
+      
+只允许[快进式合并](#--ff-only-快速前进)，不允许产生新合并提交：  
+  
+```bash  
+git pull --ff-only origin master  
+```
+如果无法进行快进式合并，命令会失败。  
+      
+## --no-rebase  
+      
+覆盖配置选项，强制使用 `merge` 而不是 `rebase`：  
+```bash  
+git pull --no-rebase origin master  
+```
       
 ## --no-commit  
-> [Git - git-merge Documentation](https://git-scm.com/docs/git-merge#Documentation/git-merge.txt---no-commit)  
       
-不自动提交  
-
-## --ff
-> [Git - git-merge Documentation](https://git-scm.com/docs/git-merge#Documentation/git-merge.txt---ff) 
-
-Specifies how a merge is handled when the merged-in history is already a descendant of the current history. --ff is the default unless merging an annotated (and possibly signed) tag that is not stored in its natural place in the refs/tags/ hierarchy, in which case --no-ff is assumed.
-
-With --ff, when possible resolve the merge as a fast-forward (only update the branch pointer to match the merged branch; do not create a merge commit). When not possible (when the merged-in history is not a descendant of the current history), create a merge commit.
-
-With --no-ff, create a merge commit in all cases, even when the merge could instead be resolved as a fast-forward.
-
-With --ff-only, resolve the merge as a fast-forward when possible. When not possible, refuse to merge and exit with a non-zero status.
-    
-## --ff-only 快速前进（fast-forward）  
-> [Git Merge | Atlassian Git Tutorial](https://www.atlassian.com/git/tutorials/using-branches/git-merge)  
-> [Git Fast-Forward VS Non-Fast-Forward](https://leimao.github.io/blog/Git-Fast-Forward-VS-Non-Fast-Forward/)  
-      
-> A Fast-Forward merge occurs when the branch you are merging into (often main or master) has not diverged from the branch you are merging (often a feature branch). In other words, the commit history of the target branch is a strict subset of the branch being merged. In a Fast-Forward merge, Git simply moves the pointer of the target branch forward to the latest commit on the branch being merged. No new merge commit is created; the history is linear.  
-      
-> A Non-Fast-Forward (No-FF) merge happens when the target branch has diverged from the branch being merged or when you explicitly choose to create a merge commit. In this case, Git creates a new commit that represents the merging of the two branches. Git creates a new merge commit that has two parent commits: one from the target branch and one from the branch being merged. The merge commit is a snapshot of the merged work, preserving the history of both branches.  
-      
-- **快速前进（fast-forward）**：当本地分支落后于远程分支且本地分支没有超前远程分支时，Git 可以安全地将本地分支的指针向前移动到远程分支的最新提交，即为快速前进。这种情况下，没有新的合并提交产生，因为历史是线性的。  
-- **非快速前进**：如果远程分支有新的提交分叉，你的本地分支不是远程分支的直接祖先，那么 Git 无法通过快速前进来更新本地分支。这时，Git 需要创建一个新的合并提交，将两个分支的历史合并在一起。  
-      
-git fast-forward（快进合并）主要适用于本地分支落后于待合并分支，并且没有超前的部分。  
-它要求合并的分支历史是线性的，即待合并的分支的提交历史是当前分支的直接延续。  
-      
-**条件**：  
-**线性历史**：待合并的分支的提交历史是当前分支的直接延续。  
-**没有新的本地提交**：当前分支没有新的提交，或者当前分支的提交历史完全包含在待合并的分支中。  
-      
+拉取后不自动提交合并的结果：  
 ```bash  
-A -- B -- C [main]  
-          \  
-           D -- E [feature]  
-```
-在这个场景中，feature 分支是从 main 分支的 C 提交处创建的，并且 main 分支没有新的提交。此时，feature 分支的提交历史是 main 分支的直接延续。可以执行fast-forward 合并。  
-bash复制  
-```bash  
-git checkout main  
-git merge feature --ff-only  
+git pull --no-commit origin master  
 ```
       
-Git 会采用 fast-forward 策略，结果如下：  
+## --allow-unrelated-histories  
+      
+允许合并没有共同历史记录的分支：  
 ```bash  
-A -- B -- C -- D -- E [main, feature]  
+git pull --allow-unrelated-histories origin master  
 ```
       
-main 分支的指针直接移动到 feature 分支的最新提交 E 上。  
-没有创建新的合并提交，历史保持线性。  
+## --tags  
       
-如果本地比待合并分支有新的提交：  
+拉取远程仓库的标签：  
 ```bash  
-lx@lx MINGW64 /d/Documents/git_test04 (fix_C)  
-$ git branch -vv  
-  fix_B a3df94d [origin/fix_B] Merge branch 'fix_B' of https://github.com/lxwcd/git_test into fix_B  
-* fix_C 69cf6cc [origin/fix_B: ahead 1, behind 2] modify 2.txt  
-  main  03d14ae [origin/main: ahead 2, behind 19] update main test01.txt  
-  main2 a47ac74 [origin/main: ahead 8, behind 19] Revert "update main test01.txt"  
-  main3 ee19c9a [origin/main: ahead 5, behind 19] Revert "add test02.txt and test03.txt"  
+git pull --tags origin master  
 ```
       
-执行 fast-forward 合并将失败。  
+## --prune  
+      
+拉取后清除本地不存在于远程仓库的分支：  
 ```bash  
-lx@lx MINGW64 /d/Documents/git_test04 (fix_C)  
-$ git merge origin/fix_B --ff-only  
-hint: Diverging branches can't be fast-forwarded, you need to either:  
-hint:  
-hint:   git merge --no-ff  
-hint:  
-hint: or:  
-hint:  
-hint:   git rebase  
-hint:  
-hint: Disable this message with "git config advice.diverging false"  
-fatal: Not possible to fast-forward, aborting.  
+git pull --prune origin master  
 ```
       
-## --squash 合并多个提交记录为一个提交记录  
-git merge --squash 的主要作用是将一个分支上的所有提交合并为一个单独的提交，并将这些更改应用到当前分支上。它不会创建合并提交，而是将所有更改暂存为一次新的提交。这常用于清理历史记录，将多个提交合并为一个。  
+## --recurse-submodules  
       
+递归地拉取和更新子模块：  
 ```bash  
-git merge --squash feature  
-```
-这会将 feature 分支上的所有更改合并到当前分支，但不会自动创建一个新的提交。  
-      
-```bash  
-git commit -m "Squash commit: Merge feature branch changes"  
+git pull --recurse-submodules origin master  
 ```
       
-## --abort  
+## --depth  
       
-## --continue  
+指定拉取的历史记录深度，减少拉取的数据量，加快拉取速度：  
+```bash  
+git pull --depth=1 origin master  
+```
       
-## -X 合并策略  
-> [Git - git-merge Documentation](https://git-scm.com/docs/git-merge#_merge_strategies)  
+## --verbose  
       
-### ort  
+详细输出拉取的过程：  
+```bash  
+git pull --verbose origin master  
+```
+      
+## --progress  
+      
+显示拉取进度：  
+```bash  
+git pull --progress origin master  
+```
       
 # git prune  
 > [Git - git-prune Documentation](https://git-scm.com/docs/git-prune)  
@@ -5869,7 +5905,7 @@ ee19c9a (HEAD -> main3) Revert "add test02.txt and test03.txt"
 737c5b7 commit B  
 ```
       
-## 解决冲突  
+## pick 过程中解决冲突  
 git cherry-pick 解决冲突后不修改 Author Date。  
     
 `git cherry-pick` 如果有冲突，根据提示和 git status 查看的状态打开冲突文件解决冲突。  
@@ -6440,6 +6476,170 @@ git checkout <tag-name>
    git checkout main
    ```
 
+# git describe
+> [Git - git-describe Documentation](https://git-scm.com/docs/git-describe) 
+
+`git describe` 是一个强大的 Git 命令，用于生成人类可读的版本标识符，基于最近的标签（tag）和提交历史。它常用于自动化版本管理和发布流程。
+
+有标签时使用这个命令。
+
+- **查找最近的标签**：从当前提交向上回溯查找最近的标签
+- **生成描述字符串**：格式为`<最近标签>-<距离标签的提交数>-g<提交哈希缩写>`
+- **状态标记**：可添加`-dirty`（工作区有修改）或`-broken`（工作区损坏）后缀
+
+```bash
+git describe [选项] [提交引用]
+```
+
+## 常用选项
+
+| 选项            | 说明                                 |
+| --------------- | ------------------------------------ |
+| `--tags`        | 包含轻量标签（默认只查找带注释标签） |
+| `--abbrev=<n>`  | 指定提交哈希缩写长度（默认7）        |
+| `--dirty`       | 工作区有修改时添加`-dirty`后缀       |
+| `--always`      | 无标签时显示提交哈希                 |
+| `--long`        | 总是显示完整格式（即使匹配精确标签） |
+| `--exact-match` | 仅当当前提交正好是标签时输出         |
+
+
+## 示例仓库结构
+
+```mermaid
+gitGraph
+    commit id: "a1b2c3d" tag: "v1.0.0"
+    commit id: "b2c3d4e"
+    commit id: "c3d4e5f"
+    commit id: "d4e5f6g" tag: "v1.1.0"
+    commit id: "e5f6g7h"
+    commit id: "f6g7h8i" tag: "v2.0.0"
+    commit id: "g7h8i9j"
+    commit id: "h8i9j0k" type: HIGHLIGHT
+```
+
+## 查看当前分支最近的附注标签
+> [附注标签](#附注标签)
+
+> By default (without --all or --tags) git describe only shows annotated tags.
+
+```bash
+# 在提交 h8i9j0k 上执行
+$ git describe
+v2.0.0-2-gh8i9j0k
+```
+
+- `v2.0.0`：最近的标签
+- `2`：距离标签有2次提交
+- `gh8i9j0k`：当前提交的7位哈希缩写（g前缀防止与数字混淆）
+
+## 查看当前分支最近的标签（包含轻量标签）
+> [轻量标签](#标签的类型)
+> [Git - git-describe Documentation](https://git-scm.com/docs/git-describe#Documentation/git-describe.txt---tags) 
+
+```bash
+# 创建轻量标签
+$ git tag test-light
+```
+
+轻量标签，不加 --long 仅显示标签名
+```bash
+$ git describe --tags
+test-light
+```
+
+## 查看标签的详细信息
+
+轻量标签，不加 --long 仅显示标签名
+```bash
+$ git describe --tags
+test-light-1-gh8i9j0k
+```
+
+## 检测当前分支工作区状态
+
+```bash
+# 修改文件后执行
+$ echo "change" >> file.txt
+$ git describe --dirty
+v2.0.0-2-gh8i9j0k-dirty
+```
+
+## 无标签时显示当前分支最新的提交哈希
+
+```bash
+# 在第一个提交前执行
+$ git checkout a1b2c3d~1
+
+$ git describe
+fatal: No names found, cannot describe anything.
+
+$ git describe --always
+a0b1c2d  # 显示完整提交哈希
+```
+
+## 查看当前分支距离定提交最近标签
+
+```bash
+# 描述特定提交
+$ git describe b2c3d4e
+v1.0.0-1-gb2c3d4e
+
+# 描述标签本身
+$ git describe v1.1.0
+v1.1.0
+```
+
+## 指定哈希值的长度
+
+```bash
+# 增加哈希长度
+$ git describe --abbrev=10
+v2.0.0-2-gh8i9j0k1234
+```
+
+## 比较当前版本与上次发布差异
+
+```bash
+# 比较当前版本与上次发布
+git diff $(git describe --tags --abbrev=0)..HEAD
+```
+
+## 查看特定分支的最近标签
+
+```bash
+lx@lx MINGW64 /d/Documents/vnote (dev-copy)
+$ git describe --tags --abbrev=0 origin/qt56
+v2.7.1
+```
+
+- `--tags`：包含轻量标签（默认只查找带注释标签）
+- `--abbrev=0`：不使用缩写，返回完整标签名
+- `origin/qt56`：目标分支（远程分支）
+
+## 查看最后一次打标签的时间
+
+指定输出格式：
+```bash
+lx@lx MINGW64 /d/Documents/vnote (dev-copy)
+$ git log -1 --format="%ai" $(git describe --tags --abbrev=0 origin/qt56 2>/dev/null) 2>/dev/null
+2019-06-25 20:20:39 +0800
+```
+- `%ai`：ISO 8601 格式的日期（YYYY-MM-DD HH:MM:SS +ZZZZ）
+
+
+或者
+```bash
+lx@lx MINGW64 /d/Documents/vnote (dev-copy)
+$ git log -1 --shortstat $(git describe --tags --abbrev=0 origin/qt56)
+commit c152c463840dcb23d6aa8d30042e6f9d04d3506a (tag: v2.7.1)
+Author: Le Tan <tamlokveer@gmail.com>
+Date:   Tue Jun 25 20:20:39 2019 +0800
+
+    release v2.7.1
+
+ 6 files changed, 16 insertions(+), 11 deletions(-)
+```
+
 # 常用案例  
       
 ## git fetch -p 更新远程信息  
@@ -6591,7 +6791,9 @@ git clean -fd
 ```
       
 ## 有冲突时指定使用版本  
-      
+> [git rebase 冲突解决案例](#合并有冲突解决示例)
+> [git cherry-pick 冲突解决案例](#pick-过程中解决冲突)
+  
 两个仓库中的一个分支都修改了文件 2.txt 的相同一行，但修改内容内容不同，一个仓库已经将修改推送到远程仓库，另一个仓库修改后提交到本地，然后 git pull 时提示有冲突：  
 ```bash  
 lx@lx MINGW64 /d/Documents/git_test03 (fix_B)  
@@ -6674,7 +6876,7 @@ git add <file-path>
 ```
       
 ### 继续合并  
-如果你已经解决了所有文件的冲突，你可以继续完成合并操作：  
+如果已经解决了所有文件的冲突，你可以继续完成合并操作：  
       
 ```bash  
 git commit -m "message"  
@@ -6684,13 +6886,39 @@ git commit -m "message"
 ```bash  
 git merge --continue  
 ```
+
+## 查看分支的创建时间
+> [git merge-base](#git-merge-base-查找分支的共同祖先)
+
+origin/develop 和 origin/demo 分支分叉的时间为 origin/demo 创建时间
+
+```bash
+lx@lx MINGW64 /d/src_git/IND400_demo (demo_new)
+$ git show $(git merge-base origin/develop origin/demo) --stat
+commit 581700b08431084e2de5fc21dd3b4f69868ea687
+Author: lxwcd <15521168075@163.com>  
+Date:   Sun Jan 19 18:34:59 2025 +0800  
       
+    Merge branch 'fix_B'  
+
+Author: Alice <.Zhu@mt.com>
+
+ 1 file changed, 17 insertions(+), 14 deletions(-)
+```
+
+## 查看特定分支的最近标签
+> [查看特定分支的最近标签](#查看特定分支的最近标签)
+      
+## 查看最后一次打标签的时间
+> [查看最后一次打标签的时间](#查看最后一次打标签的时间)
+
+
 ## 合并 feature 分支合并到主干分支  
     
 - git fetch -p 更新远程仓库  
 - 拉取远程仓库主分支到本地  
 ```bash  
-git checkout -b dev origin/dev  
+git checkout -b feature origin/dev  
 ```
 - git switch -c 复制当前分支到新分支进行合并操作  
 如果当前分支工作目录不干净，可以 git stash 保持未提交的信息；  
