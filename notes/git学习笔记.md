@@ -4511,6 +4511,13 @@ git restore [<options>] [--source=<tree>] [--staged] [--worktree] [--] <pathspec
 指定 `--staged` 则仅恢复暂存区。  
 同时指定 `--staged --worktree` 则恢复工作目录和暂存区。  
       
+## 恢复已跟踪但未暂存的全部文件
+
+不影响已暂存的文件
+```bash
+git restore .
+```
+
 ## 恢复暂存区的特定文件  
       
 已暂存的文件，希望取消暂存，但保持文件在工作目录中不变：  
@@ -4537,6 +4544,35 @@ $ git restore --source=HEAD --staged --worktree .
 ```
       
 不会修改未跟踪的文件  
+
+## 删除没有被跟踪的文件：  
+
+```bash
+$ git clean -fd
+```
+
+如：
+```bash  
+lx@lx MINGW64 /d/Documents/vnote (dev-copy01)
+$ git status
+On branch dev-copy01
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        2.txt
+        3.txt
+
+nothing added to commit but untracked files present (use "git add" to track)
+
+lx@lx MINGW64 /d/Documents/vnote (dev-copy01)
+$ git clean -fd
+Removing 2.txt
+Removing 3.txt
+
+lx@lx MINGW64 /d/Documents/vnote (dev-copy01)
+$ git status
+On branch dev-copy01
+nothing to commit, working tree clean
+```
       
 ## 从其他提交中恢复文件  
       
@@ -5155,7 +5191,55 @@ git commit -m "Squash commit: Merge feature branch changes"
 > [Git - git-merge Documentation](https://git-scm.com/docs/git-merge#_merge_strategies)  
       
 ### ort  
-      
+
+## merge 合并方向
+
+在 feature 分支修改完最终打算用 merge 方式和主干分支合并时，最好用正向合并，保留主干分支历史，然后在主干分支上增加特性分支的提交记录。
+
+1. **当前分支 (Current Branch)**：执行 `git merge` 时所在的分支（`HEAD` 指向的分支）
+2. **被合并分支 (Merged Branch)**：命令中指定的分支（如 `git merge feature` 中的 `feature`）
+3. **方向差异**：
+   - **正向合并**：在稳定分支（如 `main`）合并特性分支（如 `feature`）
+   - **反向合并**：在特性分支合并稳定分支
+
+| **场景**         | **正向合并** (`main` ← `feature`) | **反向合并** (`feature` ← `main`) |
+| ---------------- | --------------------------------- | --------------------------------- |
+| **工作目录状态** | 影响稳定分支                      | 影响特性分支                      |
+| **冲突解决责任** | 需确保 `main` 分支稳定性          | 可在特性分支实验性解决            |
+| **紧急修复影响** | 可能阻塞其他开发                  | 不影响主分支稳定性                |
+| **典型场景**     | 功能发布前集成测试                | 同步主分支修复到特性分支          |
+
+
+假设初始状态：
+```
+          A---B---C  main
+          \
+           D---E  feature
+```
+
+### 正向合并 (`git checkout main && git merge feature`)
+```
+          A---B---C---F  main
+          \         /
+           D---E---'  feature
+```
+- **结果**：创建新合并提交 `F` 在 `main` 分支
+- **特点**：
+  - `main` 分支历史包含特性分支所有提交
+  - 适合功能发布
+  - 不影响 `main` 分支的其他历史记录
+
+### 反向合并 (`git checkout feature && git merge main`)
+```
+          A---B---C  main
+          \       \
+           D---E---F  feature
+```
+- **结果**：创建新合并提交 `F` 在 `feature` 分支
+- **特点**：
+  - `feature` 分支包含主分支最新修复
+  - 避免特性分支与主分支偏离过大
+
 # git rebase  
 > [git rebase | Atlassian Git Tutorial](https://www.atlassian.com/git/tutorials/rewriting-history/git-rebase)  
 > [Git - Rebasing](https://git-scm.com/book/en/v2/Git-Branching-Rebasing)  
@@ -5347,6 +5431,12 @@ Commit:     lxwcd <15521168075@163.com>
 CommitDate: Mon Feb 10 00:13:44 2025 +0800  
     
     rebase 91b0e3c Fix bug and fix confict  
+```
+
+### git rebase --abort 终止合并  
+如果想放弃合并，则执行
+```bash
+git rebase --abort
 ```
     
 ## git rebase -i 交互变基  
@@ -6105,6 +6195,8 @@ git ls-files -v | grep "^h"
 > [Removing sensitive data from a repository - GitHub Docs](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository)  
       
 # git tag
+> [git tag](https://git-scm.com/docs/git-tag) 
+
 Git 的 `tag` 是用于标记某个特定的提交（commit）的重要工具，常用于标识版本号（如 `v1.0.0`）或关键里程碑。
 
 ## 标签的作用
@@ -6243,15 +6335,151 @@ Date:   Sun May 11 22:08:18 2025 +0800
  1 file changed, 1 insertion(+)
 ```
 
-## 查看标签
+## 查看全部标签
+
+- 包含全部分支的标签，不是针对特定分支
+- 包含轻量标签和附注标签
+- 默认按照字母顺序升序排列
+
 ```bash
-git tag                    # 列出所有标签
-git tag -l "v1.*"          # 按通配符过滤（如 v1.0、v1.1）
+git tag
+```
+
+## 查看全部标签并指定排序方式
+
+```bash
+git tag --sort=<排序键>   # 升序
+git tag --sort=-<排序键>  # 降序（添加减号）
+```
+
+| **排序键**        | **说明**                                                 |
+| ----------------- | -------------------------------------------------------- |
+| `refname`         | 按标签名字母顺序（默认方式）                             |
+| `version:refname` | 按**语义化版本号**排序（如 `v1.10` > `v1.2`）            |
+| `creatordate`     | 按**标签创建时间**（仅对带注释的标签有效）               |
+| `taggerdate`      | 同 `creatordate`（别名）                                 |
+| `committerdate`   | 按标签指向的**提交时间**（对轻量标签和带注释标签均有效） |
+| `authordate`      | 按原始**作者提交时间**                                   |
+| `v:refname`       | `version:refname` 的简写                                 |
+
+
+**注意**：轻量标签（lightweight tags）无独立创建时间，推荐用 `committerdate` 排序。
+
+### 按字母顺序升序（默认）
+
+```bash
+lx@lx MINGW64 /d/Documents/vnote (dev)
+$   git tag --sort=refname | head -n10
+2.4
+3.11.0
+continuous-build
+test
+test-light
+v-test-dev-copy
+v1.0
+v1.1
+v1.10
+v1.11
+```
+
+### 按语义化版本号降序
+
+- 如 v1.0.9 → v1.0.10
+- 如果标签名不是标准的版本号格式，使用version:refname可能不会按预期排序。它适用于类似“v1”、“v1.0”、“v1.0.1”这样的标签。
+
+```bash
+lx@lx MINGW64 /d/Documents/vnote (dev)
+$    git tag --sort=-version:refname | head
+v3.19.2
+v3.19.1
+v3.19.0
+v3.18.2
+v3.18.1
+v3.18.0
+v3.17.0
+v3.16.0
+v3.15.1
+v3.15.0
+```
+
+### 按提交时间降序（最新提交在前）
+
+按实际提交时间排序，适合有轻量标签的情况：
+```bash
+lx@lx MINGW64 /d/Documents/vnote (dev)
+$ git tag --sort=-committerdate | head
+v-test-dev-copy
+test
+continuous-build
+v3.19.2
+test-light
+v3.19.1
+v3.19.0
+v3.18.2
+v3.18.1
+v3.18.0
+```
+
+### 组合显示信息（时间+标签名）
+
+```bash
+lx@lx MINGW64 /d/Documents/vnote (dev)
+$ git tag --sort=-committerdate --format='%(committerdate:iso8601) %(refname:short)' | head -n10
+2025-06-02 19:12:11 +0800 v-test-dev-copy
+2025-05-16 10:55:44 +0800 tags/test
+2025-05-15 20:23:24 +0800 continuous-build
+2025-05-15 20:23:24 +0800 v3.19.2
+2025-04-23 20:21:16 +0800 test-light
+2025-04-17 09:48:02 +0800 v3.19.1
+2025-04-10 20:46:58 +0800 v3.19.0
+2024-08-06 21:56:46 +0800 v3.18.2
+2024-07-10 22:23:14 +0800 v3.18.1
+2024-07-01 22:51:24 +0800 v3.18.0
+```
+
+### 注意事项
+1. **轻量标签 vs 带注释标签**：
+   - 轻量标签：无独立时间信息，`creatordate` 无效。
+   - 带注释标签：用 `git show <标签名>` 可查看完整的标签元信息。
+
+2. **语义化版本号要求**：
+   - 使用 `version:refname` 时，标签名需符合 `X.Y.Z` 格式（如 `v1.2.3` 或 `2.0.1`）。
+   - 非版本号标签（如 `release-1`）会按字母顺序排在结果开头或末尾。
+
+3. **时间格式转换**：
+   在 `--format` 中可使用时间格式化选项：
+   - `%(committerdate:iso8601)` → ISO 格式时间
+   - `%(committerdate:relative)` → 相对时间（如 "2 weeks ago"）
+
+## 过滤特定模式标签
+
+```bash
+lx@lx MINGW64 /d/Documents/vnote (dev)
+$ git tag --list "*test*"
+test
+test-light
+v-test-dev-copy
+
+lx@lx MINGW64 /d/Documents/vnote (dev)
+$ git tag -l "*test*"
+test
+test-light
+v-test-dev-copy
 ```
 
 ## 查看标签详细信息
 ```bash
-git show v1.0.0            # 显示标签指向的提交和标签元数据
+lx@lx MINGW64 /d/Documents/vnote (dev)
+$ git show test --stat
+warning: refname 'test' is ambiguous.
+commit 9b0fdb8b3ae4b91fb6583c542c244494bdd58b3d (HEAD -> dev, tag: test, origin/dev)
+Author: Le Tan <tamlokveer@gmail.com>
+Date:   Fri May 16 10:32:35 2025 +0800
+
+    fix
+
+ .github/workflows/ci-macos.yml | 2 ++
+ 1 file changed, 2 insertions(+)
 ```
 
 ## 推送标签到远程仓库
@@ -6651,6 +6879,97 @@ Date:   Tue Jun 25 20:20:39 2019 +0800
 git add *.cpp *.h  
 ```
       
+## 更新最新提交内容
+如修改一个 bug 但未完成，可以先 [git commit](#git-commit) 提交，防止内容丢失，后续继续修改后用下面命令更新上次提交的内容：
+```bash
+git commit --ament --no-edit
+```
+
+上面 `--no-edit` 表示提交的日志和上次日志相同，不修改日志信息。
+
+## 强制推送本地分支到远程分支
+> [git push --force](#强制推送)
+如本地提交后推送到远程分支，然后本地右使用 `git commit --amend --no-edit` 修改提交历史，此时无法直接将本地分支推送到远程分支，需要强制推送：
+
+确保本地不落后远程分支
+```bash
+git fetch -p
+git branch -u origin/feature
+git branch -vv
+```
+
+可能修改本地提交记录：
+```bash
+git commit --amend --no-edit
+```
+或者
+```cpp
+git rebase origin/develop
+```
+
+强制推送：
+```cpp
+git push --force -u origin HEAD:feature
+```
+
+将本地当前分支最新提交强制推送到远程 feature 分支。
+
+注意：
+- 尽量不要在公共分支和与其他人一起合作的分支上进行强制推送，因为这会覆盖远程分支的提交记录，可能会导致其他开发者的工作出现冲突。
+- 强制推送前先查看本地是否有落后远程分支的提交，避免丢失提交记录。
+
+## 查看两个分支的提交记录差别
+
+### 简单查看当前分支超前和落后其他分支的提交记录个数
+
+- 将要比较的分支设置为当前分支的上游分支
+```bash
+lx@lx MINGW64 /d/Documents/vnote (test)
+$ git branch -u dev
+branch 'test' set up to track 'dev'.
+```
+
+- 查看两个分支提交记录差别
+```bash
+lx@lx MINGW64 /d/Documents/vnote (test)
+$ git branch -vv
+  dev        9b0fdb8b [origin/dev] fix
+  dev-copy   20971f78 test
+  dev-copy01 9b0fdb8b fix
+  master     856d2597 [origin/master] release v3.19.2
+* test       c3191e8f [dev: behind 7] add privacy policy
+  test01     6150d327 fix macos build
+```
+或者：
+```bash
+lx@lx MINGW64 /d/Documents/vnote (test)
+$ git branch -vv | grep "*"
+* test       c3191e8f [dev: behind 7] add privacy policy
+```
+可见当前分支落后 dev 分支 7 个提交记录
+
+### 查看相差的具体提交记录
+> [查看不同分支差异](#查看不同分支差异)
+
+- 当前分支超前 dev 分支的提交记录
+```bash
+lx@lx MINGW64 /d/Documents/vnote (test)
+$ git log HEAD ^dev --oneline
+```
+
+- 当前分支落后 dev 分支的提交记录
+```bash
+lx@lx MINGW64 /d/Documents/vnote (test)
+$ git log ^HEAD dev --oneline
+9b0fdb8b (tag: test, origin/dev, dev-copy01, dev) fix
+856d2597 (tag: v3.19.2, tag: continuous-build, origin/master, origin/HEAD, master) release v3.19.2
+44a0d759 theme: fix toolbar expansion button style
+62f6b7f3 theme: support hot-reload via --watch-themes cmd option
+6150d327 (test01) fix macos build
+522ccfec fix macos deployment (#2610)
+4788ae4c add icons for macOS store
+```
+
 ## 复制当前分支  
     
 如果当前分支需要执行一些合并等操作，不确定操作后行为是否有问题，可以依据当前分支创建一个临时分支，在临时分支进行操作，这样不会影响当前分支：  
@@ -6677,6 +6996,47 @@ git fetch -p
 git checkout b fix_bug origin/develop  
 ```
     
+## 从特定提交记录创建分支
+
+- 当前分支的提交记录：
+```cpp
+lx@lx MINGW64 /d/Documents/vnote (dev)
+$ git log --oneline -10
+9b0fdb8b (HEAD -> dev, origin/dev) fix
+856d2597 (tag: v3.19.2, tag: continuous-build, origin/master, origin/HEAD, master) release v3.19.2
+44a0d759 theme: fix toolbar expansion button style
+62f6b7f3 theme: support hot-reload via --watch-themes cmd option
+6150d327 fix macos build
+522ccfec fix macos deployment (#2610)
+4788ae4c add icons for macOS store
+c3191e8f (tag: test-light, test) add privacy policy
+4952c88b fix readme
+ebd4489a update welcome doc
+```
+
+- 从 6150d327 提交记录创建新分支 test01
+```bash
+lx@lx MINGW64 /d/Documents/vnote (dev)
+$ git checkout -b test01 6150d327
+Switched to a new branch 'test01'
+```
+
+- 查看 test01 的提交记录
+```bash
+lx@lx MINGW64 /d/Documents/vnote (test01)
+$ git log --oneline -3
+6150d327 (HEAD -> test01) fix macos build
+522ccfec fix macos deployment (#2610)
+4788ae4c add icons for macOS store
+```
+
+## 从特定标签创建新分支
+
+- 查看当前提交录
+
+## 查看全部标签并指定排序方式
+> [查看全部标签并指定排序方式](#查看全部标签并指定排序方式)
+
 ## 显示已跟踪被修改的文件名  
 ```bash  
 git diff HEAD --name-only  
@@ -6779,18 +7139,9 @@ $ git status --short | grep "??" | cut -d" " -f2 | xargs rm -rf
 ```
       
 ### git restore  
-      
-恢复已跟踪的文件：  
-```bash  
-$ git restore --source=HEAD --staged --worktree .  
-```
-      
-再删除没有被跟踪的文件：  
-```bash  
-git clean -fd  
-```
-      
-## 有冲突时指定使用版本  
+> [git restore](#git-restore)
+
+## 合并时有冲突解决方案
 > [git rebase 冲突解决案例](#合并有冲突解决示例)
 > [git cherry-pick 冲突解决案例](#pick-过程中解决冲突)
   
@@ -6876,7 +7227,7 @@ git add <file-path>
 ```
       
 ### 继续合并  
-如果已经解决了所有文件的冲突，你可以继续完成合并操作：  
+如果已经解决了所有文件的冲突，可以继续完成合并操作：  
       
 ```bash  
 git commit -m "message"  
@@ -6912,55 +7263,8 @@ Author: Alice <.Zhu@mt.com>
 ## 查看最后一次打标签的时间
 > [查看最后一次打标签的时间](#查看最后一次打标签的时间)
 
-
-## 合并 feature 分支合并到主干分支  
-    
-- git fetch -p 更新远程仓库  
-- 拉取远程仓库主分支到本地  
-```bash  
-git checkout -b feature origin/dev  
-```
-- git switch -c 复制当前分支到新分支进行合并操作  
-如果当前分支工作目录不干净，可以 git stash 保持未提交的信息；  
-或者 git commmit 提交，然后到新分支后 git reset --hard HEAD^ 撤销提交。  
-- 查看 feature 分支和待合并的主分支的提交差异  
-```bash  
-git branch -u origin/dev  
-git branch -vv  
-```
-- 如果 feature 分支仅自己使用，且只有超前主分支的记录，无落后记录，则可以用 git rebase 或者 git merge -ff 合并。  
-- 如果 feature 分支仅自己使用，有超前主分支的记录，也有落后记录，则可以用 git rebase 尝试合并，如果有冲突则中途解决冲突。  
-- 如果 feature 分支是自己和其他人合作开发的分支，比主分支有超前和落后的记录，则可以先用 git rebase 尝试合并，看是否有冲突。  
-- 如果 feature 分支是别人合作开发的分支，比主分支有超前和落后的记录，则需要用 git merge 合并。  
-  - 如果无冲突，可直接用 git rebase 合并。  
-  - 如果有冲突，冲突是自己的提交记录，也可以修改冲突记录，然后继续用 git rebase 合并。  
-  - 如果有冲突，但冲突是别人的提交记录，则然对方进行合并解决冲突，或者自己解决冲突。  
-    根据实际需要，用 git rebase，解决冲突会修改其他人的提交记录，但最终显示 Author 仍为对方或者可以改为自己。  
-    或者用 git merge 等其他方式合并。  
-    
-## 提 Pull Request 策略  
-    
-### 更新最新代码  
-提 PR 前更新远程仓库代码，依据远程仓库主分支的最新代码在本地新建 feature 分支。  
-    
-### 冲突文件先提 PR 尽快合并  
-对于很容易发生的修改，如多语言，工程文件等，可以在提 PR 前更新代码，查看其他人 PR，如果当前 Active PR 没有多语言的修改，则先将这些易冲突的文件先提 PR 尽快合并到主分支。  
-    
-### 提 PR 前本地合并 feature 分支到主分支  
-本地代码修改完后，在提 PR 前，先更新远程仓库主分支的代码并拉取到本地，然后将当前分支合并到主分支，如果有冲突解决冲突。  
-合并步骤见前面介绍。  
-    
-合并后分支只有超前远程主分支的记录，无落后记录。  
-    
-### 新建远程 feature 分支提 PR  
-本地合并以后，将本地 feature 分支推送到远程仓库且在远程仓库新建 featrue 分支：  
-```bash  
-git push -u origin HEAD:feature  
-```
-    
-### PR 通过后合并到远程仓库主分支策略  
-PR 经过验证后真正合并到远程仓库时，可能远程仓库主分支又有了新的提交记录，这时可以在本地拉取远程仓库主分支，再将 feature 分支尝试合并到主分支，如 git rebase，如果没有冲突，则可以在远程仓库选择 git rebase 合并方案。  
-如果有冲突。则本地进行合并，并解决冲突后，重新推送到远程仓库进行 PR。  
+## 撤销本地最近的几个提交记录
+> [撤销本地最近的几个提交记录](#git-reset-撤销本地多个提交)
   
 # git 多人协作
 
@@ -6981,58 +7285,60 @@ git checkout -b feature origin/develop
 对于容易冲突的文件，如工程文件，多语言文件等，修改后单独创建提交记录，可以提前提 PR，这些文件的修改编译通过后提前尽快合并到主分支，防止后面合并时冲突。
 
 工程文件，可以先建好文件，内容为空，或者注释掉，先将文件加入工程中，单独创建提交记录并提 PR。
-如果提 PR 时有其他 PR 也修改了这些文件，或者像稍后合并，则将这些冲突提交单独创建提交记录，方便后面合并解决冲突。
+如果提 PR 时有其他 PR 也修改了这些文件，或者想稍后合并，则将这些冲突提交单独创建提交记录，方便后面合并解决冲突。
 
-## feature 本地与远程仓库主分支合并
+### 整理提交记录
+在本地修改后，可以修改部分就先进行提交，后面继续补充修改后，如果希望和上一个使用同样的提交记录，则可以用 [git commit --amend](#更新最新提交内容) 合并到上一个提交记录。
+
+如果之前的提交已经推送到远程仓库的 feature 分支，则需要用 [git push --force](#强制推送本地分支到远程分支) 强制覆盖远程仓库 feature 分支。
+
+## feature 分支与远程仓库主分支合并
 feature 分支修改完后，准备提 PR 之前，先更新远程仓库主分支的代码并拉取到本地，然后将当前分支合并到主分支，如果有冲突解决冲突。
 
-## 整理提交记录
-在本地修改后，可以修改部分就先进行提交，后面继续补充修改后，如果希望和上一个使用同样的提交记录，则可以用 [git commit --amend](#git-commit) 合并到上一个提交记录。
+合并前复制当前分支，用复制的分支合并，如果合并出错则切换回原来分支，然后删除复制分支。
 
-如果之前的提交已经推送到远程仓库的 feature 分支，则需要用 [git push --force](#强制推送) 强制覆盖远程仓库 feature 分支。
-
-### 查看 feature 分支和待合并的主分支的提交差异
+- 更新
 ```bash
 git fetch -p
-git branch -u origin/develop
-git branch -vv
-```
-上面操作可以看到当前分支超前和落后远程多少提交。如果具体想看远程超强的提交记录，用 [git log](#git-log-查看日志) 命令。
-```bash
-git log HEAD..origin/develop --oneline
 ```
 
-### 创建 feature 分支的副本分支
-进行合并前，最好创建一个当前分支的副本分支，用该分支进行合并测试，这样合并出错后可以切换回原来分支：
+- 创建当前分支副本进行合并操作
 ```cpp
-git swich -c feature_copy
+git switch -c feature-copy
 ```
 
-### 在 feature-copy 分支进行合并测试
-可以先用 git rebase 的方式合并到主干分支，这样不会影响主干分支的提交记录，且不会创建额外分支历史。
+- 让当前工作目录保持干净
+如果当前有修改但未提交：
+  - 修改的代码需要提交则 git commit 提交
+  - 修改的代码不需要提交则 `git stash` 暂存
+  ```bash
+  $ git stash push -m "stash 1.txt"
+  Saved working directory and index state On dev-copy01: stash 1.txt
+  ```
+  - 修改的代码不需要暂存则用 [git restore](#git-restore) 恢复
+
+- git rebase 和远程仓库主分支合并
 ```bash
-git rebase origin/develop
+git restore origin/develop
 ```
 
-如果直接合并有冲突，且是工程文件或者多语言文件等的冲突，这种必须使用主干的版本，再将自己的修改重新添加，这是可以用 [git cherry-pick](#git-cherry-pick) 合并。
-
-```bash
-git cherry-pick <commit-id>
-// 等待需要添加冲突文件，手动添加
-git add <file>
-git commit -m "message"
-// 继续用 git cherry-pick 合并
-git cherry-pick <commit-id>
-```
-注意按照原来的提交顺序合并。
-
-如果是其他文件的冲突，需要在冲突的文件中每个地方判断解决，具体见[有冲突时指定使用版本](#有冲突时指定使用版本)。
-
-如果有冲突，解决冲突后，用 git rebase --continue 继续合并。
-
-或者希望终止合并，则用 git rebase --abort。
+- 如果有冲突则[解决冲突](#合并时有冲突解决方案)
+  - 普通文件冲突，则解决冲突。
+  - 如果工程文件或者多语言文件等不方便合并的冲突，则[使用对方版本](#使用对方版本)，然后重新修改工程文件或多语言文件等
+  如果之前将工程文件和多语言文件单独提交，则可以用 [git cherry-pick](#git-cherry-pick) 合并，遇到冲突的提交记录，则重新修改后再提交，然后后面的提交记录继续用 `git cherry-pick` 合并。
+  ```bash
+  git cherry-pick <commit-id>
+  // 等待需要添加冲突文件，手动添加
+  git add <file>
+  git commit -m "message"
+  // 继续用 git cherry-pick 合并
+  git cherry-pick <commit-id>
+  ```
+  注意按照原来的提交顺序合并。
 
 ## 将合并后的本地分支推送到远程仓库
+
+当前分支最新提交推送到远程仓库的 feature 分支，如果该分支在远程仓库不存在，则创建该分支。
 ```bash
 git push -u origin HEAD:feature
 ```
@@ -7042,9 +7348,33 @@ git push -u origin HEAD:feature
 ## PR 通过后合并到远程仓库主分支
 PR　通过后，将远程的 feature 分支合并到远程仓库主分支。
 
-这时可能远程仓库的主分支又有了新的提交记录，因此可以在本地按照上面的方式进行合并尝试，看是否有冲突，如果无，且能用 git rebase 合并，则选择 git rebase 合并方案。  
+这时可能远程仓库的主分支又有了新的提交记录，因此可以在本地重复上面的方式进行合并尝试，看是否有冲突，如果无，且能用 git rebase 合并，则选择 git rebase 合并方案。  
 
 有冲突则需要本地处理冲突后才能进行合并。
+
+```bash
+git fetch -p
+# 比较当前分支是否落后待合并的远程仓库的分支
+git branch -u origin/develop
+git branch -vv
+# 有落后则本地尝试合并
+git switch -c feature-copy-new
+git rebase origin/develop
+```
+合并成功则直接在 PR 界面选中 rebase 的方式合并。
+
+合并冲突则重复 [feature 分支与远程仓库主分支合并](#feature-分支与远程仓库主分支合并) 过程。
+解决冲突后推送到远程仓库再进行合并。
+
+## 注意
+- git rebase 或者 git commit --amend 等修改提交历史的操作仅适合在自己分支上使用，最好不要在公共分支上使用
+- 公共分支最好不用 `git push --force` 强制推送
+- git rebase 注意方向
+自己 feature 分支合并到主干分支，则在 feature 分支上执行 git rebase develop，这样则不会修改主干分支的提交历史，仅修改自己分支的提交历史。
+- 如果用 git merge，则需要将 feature 分支合并到主干分支，即[正向合并](#merge-合并方向)。
+
+# 多人合作 feature 分支
+和 [git 多人协作](#git-多人协作) 操作相同，将共同使用的 feature 分支当作公共的主干分支一样的策略使用，最后再该 feature 分支合并到主干分支。
 
 # git subtree  
 > [Just a moment...](https://stackoverflow.com/questions/32407634/when-to-use-git-subtree)   
