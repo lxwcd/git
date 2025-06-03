@@ -1184,7 +1184,9 @@ $ git log --oneline --graph -15
 * 470dcf0 add files  
 ```
       
-## 查看不同分支差异  
+## <span id="view-branch-differences">view branch differences</span>
+
+查看不同分支差异  
       
 ```bash  
 $ git log foo bar ^baz  
@@ -1207,7 +1209,7 @@ $ git log origin/demo..HEAD --oneline
 $ git log HEAD ^origin/demo --oneline  
 ```
 
-## 查看最后一次打标签的时间
+# <span id="get-latest-tag-time">get latest tag time</span>
 ```bash
 # 输出时间
 git log -1 --format="%ai" $(git describe --tags --abbrev=0 origin/demo 2>/dev/null) 2>/dev/null 
@@ -1336,7 +1338,7 @@ M       test01.txt
 ## --patch
 显示提交的差异（默认选项），展示具体的代码变化。
 
-# git merge-base 查找分支的共同祖先  
+# <span id="git-merge-base">git merge-base</span>
 > [Git - git-merge-base Documentation](https://git-scm.com/docs/git-merge-base)  
       
 ## 两个分支的共同祖先  
@@ -2274,7 +2276,7 @@ git add *.cpp *.h
 git add -i
 ```
   
-# git commit  
+# <span id="git-commit">git commit</span>
 > [Git - git-commit Documentation](https://git-scm.com/docs/git-commit)   
   
 `git commit` 是 Git 中用于记录更改的命令。它将暂存区中的更改保存到本地仓库的历史记录中。  
@@ -2546,7 +2548,7 @@ git mv <file> <directory>
 git mv <old-directory> <new-directory>
 ```
 
-# git restore
+# <span id="git-restore">git restore</span>
 
 ```bash
 git restore [<options>] [--source=<tree>] [--staged] [--worktree] [--] <pathspec>…
@@ -2938,7 +2940,9 @@ branch 'test' set up to track 'origin/test'.
 git push --all <remote>
 ```
 
-## 强制推送
+## <span id="forced-push">forced push</span>
+
+强制推送
 
 ```bash
 git push --force <remote> <branch>
@@ -2983,7 +2987,7 @@ With --no-ff, create a merge commit in all cases, even when the merge could inst
 
 With --ff-only, resolve the merge as a fast-forward when possible. When not possible, refuse to merge and exit with a non-zero status.
     
-## --ff-only 快速前进
+## <span id="fast-forward-merge">fast-forward merge</span>
 > [Git Merge | Atlassian Git Tutorial](https://www.atlassian.com/git/tutorials/using-branches/git-merge)  
 > [Git Fast-Forward VS Non-Fast-Forward](https://leimao.github.io/blog/Git-Fast-Forward-VS-Non-Fast-Forward/)  
       
@@ -3069,7 +3073,7 @@ git commit -m "Squash commit: Merge feature branch changes"
       
 ### ort  
 
-## merge 合并方向
+## <span id="merge-direction">merge direction</span>
 
 在 feature 分支修改完最终打算用 merge 方式和主干分支合并时，最好用正向合并，保留主干分支历史，然后在主干分支上增加特性分支的提交记录。
 
@@ -3131,7 +3135,7 @@ git rebase 的行为和 git cherry-pick 的效果相同，如果合并过程中�
     
 进行合并前最好先复制当前分支来创建一个新分支操作。  
     
-## 合并有冲突解决示例  
+## <span id="rebase-with-conflicts">rebase with conflicts</span>
     
 要将 fix_D 分支和 fix_C 分支合并，利用 rebase。  
     
@@ -3592,7 +3596,7 @@ git pull --rebase origin master
       
 ## --ff-only 快速前进 
       
-只允许[快进式合并](#--ff-only-快速前进)，不允许产生新合并提交：  
+只允许[快进式合并](#fast-forward-merge)，不允许产生新合并提交：  
   
 ```bash  
 git pull --ff-only origin master  
@@ -3662,7 +3666,7 @@ git pull --verbose origin master
 git pull --progress origin master  
 ```
 
-# git cherry-pick  
+# <span id="git-cherry-pick">git cherry-pick</span>
 > [Git - git-cherry-pick Documentation](https://git-scm.com/docs/git-cherry-pick)  
       
 > Apply the changes introduced by some existing commits.  
@@ -3820,7 +3824,8 @@ ee19c9a (HEAD -> main3) Revert "add test02.txt and test03.txt"
 737c5b7 commit B  
 ```
       
-## pick 过程中解决冲突  
+## <span id="pick-with-conflicts">pick with conflicts</span>
+
 git cherry-pick 解决冲突后不修改 Author Date。  
     
 `git cherry-pick` 如果有冲突，根据提示和 git status 查看的状态打开冲突文件解决冲突。  
@@ -3905,7 +3910,9 @@ Git 的 `tag` 是用于标记某个特定的提交（commit）的重要工具，
 2. **快速定位提交**：通过标签直接跳转到关键提交，避免记忆哈希值。
 3. **发布管理**：常用于标记正式发布的代码版本。
 
-## 标签的类型
+## <span id="tag-type">tag type</span>
+
+标签的类型:
 ### 1. **轻量标签（Lightweight Tag）**
    - 仅是一个指向某个提交的指针，不存储额外信息。
    - **适用场景**：临时标记或本地使用。
@@ -3914,7 +3921,7 @@ Git 的 `tag` 是用于标记某个特定的提交（commit）的重要工具，
    - 是一个独立的 Git 对象，存储标签的元数据（作者、日期、说明等）。
    - **适用场景**：正式版本发布，需要记录详细信息的场景。
 
-## 附注标签
+## <span id="annotated-tag">annotated tag</span>
 当使用 `-a` 时，Git 会生成一个 **独立的标签对象**，包含以下完整元数据：
 ```bash
 git tag -a v1.0.0 -m "Release version 1.0.0"
@@ -4046,7 +4053,7 @@ Date:   Sun May 11 22:08:18 2025 +0800
 git tag
 ```
 
-## 查看全部标签并指定排序方式
+## <span id="sort-all-tags">sort all tags</span>
 
 ```bash
 git tag --sort=<排序键>   # 升序
@@ -4447,7 +4454,7 @@ gitGraph
 ```
 
 ## 查看当前分支最近的附注标签
-> [附注标签](#附注标签)
+> [附注标签](#annotated-tag)
 
 > By default (without --all or --tags) git describe only shows annotated tags.
 
@@ -4462,7 +4469,7 @@ v2.0.0-2-gh8i9j0k
 - `gh8i9j0k`：当前提交的7位哈希缩写（g前缀防止与数字混淆）
 
 ## 查看当前分支最近的标签（包含轻量标签）
-> [轻量标签](#标签的类型)
+> [轻量标签](#tag-type)
 > [Git - git-describe Documentation](https://git-scm.com/docs/git-describe#Documentation/git-describe.txt---tags) 
 
 ```bash
@@ -4533,7 +4540,7 @@ v2.0.0-2-gh8i9j0k1234
 git diff $(git describe --tags --abbrev=0)..HEAD
 ```
 
-## 查看特定分支的最近标签
+## <span id="git-latest-tag-on-a-branch">git latest tag on a branch</span>
 
 ```bash
 lx@lx MINGW64 /d/Documents/vnote (dev-copy)
@@ -4576,7 +4583,7 @@ Date:   Tue Jun 25 20:20:39 2019 +0800
 - 仅针对本地最新的提交  
 - 最新提交还未推送到远程  
       
-## git reset 撤销本地多个提交  
+# <span id="undo-multiple-local-commits">undo multiple local commits</span>
 > [git - reset demystified](https://git-scm.com/book/en/v2/git-tools-reset-demystified#_git_reset)  
 > [git - git-reset documentation](https://git-scm.com/docs/git-reset)  
 > [git - git-reset documentation](https://git-scm.com/docs/git-reset#_discussion)  
@@ -4707,7 +4714,7 @@ e43f274 merge branch 'branch01'
 git add *.cpp *.h  
 ```
       
-## 更新最新提交内容
+## <span id="amend-local-latest-commit">amend local latest commit</span>
 如修改一个 bug 但未完成，可以先 [git commit](#git-commit) 提交，防止内容丢失，后续继续修改后用下面命令更新上次提交的内容：
 ```bash
 git commit --ament --no-edit
@@ -4715,8 +4722,9 @@ git commit --ament --no-edit
 
 上面 `--no-edit` 表示提交的日志和上次日志相同，不修改日志信息。
 
-## 强制推送本地分支到远程分支
-> [git push --force](#强制推送)
+## <span id="force-push">force push</span>
+> [git push --force](#forced-push)
+
 如本地提交后推送到远程分支，然后本地右使用 `git commit --amend --no-edit` 修改提交历史，此时无法直接将本地分支推送到远程分支，需要强制推送：
 
 确保本地不落后远程分支
@@ -4777,7 +4785,7 @@ $ git branch -vv | grep "*"
 可见当前分支落后 dev 分支 7 个提交记录
 
 ### 查看相差的具体提交记录
-> [查看不同分支差异](#查看不同分支差异)
+> [查看不同分支差异](#view-branch-differences)
 
 - 当前分支超前 dev 分支的提交记录
 ```bash
@@ -4863,7 +4871,7 @@ $ git log --oneline -3
 - 查看当前提交录
 
 ## 查看全部标签并指定排序方式
-> [查看全部标签并指定排序方式](#查看全部标签并指定排序方式)
+> [查看全部标签并指定排序方式](#sort-all-tags)
 
 ## 显示已跟踪被修改的文件名  
 ```bash  
@@ -4969,9 +4977,9 @@ $ git status --short | grep "??" | cut -d" " -f2 | xargs rm -rf
 ### git restore  
 > [git restore](#git-restore)
 
-## 合并时有冲突解决方案
-> [git rebase 冲突解决案例](#合并有冲突解决示例)
-> [git cherry-pick 冲突解决案例](#pick-过程中解决冲突)
+## <span id="resolve-conflicts">resolve conflicts</span>
+> [git rebase 冲突解决案例](#rebase-with-conflicts)
+> [git cherry-pick 冲突解决案例](#pick-with-conflicts)
   
 两个仓库中的一个分支都修改了文件 2.txt 的相同一行，但修改内容内容不同，一个仓库已经将修改推送到远程仓库，另一个仓库修改后提交到本地，然后 git pull 时提示有冲突：  
 ```bash  
@@ -5025,7 +5033,7 @@ $ cat 2.txt
 `=======` 表示分隔符，下方内容为冲突版本的内容  
 `>>>>>>> f54dd265ddebde6a06e2ea619a0588d2b1555945` 表示冲突结束位置  
       
-### 使用对方版本  
+### <span id="use-their-version">use their version</span>
 ```bash  
 lx@lx MINGW64 /d/Documents/git_test03 (fix_B|MERGING)  
 $ git checkout --theirs 2.txt  
@@ -5036,7 +5044,7 @@ $ cat 2.txt
 222  
 ```
       
-### 使用本地版本  
+### <span id="use-our-version">use our version</span>
 ```bash  
 lx@lx MINGW64 /d/Documents/git_test03 (fix_B|MERGING)  
 $ git checkout --ours 2.txt  
@@ -5067,7 +5075,7 @@ git merge --continue
 ```
 
 ## 查看分支的创建时间
-> [git merge-base](#git-merge-base-查找分支的共同祖先)
+> [git merge-base](#git-merge-base)
 
 origin/develop 和 origin/demo 分支分叉的时间为 origin/demo 创建时间
 
@@ -5086,15 +5094,17 @@ Author: Alice <.Zhu@mt.com>
 ```
 
 ## 查看特定分支的最近标签
-> [查看特定分支的最近标签](#查看特定分支的最近标签)
+> [查看特定分支的最近标签](#git-latest-tag-on-a-branch)
       
 ## 查看最后一次打标签的时间
-> [查看最后一次打标签的时间](#查看最后一次打标签的时间)
+> [查看最后一次打标签的时间](#get-latest-tag-time)
 
 ## 撤销本地最近的几个提交记录
-> [撤销本地最近的几个提交记录](#git-reset-撤销本地多个提交)
+> [撤销本地最近的几个提交记录](#undo-multiple-local-commits)
   
-# git 多人协作
+# <span id="git-collaboration">git collaboration</span>
+
+多人合作，主干分支为 develop，自己负责的分支为 feature，feature 分支基于 develop 分支创建。
 
 ## 更新远程仓库
 ```bash
@@ -5116,11 +5126,11 @@ git checkout -b feature origin/develop
 如果提 PR 时有其他 PR 也修改了这些文件，或者想稍后合并，则将这些冲突提交单独创建提交记录，方便后面合并解决冲突。
 
 ### 整理提交记录
-在本地修改后，可以修改部分就先进行提交，后面继续补充修改后，如果希望和上一个使用同样的提交记录，则可以用 [git commit --amend](#更新最新提交内容) 合并到上一个提交记录。
+在本地修改后，可以修改部分就先进行提交，后面继续补充修改后，如果希望和上一个使用同样的提交记录，则可以用 [git commit --amend](#amend-local-latest-commit) 合并到上一个提交记录。
 
-如果之前的提交已经推送到远程仓库的 feature 分支，则需要用 [git push --force](#强制推送本地分支到远程分支) 强制覆盖远程仓库 feature 分支。
+如果之前的提交已经推送到远程仓库的 feature 分支，则需要用 [git push --force](#force-push) 强制覆盖远程仓库 feature 分支。
 
-## feature 分支与远程仓库主分支合并
+## <span id="rebase-target-branch">rebase target branch</span>
 feature 分支修改完后，准备提 PR 之前，先更新远程仓库主分支的代码并拉取到本地，然后将当前分支合并到主分支，如果有冲突解决冲突。
 
 合并前复制当前分支，用复制的分支合并，如果合并出错则切换回原来分支，然后删除复制分支。
@@ -5150,9 +5160,9 @@ git switch -c feature-copy
 git restore origin/develop
 ```
 
-- 如果有冲突则[解决冲突](#合并时有冲突解决方案)
+- 如果有冲突则 [解决冲突](#resolve-conflicts)
   - 普通文件冲突，则解决冲突。
-  - 如果工程文件或者多语言文件等不方便合并的冲突，则[使用对方版本](#使用对方版本)，然后重新修改工程文件或多语言文件等
+  - 如果工程文件或者多语言文件等不方便合并的冲突，则 [使用对方版本](#use-their-version)，然后重新修改工程文件或多语言文件等
   如果之前将工程文件和多语言文件单独提交，则可以用 [git cherry-pick](#git-cherry-pick) 合并，遇到冲突的提交记录，则重新修改后再提交，然后后面的提交记录继续用 `git cherry-pick` 合并。
   ```bash
   git cherry-pick <commit-id>
@@ -5191,7 +5201,7 @@ git rebase origin/develop
 ```
 合并成功则直接在 PR 界面选中 rebase 的方式合并。
 
-合并冲突则重复 [feature 分支与远程仓库主分支合并](#feature-分支与远程仓库主分支合并) 过程。
+合并冲突则重复 [rebase target branch](#rebase-target-branch) 过程。
 解决冲突后推送到远程仓库再进行合并。
 
 ## 注意
@@ -5199,7 +5209,7 @@ git rebase origin/develop
 - 公共分支最好不用 `git push --force` 强制推送
 - git rebase 注意方向
 自己 feature 分支合并到主干分支，则在 feature 分支上执行 git rebase develop，这样则不会修改主干分支的提交历史，仅修改自己分支的提交历史。
-- 如果用 git merge，则需要将 feature 分支合并到主干分支，即[正向合并](#merge-合并方向)。
+- 如果用 git merge，则需要将 feature 分支合并到主干分支，即 [合并方向](#merge-direction) 中的正向合并。
 
 # 多人合作 feature 分支
-和 [git 多人协作](#git-多人协作) 操作相同，将共同使用的 feature 分支当作公共的主干分支一样的策略使用，最后再该 feature 分支合并到主干分支。
+和 [git collaboration](#git-collaboration) 操作相同，将共同使用的 feature 分支当作公共的主干分支一样的策略使用，最后再该 feature 分支合并到主干分支。
