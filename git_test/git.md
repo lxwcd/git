@@ -435,9 +435,9 @@ HEAD is the pointer to the current branch reference, which is in turn a pointer 
       
 ## `HEAD` 的作用  
       
-1. **指向当前分支**：`HEAD` 通常指向当前分支的引用，比如 `master` 或 `feature`。当你检出（checkout）一个分支时，`HEAD` 会更新为指向该分支的最新提交。  
-2. **确定工作目录**：`HEAD` 指向的提交决定了你的工作目录的内容。当你检出不同的提交时，工作目录会更新以反映该提交时的文件状态。  
-3. **暂存区的基础**：`HEAD` 也用作暂存区（staging area）的基础。当你添加（add）更改到暂存区时，这些更改是相对于 `HEAD` 指向的提交进行的。  
+1. **指向当前分支**：`HEAD` 通常指向当前分支的引用，比如 `master` 或 `feature`。当检出（checkout）一个分支时，`HEAD` 会更新为指向该分支的最新提交。  
+2. **确定工作目录**：`HEAD` 指向的提交决定了工作目录的内容。当检出不同的提交时，工作目录会更新以反映该提交时的文件状态。  
+3. **暂存区的基础**：`HEAD` 也用作暂存区（staging area）的基础。当添加（add）更改到暂存区时，这些更改是相对于 `HEAD` 指向的提交进行的。  
       
 ## `HEAD` 的工作方式  
       
@@ -477,7 +477,7 @@ git log -1
       
 ### 2. 使用 `git show`  
       
-如果你想查看 `HEAD` 指向的提交的详细内容，可以使用：  
+如果想查看 `HEAD` 指向的提交的详细内容，可以使用：  
       
 ```bash  
 git show HEAD  
@@ -543,8 +543,8 @@ git status
 使用 git checkout origin/<branch> 命令切换到远程分支，但本地没有对应的分支。  
 使用 git checkout <tag> 命令切换到某个标签。  
       
-在 detached HEAD 状态下，你可以进行正常的 Git 操作，如提交、合并、重置等。但需要注意以下几点：  
-提交的引用：在 detached HEAD 状态下进行的提交不会关联到任何分支，因此这些提交可能会变得不可访问。你可以通过查看 Git 的引用日志（git reflog）来找回这些提交。  
+在 detached HEAD 状态下，可以进行正常的 Git 操作，如提交、合并、重置等。但需要注意以下几点：  
+提交的引用：在 detached HEAD 状态下进行的提交不会关联到任何分支，因此这些提交可能会变得不可访问。可以通过查看 Git 的引用日志（git reflog）来找回这些提交。  
       
 当在 detached HEAD 状态下进行提交时，这些提交不会关联到任何分支。HEAD 直接指向这些提交，而不是通过分支引用指向它们。因此，如果切换到其他分支，这些提交将不会被自动保留。  
       
@@ -560,16 +560,6 @@ git checkout -b new-branch
 - **比较提交**：使用 `git diff HEAD^` 或 `git diff HEAD~` 比较 `HEAD` 和其父提交之间的差异。  
 - **撤销提交**：使用 `git reset --soft HEAD^` 撤销最后一次提交，但保留工作目录和暂存区的状态。  
 在 Git 中，`HEAD` 是一个非常重要的概念，它指向当前分支的最新提交。`HEAD` 及其相关语法（如 `HEAD~3`）用于引用特定的提交。以下是关于 `HEAD` 及其语法的详细讲解：  
-      
-### 总结  
-      
-`HEAD`、`HEAD^`、`HEAD~` 和 `HEAD~n` 是 Git 中用于引用提交的强大工具。它们帮助你指定和操作特定的提交及其关系。理解这些概念对于有效使用 Git 进行版本控制和历史管理至关重要。  
-      
-      
-## `HEAD` 的重要性  
-      
-- **版本控制的基础**：`HEAD` 是 Git 版本控制的核心，它决定了你正在工作的版本和状态。  
-- **分支和合并**：在分支和合并操作中，`HEAD` 用于确定当前的工作基础和合并的目标。  
       
 ## 注意事项  
       
@@ -3900,56 +3890,54 @@ CommitDate: Sun Feb 9 22:32:24 2025 +0800
     modify test01.txt , add C  
 ```
       
-# git tag
-> [git tag](https://git-scm.com/docs/git-tag) 
-
-Git 的 `tag` 是用于标记某个特定的提交（commit）的重要工具，常用于标识版本号（如 `v1.0.0`）或关键里程碑。
-
-## 标签的作用
-1. **标记版本**：例如 `v1.0.0`、`v2.1.0-beta` 等。
-2. **快速定位提交**：通过标签直接跳转到关键提交，避免记忆哈希值。
-3. **发布管理**：常用于标记正式发布的代码版本。
-
-## <span id="tag-type">tag type</span>
-
-标签的类型:
-### 1. **轻量标签（Lightweight Tag）**
-   - 仅是一个指向某个提交的指针，不存储额外信息。
-   - **适用场景**：临时标记或本地使用。
-
-### 2. **附注标签（Annotated Tag）**
-   - 是一个独立的 Git 对象，存储标签的元数据（作者、日期、说明等）。
-   - **适用场景**：正式版本发布，需要记录详细信息的场景。
-
-## <span id="annotated-tag">annotated tag</span>
-当使用 `-a` 时，Git 会生成一个 **独立的标签对象**，包含以下完整元数据：
-```bash
-git tag -a v1.0.0 -m "Release version 1.0.0"
-```
-- **存储内容**：
-  - 标签名称（如 `v1.0.0`）
-  - 标签消息（`-m` 指定的内容）
-  - 标签创建者的姓名、邮箱和时间戳
-  - 指向的目标提交的 SHA-1 哈希
-- **查看信息**：
-  ```bash
-  git show v1.0.0
-  ```
-  输出会显示完整的标签元数据 + 对应的提交详情。
-
-直接使用 `git tag` 不加 `-a`，Git 只会创建一个 **轻量标签**：
-```bash
-git tag v1.0.0  # 仅是一个指向提交的指针
-```
-- **存储内容**：
-  - 仅是一个指向某个提交的 **引用**（类似分支指针）。
-  - **不存储任何元数据**（作者、时间、消息等）。
-- **查看信息**：
-  ```bash
-  git show v1.0.0
-  ```
-  输出直接显示目标提交的详情，不会包含标签自身的元数据。
-
+# git tag  
+> [git tag](https://git-scm.com/docs/git-tag)   
+  
+Git 的 `tag` 是用于标记某个特定的提交（commit）的重要工具，常用于标识版本号（如 `v1.0.0`）或关键里程碑。  
+  
+## 标签的作用  
+1. **标记版本**：例如 `v1.0.0`、`v2.1.0-beta` 等。  
+2. **快速定位提交**：通过标签直接跳转到关键提交，避免记忆哈希值。  
+3. **发布管理**：常用于标记正式发布的代码版本。  
+  
+## 标签的类型  
+### 1. **轻量标签（Lightweight Tag）**  
+   - 仅是一个指向某个提交的指针，不存储额外信息。  
+   - **适用场景**：临时标记或本地使用。  
+  
+### 2. **附注标签（Annotated Tag）**  
+   - 是一个独立的 Git 对象，存储标签的元数据（作者、日期、说明等）。  
+   - **适用场景**：正式版本发布，需要记录详细信息的场景。  
+  
+## 附注标签  
+当使用 `-a` 时，Git 会生成一个 **独立的标签对象**，包含以下完整元数据：  
+```bash  
+git tag -a v1.0.0 -m "Release version 1.0.0"  
+```  
+- **存储内容**：  
+  - 标签名称（如 `v1.0.0`）  
+  - 标签消息（`-m` 指定的内容）  
+  - 标签创建者的姓名、邮箱和时间戳  
+  - 指向的目标提交的 SHA-1 哈希  
+- **查看信息**：  
+  ```bash  
+  git show v1.0.0  
+  ```  
+  输出会显示完整的标签元数据 + 对应的提交详情。  
+  
+直接使用 `git tag` 不加 `-a`，Git 只会创建一个 **轻量标签**：  
+```bash  
+git tag v1.0.0  # 仅是一个指向提交的指针  
+```  
+- **存储内容**：  
+  - 仅是一个指向某个提交的 **引用**（类似分支指针）。  
+  - **不存储任何元数据**（作者、时间、消息等）。  
+- **查看信息**：  
+  ```bash  
+  git show v1.0.0  
+  ```  
+  输出直接显示目标提交的详情，不会包含标签自身的元数据。  
+  
 | 特性       | 附注标签（`-a`）                 | 轻量标签（不加 `-a`）   |
 | ---------- | -------------------------------- | ----------------------- |
 | 存储方式   | 独立 Git 对象                    | 仅是一个引用文件        |
@@ -3958,108 +3946,108 @@ git tag v1.0.0  # 仅是一个指向提交的指针
 | 查看详情   | 显示标签元数据 + 提交            | 直接显示提交内容        |
 | 签名支持   | 支持（`-s` 签名标签）            | 不支持                  |
 | 存储位置   | `.git/refs/tags/[name]` + 对象库 | `.git/refs/tags/[name]` |
-
-### **实际场景选择建议**
-#### 1. **必须用附注标签的场景**：
-   - **正式版本发布**（如 `v1.0.0`）：需记录版本号、发布日期、更新说明等。
-   - **长期维护的版本**：方便后续追溯版本背景信息。
-   - **需要签名验证**：用 `-s` 对标签加密，确保代码来源可信。
-
-#### 2. **轻量标签适用场景**：
-   - **临时本地标记**（如 `test-feature-A`）：快速标记某个提交用于测试。
-   - **私有开发记录**：无需共享给他人，仅个人快速跳转。
-
-### **底层存储结构示例**
-假设提交 `abc123` 被标记：
-- **附注标签**：
-  ```text
-  .git/refs/tags/v1.0.0 → 指向标签对象 def456
-  .git/objects/def456 → 包含标签元数据 + 提交 abc123 的引用
-  ```
-- **轻量标签**：
-  ```text
-  .git/refs/tags/v1.0.0 → 直接指向提交 abc123
-  ```
-
-### **将轻量标签转换为附注标签**
-如果误用了轻量标签，可通过以下步骤修正：
-```bash
-# 1. 删除旧轻量标签
-git tag -d v1.0.0
-
-# 2. 重新创建附注标签（指向同一提交）
-git tag -a v1.0.0 abc123 -m "Release version 1.0.0"
-```
-
-## 为当前分支最新提交创建标签
-```bash
-git tag v1.0.0             # 标记当前提交为 v1.0.0
-```
-
-## 为指定提交创建标签
-```bash
-git tag v1.0.0 9fceb02     # 标记哈希为 9fceb02 的提交
-```
-
-## 创建附注标签
-使用 `-a` 添加元数据，`-m` 添加说明：
-```bash
-git tag -a v1.0.0 -m "Release version 1.0.0"
-git tag -a v1.0.0 9fceb02 -m "Initial release"
-```
-
-包含元数据的标签：
-```bash
-lx@lx MINGW64 /d/Documents/docker (test01)
-$ git show v2.0 --stat
-tag v2.0
-Tagger: lxwcd <15521168075@163.com>
-Date:   Sat Jul 15 11:35:12 2023 +0800
-
-第二个实验，nginx负载均衡，keepalived 反向代理
-
-commit f2b5817945c9c2095597cd0dd75b22f190724b65 (tag: v2.0)
-Author: lxwcd <15521168075@163.com>
-Date:   Sat Jul 8 18:04:38 2023 +0800
-
-    update note
-
- lab/LNMP-wordpress-02/LNMP-wordpress搭建-02.md    |   7 +++++++
- lab/LNMP-wordpress-02/img/2023-07-08-18-03-34.png | Bin 0 -> 9660187 bytes
- 2 files changed, 7 insertions(+)
-```
-
-不包含元数据的轻量标签（git tag 没有用 -a）
-```bash
-lx@lx MINGW64 /d/Documents/docker (test01)
-$ git show vt01.00 --stat
-commit d8161017e6e3cbf3c47c47f10007ffa29ec1d43a (HEAD -> test01, tag: vt01.00)
-Author: lxwcd <15521168075@163.com>
-Date:   Sun May 11 22:08:18 2025 +0800
-
-    add 1.txt, test01
-
- 1.txt | 1 +
- 1 file changed, 1 insertion(+)
-```
-
-## 查看全部标签
-
-- 包含全部分支的标签，不是针对特定分支
-- 包含轻量标签和附注标签
-- 默认按照字母顺序升序排列
-
-```bash
-git tag
-```
-
-## <span id="sort-all-tags">sort all tags</span>
-
-```bash
-git tag --sort=<排序键>   # 升序
-git tag --sort=-<排序键>  # 降序（添加减号）
-```
-
+  
+### **实际场景选择建议**  
+#### 1. **必须用附注标签的场景**：  
+   - **正式版本发布**（如 `v1.0.0`）：需记录版本号、发布日期、更新说明等。  
+   - **长期维护的版本**：方便后续追溯版本背景信息。  
+   - **需要签名验证**：用 `-s` 对标签加密，确保代码来源可信。  
+  
+#### 2. **轻量标签适用场景**：  
+   - **临时本地标记**（如 `test-feature-A`）：快速标记某个提交用于测试。  
+   - **私有开发记录**：无需共享给他人，仅个人快速跳转。  
+  
+### **底层存储结构示例**  
+假设提交 `abc123` 被标记：  
+- **附注标签**：  
+  ```text  
+  .git/refs/tags/v1.0.0 → 指向标签对象 def456  
+  .git/objects/def456 → 包含标签元数据 + 提交 abc123 的引用  
+  ```  
+- **轻量标签**：  
+  ```text  
+  .git/refs/tags/v1.0.0 → 直接指向提交 abc123  
+  ```  
+  
+### **将轻量标签转换为附注标签**  
+如果误用了轻量标签，可通过以下步骤修正：  
+```bash  
+# 1. 删除旧轻量标签  
+git tag -d v1.0.0  
+  
+# 2. 重新创建附注标签（指向同一提交）  
+git tag -a v1.0.0 abc123 -m "Release version 1.0.0"  
+```  
+  
+## 为当前分支最新提交创建标签  
+```bash  
+git tag v1.0.0             # 标记当前提交为 v1.0.0  
+```  
+  
+## 为指定提交创建标签  
+```bash  
+git tag v1.0.0 9fceb02     # 标记哈希为 9fceb02 的提交  
+```  
+  
+## 创建附注标签  
+使用 `-a` 添加元数据，`-m` 添加说明：  
+```bash  
+git tag -a v1.0.0 -m "Release version 1.0.0"  
+git tag -a v1.0.0 9fceb02 -m "Initial release"  
+```  
+  
+包含元数据的标签：  
+```bash  
+lx@lx MINGW64 /d/Documents/docker (test01)  
+$ git show v2.0 --stat  
+tag v2.0  
+Tagger: lxwcd <15521168075@163.com>  
+Date:   Sat Jul 15 11:35:12 2023 +0800  
+  
+第二个实验，nginx负载均衡，keepalived 反向代理  
+  
+commit f2b5817945c9c2095597cd0dd75b22f190724b65 (tag: v2.0)  
+Author: lxwcd <15521168075@163.com>  
+Date:   Sat Jul 8 18:04:38 2023 +0800  
+  
+    update note  
+  
+ lab/LNMP-wordpress-02/LNMP-wordpress搭建-02.md    |   7 +++++++  
+ lab/LNMP-wordpress-02/img/2023-07-08-18-03-34.png | Bin 0 -> 9660187 bytes  
+ 2 files changed, 7 insertions(+)  
+```  
+  
+不包含元数据的轻量标签（git tag 没有用 -a）  
+```bash  
+lx@lx MINGW64 /d/Documents/docker (test01)  
+$ git show vt01.00 --stat  
+commit d8161017e6e3cbf3c47c47f10007ffa29ec1d43a (HEAD -> test01, tag: vt01.00)  
+Author: lxwcd <15521168075@163.com>  
+Date:   Sun May 11 22:08:18 2025 +0800  
+  
+    add 1.txt, test01  
+  
+ 1.txt | 1 +  
+ 1 file changed, 1 insertion(+)  
+```  
+  
+## 查看全部标签  
+  
+- 包含全部分支的标签，不是针对特定分支  
+- 包含轻量标签和附注标签  
+- 默认按照字母顺序升序排列  
+  
+```bash  
+git tag  
+```  
+  
+## 查看全部标签并指定排序方式  
+  
+```bash  
+git tag --sort=<排序键>   # 升序  
+git tag --sort=-<排序键>  # 降序（添加减号）  
+```  
+  
 | **排序键**        | **说明**                                                 |
 | ----------------- | -------------------------------------------------------- |
 | `refname`         | 按标签名字母顺序（默认方式）                             |
@@ -4069,346 +4057,312 @@ git tag --sort=-<排序键>  # 降序（添加减号）
 | `committerdate`   | 按标签指向的**提交时间**（对轻量标签和带注释标签均有效） |
 | `authordate`      | 按原始**作者提交时间**                                   |
 | `v:refname`       | `version:refname` 的简写                                 |
+  
+  
+**注意**：轻量标签（lightweight tags）无独立创建时间，推荐用 `committerdate` 排序。  
+  
+### 按字母顺序升序（默认）  
+  
+```bash  
+lx@lx MINGW64 /d/Documents/vnote (dev)  
+$   git tag --sort=refname | head -n10  
+2.4  
+3.11.0  
+continuous-build  
+test  
+test-light  
+v-test-dev-copy  
+v1.0  
+v1.1  
+v1.10  
+v1.11  
+```  
+  
+### 按语义化版本号降序  
+  
+- 如 v1.0.9 → v1.0.10  
+- 如果标签名不是标准的版本号格式，使用version:refname可能不会按预期排序。它适用于类似“v1”、“v1.0”、“v1.0.1”这样的标签。  
+  
+```bash  
+lx@lx MINGW64 /d/Documents/vnote (dev)  
+$    git tag --sort=-version:refname | head  
+v3.19.2  
+v3.19.1  
+v3.19.0  
+v3.18.2  
+v3.18.1  
+v3.18.0  
+v3.17.0  
+v3.16.0  
+v3.15.1  
+v3.15.0  
+```  
+  
+### 按提交时间降序（最新提交在前）  
+  
+按实际提交时间排序，适合有轻量标签的情况：  
+```bash  
+lx@lx MINGW64 /d/Documents/vnote (dev)  
+$ git tag --sort=-committerdate | head  
+v-test-dev-copy  
+test  
+continuous-build  
+v3.19.2  
+test-light  
+v3.19.1  
+v3.19.0  
+v3.18.2  
+v3.18.1  
+v3.18.0  
+```  
+  
+### 组合显示信息（时间+标签名）  
+  
+```bash  
+lx@lx MINGW64 /d/Documents/vnote (dev)  
+$ git tag --sort=-committerdate --format='%(committerdate:iso8601) %(refname:short)' | head -n10  
+2025-06-02 19:12:11 +0800 v-test-dev-copy  
+2025-05-16 10:55:44 +0800 tags/test  
+2025-05-15 20:23:24 +0800 continuous-build  
+2025-05-15 20:23:24 +0800 v3.19.2  
+2025-04-23 20:21:16 +0800 test-light  
+2025-04-17 09:48:02 +0800 v3.19.1  
+2025-04-10 20:46:58 +0800 v3.19.0  
+2024-08-06 21:56:46 +0800 v3.18.2  
+2024-07-10 22:23:14 +0800 v3.18.1  
+2024-07-01 22:51:24 +0800 v3.18.0  
+```  
+  
+### 注意事项  
+1. **轻量标签 vs 带注释标签**：  
+   - 轻量标签：无独立时间信息，`creatordate` 无效。  
+   - 带注释标签：用 `git show <标签名>` 可查看完整的标签元信息。  
+  
+2. **语义化版本号要求**：  
+   - 使用 `version:refname` 时，标签名需符合 `X.Y.Z` 格式（如 `v1.2.3` 或 `2.0.1`）。  
+   - 非版本号标签（如 `release-1`）会按字母顺序排在结果开头或末尾。  
+  
+3. **时间格式转换**：  
+   在 `--format` 中可使用时间格式化选项：  
+   - `%(committerdate:iso8601)` → ISO 格式时间  
+   - `%(committerdate:relative)` → 相对时间（如 "2 weeks ago"）  
+  
+## 过滤特定模式标签  
+  
+```bash  
+lx@lx MINGW64 /d/Documents/vnote (dev)  
+$ git tag --list "*test*"  
+test  
+test-light  
+v-test-dev-copy  
+  
+lx@lx MINGW64 /d/Documents/vnote (dev)  
+$ git tag -l "*test*"  
+test  
+test-light  
+v-test-dev-copy  
+```  
+  
+## 查看标签详细信息  
+```bash  
+lx@lx MINGW64 /d/Documents/vnote (dev)  
+$ git show test --stat  
+warning: refname 'test' is ambiguous.  
+commit 9b0fdb8b3ae4b91fb6583c542c244494bdd58b3d (HEAD -> dev, tag: test, origin/dev)  
+Author: Le Tan <tamlokveer@gmail.com>  
+Date:   Fri May 16 10:32:35 2025 +0800  
+  
+    fix  
+  
+ .github/workflows/ci-macos.yml | 2 ++  
+ 1 file changed, 2 insertions(+)  
+```  
+  
+## 推送标签到远程仓库  
+默认 `git push` 不会推送标签，需显式指定：  
+```bash  
+git push origin v1.0.0     # 推送单个标签  
+git push origin --tags     # 推送所有本地标签  
+```  
+  
+### 推送单个标签  
+```bash  
+git push <远程仓库名> <标签名>  
+```  
+- **参数说明**：  
+  - `<远程仓库名>`：通常是 `origin`（默认远程仓库名），也可以是自定义的远程仓库名称（如 `upstream`）。  
+  - `<标签名>`：要推送的标签名称（如 `v1.0.0`）。  
+  
+### 推送所有本地标签  
+```bash  
+git push <远程仓库名> --tags  
+```  
+- `--tags` 会推送所有本地未被推送到远程的标签（包括轻量标签和附注标签）。  
+  
+### 目标仓库与分支的说明  
+- **标签是全局的**：标签与分支无关，它直接指向某个提交（Commit），而非分支。  
+- **推送目标**：标签会被推送到远程仓库的标签存储区（`refs/tags/`），**不涉及分支**。  
+- **示例流程**：  
+  ```text  
+  本地仓库 → 远程仓库的标签区（如 `refs/tags/v1.0.0`）  
+  ```  
+  
+### 将本地标签推送到远程仓库 `origin`  
+1. **查看本地标签**：  
+   ```bash  
+   git tag -l  
+   # 输出：  
+   # v1.0.0  
+   # v1.1.0  
+   ```  
+  
+2. **推送单个标签到远程**：  
+   ```bash  
+   git push origin v1.0.0  
+   # 输出：  
+   # Total 0 (delta 0), reused 0 (delta 0)  
+   # To github.com:user/repo.git  
+   #  * [new tag]         v1.0.0 -> v1.0.0  
+   ```  
+  
+3. **推送所有本地标签到远程**：  
+   ```bash  
+   git push origin --tags  
+   # 输出：  
+   # Total 0 (delta 0)  
+   # To github.com:user/repo.git  
+   #  * [new tag]         v1.1.0 -> v1.1.0  
+   ```  
+  
+4. **验证远程标签**：  
+   ```bash  
+   git ls-remote --tags origin  
+   # 输出：  
+   # 从远程仓库拉取的标签列表，包含 v1.0.0 和 v1.1.0  
+   ```  
+  
+### 删除远程标签  
+```bash  
+git push origin :refs/tags/v1.0.0  
+# 或  
+git push origin --delete v1.0.0  
+```  
+  
+### 强制覆盖远程标签  
+```bash  
+git push -f origin v1.0.0  # 慎用！可能破坏他人代码历史  
+```  
+  
+### 默认不推送标签  
+   - Git 设计哲学是“显式操作”，避免意外泄露未完成的标签。  
+  
+### 查看远程仓库的标签  
+将远程仓库的标签下载到本地，然后查看本地标签
+```bash  
+git fetch --tags         # 拉取远程所有标签到本地  
+git tag -l              # 查看本地标签  
+git tag --list # 同上，查看本地标签  
+```  
 
-
-**注意**：轻量标签（lightweight tags）无独立创建时间，推荐用 `committerdate` 排序。
-
-### 按字母顺序升序（默认）
-
+或者直接查看远程仓库的标签：
 ```bash
-lx@lx MINGW64 /d/Documents/vnote (dev)
-$   git tag --sort=refname | head -n10
-2.4
-3.11.0
-continuous-build
-test
-test-light
-v-test-dev-copy
-v1.0
-v1.1
-v1.10
-v1.11
+lx@lx MINGW64 /d/Documents/git_test04 (main)
+$ git ls-remote --tags origin
+6f02f9b28a69af140d90216232d606cd94c4ca63        refs/tags/v1.0.0
+6f95c1c8edfafc0cde8285d5de188519c124a4f6        refs/tags/v1.0.0^{}
 ```
 
-### 按语义化版本号降序
-
-- 如 v1.0.9 → v1.0.10
-- 如果标签名不是标准的版本号格式，使用version:refname可能不会按预期排序。它适用于类似“v1”、“v1.0”、“v1.0.1”这样的标签。
-
-```bash
-lx@lx MINGW64 /d/Documents/vnote (dev)
-$    git tag --sort=-version:refname | head
-v3.19.2
-v3.19.1
-v3.19.0
-v3.18.2
-v3.18.1
-v3.18.0
-v3.17.0
-v3.16.0
-v3.15.1
-v3.15.0
-```
-
-### 按提交时间降序（最新提交在前）
-
-按实际提交时间排序，适合有轻量标签的情况：
-```bash
-lx@lx MINGW64 /d/Documents/vnote (dev)
-$ git tag --sort=-committerdate | head
-v-test-dev-copy
-test
-continuous-build
-v3.19.2
-test-light
-v3.19.1
-v3.19.0
-v3.18.2
-v3.18.1
-v3.18.0
-```
-
-### 组合显示信息（时间+标签名）
-
-```bash
-lx@lx MINGW64 /d/Documents/vnote (dev)
-$ git tag --sort=-committerdate --format='%(committerdate:iso8601) %(refname:short)' | head -n10
-2025-06-02 19:12:11 +0800 v-test-dev-copy
-2025-05-16 10:55:44 +0800 tags/test
-2025-05-15 20:23:24 +0800 continuous-build
-2025-05-15 20:23:24 +0800 v3.19.2
-2025-04-23 20:21:16 +0800 test-light
-2025-04-17 09:48:02 +0800 v3.19.1
-2025-04-10 20:46:58 +0800 v3.19.0
-2024-08-06 21:56:46 +0800 v3.18.2
-2024-07-10 22:23:14 +0800 v3.18.1
-2024-07-01 22:51:24 +0800 v3.18.0
-```
-
-### 注意事项
-1. **轻量标签 vs 带注释标签**：
-   - 轻量标签：无独立时间信息，`creatordate` 无效。
-   - 带注释标签：用 `git show <标签名>` 可查看完整的标签元信息。
-
-2. **语义化版本号要求**：
-   - 使用 `version:refname` 时，标签名需符合 `X.Y.Z` 格式（如 `v1.2.3` 或 `2.0.1`）。
-   - 非版本号标签（如 `release-1`）会按字母顺序排在结果开头或末尾。
-
-3. **时间格式转换**：
-   在 `--format` 中可使用时间格式化选项：
-   - `%(committerdate:iso8601)` → ISO 格式时间
-   - `%(committerdate:relative)` → 相对时间（如 "2 weeks ago"）
-
-## 过滤特定模式标签
-
-```bash
-lx@lx MINGW64 /d/Documents/vnote (dev)
-$ git tag --list "*test*"
-test
-test-light
-v-test-dev-copy
-
-lx@lx MINGW64 /d/Documents/vnote (dev)
-$ git tag -l "*test*"
-test
-test-light
-v-test-dev-copy
-```
-
-## 查看标签详细信息
-```bash
-lx@lx MINGW64 /d/Documents/vnote (dev)
-$ git show test --stat
-warning: refname 'test' is ambiguous.
-commit 9b0fdb8b3ae4b91fb6583c542c244494bdd58b3d (HEAD -> dev, tag: test, origin/dev)
-Author: Le Tan <tamlokveer@gmail.com>
-Date:   Fri May 16 10:32:35 2025 +0800
-
-    fix
-
- .github/workflows/ci-macos.yml | 2 ++
- 1 file changed, 2 insertions(+)
-```
-
-## 推送标签到远程仓库
-默认 `git push` 不会推送标签，需显式指定：
-```bash
-git push origin v1.0.0     # 推送单个标签
-git push origin --tags     # 推送所有本地标签
-```
-
-### 推送单个标签
-```bash
-git push <远程仓库名> <标签名>
-```
-- **参数说明**：
-  - `<远程仓库名>`：通常是 `origin`（默认远程仓库名），也可以是自定义的远程仓库名称（如 `upstream`）。
-  - `<标签名>`：要推送的标签名称（如 `v1.0.0`）。
-
-### 推送所有本地标签
-```bash
-git push <远程仓库名> --tags
-```
-- `--tags` 会推送所有本地未被推送到远程的标签（包括轻量标签和附注标签）。
-
-### 目标仓库与分支的说明
-- **标签是全局的**：标签与分支无关，它直接指向某个提交（Commit），而非分支。
-- **推送目标**：标签会被推送到远程仓库的标签存储区（`refs/tags/`），**不涉及分支**。
-- **示例流程**：
-  ```text
-  本地仓库 → 远程仓库的标签区（如 `refs/tags/v1.0.0`）
-  ```
-
-### 将本地标签推送到远程仓库 `origin`
-1. **查看本地标签**：
-   ```bash
-   git tag -l
-   # 输出：
-   # v1.0.0
-   # v1.1.0
-   ```
-
-2. **推送单个标签到远程**：
-   ```bash
-   git push origin v1.0.0
-   # 输出：
-   # Total 0 (delta 0), reused 0 (delta 0)
-   # To github.com:user/repo.git
-   #  * [new tag]         v1.0.0 -> v1.0.0
-   ```
-
-3. **推送所有本地标签到远程**：
-   ```bash
-   git push origin --tags
-   # 输出：
-   # Total 0 (delta 0)
-   # To github.com:user/repo.git
-   #  * [new tag]         v1.1.0 -> v1.1.0
-   ```
-
-4. **验证远程标签**：
-   ```bash
-   git ls-remote --tags origin
-   # 输出：
-   # 从远程仓库拉取的标签列表，包含 v1.0.0 和 v1.1.0
-   ```
-
-### 删除远程标签
-```bash
-git push origin :refs/tags/v1.0.0
-# 或
-git push origin --delete v1.0.0
-```
-
-### 强制覆盖远程标签
-```bash
-git push -f origin v1.0.0  # 慎用！可能破坏他人代码历史
-```
-
-### 默认不推送标签
-- Git 设计哲学是“显式操作”，避免意外泄露未完成的标签。
-
-### 查看远程仓库的标签
-- 默认 git fetch 就会拉取远程仓库的标签到本地。也可以显示指定 `git fetch --tags`。
-- `git tag -l` 或者 `git tag --list` 查看全部标签
-
-### 注意事项
-1. **权限要求**：推送标签需有远程仓库的写入权限。
-2. **标签与分支无关**：推送标签时不会影响任何分支的代码。
-3. **轻量标签与附注标签**：推送命令对两者均适用，无区别。
-4. **已存在的标签**：若远程已有同名标签，需先删除或强制推送（`-f`）。
-
-## 删除标签
-- 删除本地标签：
-  ```bash
-  git tag -d v1.0.0          # 删除本地标签 v1.0.0
-  ```
-
-- 删除远程标签：
-  ```bash
-  git push origin :refs/tags/v1.0.0  # 删除远程标签 v1.0.0
-  ```
-
-## 检出标签（切换到标签状态）
-- 标签指向的是不可变的提交，若要在标签基础上修改，需创建分支：
-  ```bash
-  git checkout -b new-branch v1.0.0  # 基于标签 v1.0.0 创建新分支
-  ```
-
-## 示例
-1. **创建附注标签**：
-   ```bash
-   git tag -a v2.1.0 -m "Release version 2.1.0: Added user authentication"
-   ```
-
-2. **推送标签到远程仓库**：
-   ```bash
-   git push origin v2.1.0
-   ```
-
-3. **查看远程标签**：
-   ```bash
-   git ls-remote --tags origin  # 查看远程仓库所有标签
-   ```
-
-4. **切换到标签状态**：
-   ```bash
-   git checkout v2.1.0          # 进入“头部分离”状态（只读）
-   ```
-
-5. **基于标签修复问题**：
-   ```bash
-   git checkout -b hotfix-v2.1.1 v2.1.0  # 创建修复分支
-   ```
-
-## 最佳实践
-1. **优先使用附注标签**：记录版本发布的元数据（如作者、日期、说明）。
-2. **语义化版本命名**：遵循 [SemVer](https://semver.org/) 规范（如 `MAJOR.MINOR.PATCH`）。
-3. **删除临时标签**：避免无效标签污染仓库历史。
-4. **避免修改已发布的标签**：标签应指向不可变的提交。
-
-## 重命名标签
-   ```bash
-   git tag new-tag old-tag     # 创建新标签
-   git tag -d old-tag          # 删除旧标签
-   git push origin new-tag     # 推送新标签
-   git push origin :old-tag    # 删除远程旧标签
-   ```
-
-## 比较标签之间的差异
-   ```bash
-   git diff v1.0.0 v2.0.0      # 比较两个标签的差异
-   git log v1.0.0..v2.0.0      # 查看两个标签之间的提交历史
-   ```
-
-## 列出标签的提交历史
-   ```bash
-   git log --graph --oneline --decorate --tags  # 图形化显示标签位置
-   ```
-
-## 查看仓库中所有的标签
-```bash
-git tag
-```
-这个命令会列出仓库中所有的标签。
-
-## 查看特定分支上的标签
-```bash
-lx@lx MINGW64 /d/Documents/docker (test01)
-$ git tag --merged test01
-v2.0
-vt01.00
-
-lx@lx MINGW64 /d/Documents/docker (test01)
-$ git tag --merged origin/main
-v2.0
-```
-
-## 检出（Checkout）标签
-找到想要的标签后，可以使用 `git checkout` 命令来检出该标签对应的代码。
-```bash
-git checkout <tag-name>
-```
-执行这个命令后，Git 会将工作目录切换到该标签对应的提交版本。此时，HEAD 会处于分离状态（detached HEAD），因为标签指向的是一个具体的提交，而不是分支。
-
-### 将该标签代码保存为新分支
-如果需要将这个标签的代码保存下来，有以下几种方法：
-- **创建一个新的分支**
-  如果需要在这个标签的基础上进行进一步的开发，可以创建一个新的分支。例如：
-  ```bash
-  git checkout -b <new-branch-name> <tag-name>
-  ```
-  这样，新的分支会从标签对应的提交开始，你可以在这个分支上进行新的提交。
-
-## 示例
-假设有一个仓库，分支名为 `feature`，标签名为 `v1.0`，你可以按照以下步骤操作：
-
-1. 查看标签：
-   ```bash
-   git tag
-   ```
-   假设输出中有 `v1.0`。
-
-2. 检出标签：
-   ```bash
-   git checkout v1.0
-   ```
-
-3. 查看代码：
-   ```bash
-   cat README.md
-   ```
-
-4. 如果需要保存代码，创建新分支：
-   ```bash
-   git checkout -b v1.0-feature v1.0
-   ```
-
-5. 返回到主分支：
-   ```bash
-   git checkout main
-   ```
-
+### 注意事项  
+1. **权限要求**：推送标签需有远程仓库的写入权限。  
+2. **标签与分支无关**：推送标签时不会影响任何分支的代码。  
+3. **轻量标签与附注标签**：推送命令对两者均适用，无区别。  
+4. **已存在的标签**：若远程已有同名标签，需先删除或强制推送（`-f`）。  
+  
+## 删除标签  
+- 删除本地标签：  
+  ```bash  
+  git tag -d v1.0.0          # 删除本地标签 v1.0.0  
+  ```  
+  
+- 删除远程标签：  
+  ```bash  
+  git push origin :refs/tags/v1.0.0  # 删除远程标签 v1.0.0  
+  ```  
+  
+## 检出标签  
+```bash  
+git checkout -b new-branch v1.0.0  # 基于标签 v1.0.0 创建新分支  
+```  
+  
+## 示例  
+1. **创建附注标签**：  
+   ```bash  
+   git tag -a v2.1.0 -m "Release version 2.1.0: Added user authentication"  
+   ```  
+  
+2. **推送标签到远程仓库**：  
+   ```bash  
+   git push origin v2.1.0  
+   ```  
+  
+3. **查看远程标签**：  
+   ```bash  
+   git ls-remote --tags origin  # 查看远程仓库所有标签  
+   ```  
+  
+4. **切换到标签状态**：  
+   ```bash  
+   git checkout v2.1.0          # 进入“头部分离”状态（只读）  
+   ```  
+  
+5. **基于标签修复问题**：  
+   ```bash  
+   git checkout -b hotfix-v2.1.1 v2.1.0  # 创建修复分支  
+   ```  
+  
+## 最佳实践  
+1. **优先使用附注标签**：记录版本发布的元数据（如作者、日期、说明）。  
+2. **语义化版本命名**：遵循 [SemVer](https://semver.org/) 规范（如 `MAJOR.MINOR.PATCH`）。  
+3. **删除临时标签**：避免无效标签污染仓库历史。  
+4. **避免修改已发布的标签**：标签应指向不可变的提交。  
+  
+## 重命名标签  
+   ```bash  
+   git tag new-tag old-tag     # 创建新标签  
+   git tag -d old-tag          # 删除旧标签  
+   git push origin new-tag     # 推送新标签  
+   git push origin :old-tag    # 删除远程旧标签  
+   ```  
+  
+## 比较标签之间的差异  
+   ```bash  
+   git diff v1.0.0 v2.0.0      # 比较两个标签的差异  
+   git log v1.0.0..v2.0.0      # 查看两个标签之间的提交历史  
+   ```  
+  
+## 列出标签的提交历史  
+   ```bash  
+   git log --graph --oneline --decorate --tags  # 图形化显示标签位置  
+   ```  
+  
+## 查看仓库中所有的标签  
+```bash  
+git tag  
+```  
+这个命令会列出仓库中所有的标签。  
+  
+## 查看特定分支上的标签  
+```bash  
+lx@lx MINGW64 /d/Documents/docker (test01)  
+$ git tag --merged test01  
+v2.0  
+vt01.00  
+  
+lx@lx MINGW64 /d/Documents/docker (test01)  
+$ git tag --merged origin/main  
+v2.0  
+```  
+  
 # git describe
 > [Git - git-describe Documentation](https://git-scm.com/docs/git-describe) 
 
@@ -4863,9 +4817,11 @@ $ git log --oneline -3
 4788ae4c add icons for macOS store
 ```
 
-## 从特定标签创建新分支
+## 从特定标签创建新分支  
 
-- 查看当前提交录
+```bash  
+git checkout -b new-branch v1.0.0  # 基于标签 v1.0.0 创建新分支  
+```  
 
 ## 查看全部标签并指定排序方式
 > [查看全部标签并指定排序方式](#sort-all-tags)
