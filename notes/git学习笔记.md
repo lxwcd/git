@@ -394,6 +394,23 @@ git config --global http.https://github.com.proxy socks5://127.0.0.1:7890
 $ git config --global --list  
 http.https://github.com.proxy=socks5://127.0.0.1:7890  
 ```  
+
+如果用 wmsxwd，点击终端代理，配置如下：
+```bash
+$ git config list --global
+user.email=email@163.com
+user.name=name
+core.quotepath=false
+gui.encoding=utf-8
+gui.fontui=-family "Microsoft YaHei UI" -size 15 -weight normal -slant roman -underline 0 -overstrike 0
+gui.fontdiff=-family 新宋体 -size 18 -weight normal -slant roman -underline 0 -overstrike 0
+gui.tabsize=4
+gui.recentrepo=D:/Documents/linux
+safe.directory=C:/Users/lx/AppData/Roaming/Code/User
+init.defaultbranch=main
+https.proxy=http://127.0.0.1:33210
+http.proxy=http://127.0.0.1:33210
+```
           
 ### vmware 虚拟机中安装的 git 设置代理  
 > [vmware Ubuntu虚拟机设置代理](https://blog.csdn.net/qq_36383272/article/details/116307665)  
