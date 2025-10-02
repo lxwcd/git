@@ -115,14 +115,14 @@ set -o vi
 2. **f-b for $VIMRUNTIME: "/usr/share/vim/vim91"**  
    - `$VIMRUNTIME` 是另一个环境变量，它指向 Vim 的运行时文件，包括语法文件、脚本等。这行表示如果 `$VIMRUNTIME` 没有设置，Git Bash 会使用 "/usr/share/vim/vim91" 作为默认路径。这里的 "vim91" 可能指的是 Vim 的某个特定版本，例如 8.1 版本。  
           
-下载 [vimrc 文件](https://github.com/lxwcd/learnVim/blob/main/vimrc.local) 重命名到 `$HOME/.vimrc`，退出后重新进入即可生效。  
+下载 [vimrc 文件](https://github.com/lxwcd/learnVim/blob/main/vimrc) 重命名到 `$HOME/.vimrc`，退出后重新进入即可生效。  
           
 修改配置文件的路径：  
 ```bash  
 " 设置全局自定义配置文件的路径变量  
 let $MYVIMRC = "$HOME/.vimrc"  
 ```  
-          
+
 git bash 中用 ls 查看有 /etc/vimrc 文件，可以在最后加上一个自己的 vimrc 文件配置：  
 ```bash  
 " Source a global configuration file if available  
@@ -130,7 +130,36 @@ if filereadable("$HOME/.vimrc")
   source $HOME/.vimrc  
 endif  
 ```  
+
+或者放到 $HOME/.vim/vimrc 中，最好放在这个目录，否则用上面的目录和文件名，gVim 也会使用这个配置文件，但两个有区别。
           
+### 修改 vim 中光标样式  
+```bash  
+" modify cursor style  
+if &term =~ "xterm\\|rxvt"  
+  " 设置插入模式下的光标样式为竖线  
+  let &t_SI .= "\<Esc>[5 q"  " SI = INSERT mode  
+  " 设置替换模式下的光标样式为竖线  
+  let &t_SR .= "\<Esc>[5 q"  " SR = REPLACE mode  
+  " 设置普通模式下的光标样式为块状  
+  let &t_EI .= "\<Esc>[2 q"  " EI = NORMAL mode (ELSE)  
+endif  
+```  
+
+### 复制到系统剪贴板  
+选中后使用 `"+ y` 复制内容，即复制到系统剪贴板。  
+```bash  
+set clipboard=unnamedplus  
+```  
+`set clipboard=unnamedplus` 是 Vim 中的一个配置选项，用于指定 Vim 如何与系统剪贴板交互。下面是这个配置选项的详细解释：  
+          
+- Vim 的 `clipboard` 选项控制 Vim 如何使用系统剪贴板。通过设置这个选项，你可以让 Vim 的复制（yank）和粘贴（paste）操作直接与系统剪贴板进行交互。  
+- `unnamedplus` 是 `clipboard` 选项的一个值，它告诉 Vim 使用系统剪贴板作为复制和粘贴操作的存储。在 Vim 中，`"+` 寄存器通常与系统剪贴板相关联，而 `unnamedplus` 使得这个寄存器的行为与系统剪贴板一致。  
+- 当设置了 `set clipboard=unnamedplus`，Vim 会将复制（yank）操作的内容存储到 `"+` 寄存器，这个寄存器与系统剪贴板同步。因此，当你在 Vim 中复制文本时，它也会出现在系统剪贴板上，你可以在其他程序中粘贴。  
+- 从系统剪贴板粘贴（paste）文本到 Vim 中时，Vim 会从 `"+` 寄存器读取内容。  
+- 可以使用 `vim --version | grep clipboard` 命令来检查你的 Vim 是否支持剪贴板功能。如果输出中包含 `+clipboard`，则表示支持。  
+          
+
 ## 设置别名  
 希望全局配置，可以在 `/etc/profile.d/aliases.sh` 中添加。  
 针对当前用户配置，在 `$HOME/.bashrc` 中添加。  
@@ -150,31 +179,6 @@ alias checkSkipWorktree='git ls-files -v | grep "^S" '
 alias checkUnchangedSkipWorktree=' git ls-files -v | grep "^[S|s]" '  
 alias restoreStashCommit='git update-ref --create-reflog refs/stash '  
 ```  
-          
-### 修改 vim 中光标样式  
-```bash  
-" modify cursor style  
-if &term =~ "xterm\\|rxvt"  
-  " 设置插入模式下的光标样式为竖线  
-  let &t_SI .= "\<Esc>[5 q"  " SI = INSERT mode  
-  " 设置替换模式下的光标样式为竖线  
-  let &t_SR .= "\<Esc>[5 q"  " SR = REPLACE mode  
-  " 设置普通模式下的光标样式为块状  
-  let &t_EI .= "\<Esc>[2 q"  " EI = NORMAL mode (ELSE)  
-endif  
-```  
-### 复制到系统剪贴板  
-选中后使用 `"+ y` 复制内容，即复制到系统剪贴板。  
-```bash  
-set clipboard=unnamedplus  
-```  
-`set clipboard=unnamedplus` 是 Vim 中的一个配置选项，用于指定 Vim 如何与系统剪贴板交互。下面是这个配置选项的详细解释：  
-          
-- Vim 的 `clipboard` 选项控制 Vim 如何使用系统剪贴板。通过设置这个选项，你可以让 Vim 的复制（yank）和粘贴（paste）操作直接与系统剪贴板进行交互。  
-- `unnamedplus` 是 `clipboard` 选项的一个值，它告诉 Vim 使用系统剪贴板作为复制和粘贴操作的存储。在 Vim 中，`"+` 寄存器通常与系统剪贴板相关联，而 `unnamedplus` 使得这个寄存器的行为与系统剪贴板一致。  
-- 当设置了 `set clipboard=unnamedplus`，Vim 会将复制（yank）操作的内容存储到 `"+` 寄存器，这个寄存器与系统剪贴板同步。因此，当你在 Vim 中复制文本时，它也会出现在系统剪贴板上，你可以在其他程序中粘贴。  
-- 从系统剪贴板粘贴（paste）文本到 Vim 中时，Vim 会从 `"+` 寄存器读取内容。  
-- 可以使用 `vim --version | grep clipboard` 命令来检查你的 Vim 是否支持剪贴板功能。如果输出中包含 `+clipboard`，则表示支持。  
           
 # Git config 配置Git  
 > [Git Config](https://www.gitkraken.com/learn/git/git-config)  
@@ -3101,14 +3105,14 @@ git diff <branch1> <branch2> -- <folder-path>
 > **`a` 总是参照物（旧基准），`b` 总是变动方（新状态）**  
 > 参照物取决于命令参数，变动方取决于比较目标  
     
-| **命令**                     | `a` (---) 版本    | `b` (+++) 版本  | 记忆要点                   |  
-| ---------------------------- | ----------------- | --------------- | -------------------------- |  
-| `git diff`                   | 暂存区 (旧)       | **工作区** (新) | 默认比较：暂存区 vs 工作区 |  
-| `git diff --cached`          | **最新提交** (旧) | 暂存区 (新)     | `--cached` 以提交为基准    |  
-| `git diff HEAD`              | **最新提交** (旧) | 工作区 (新)     | `HEAD` 指向提交            |  
-| `git diff <commit>`          | **指定提交** (旧) | 工作区 (新)     | 提交哈希作为旧基准         |  
-| `git diff <commit> --cached` | **指定提交** (旧) | 暂存区 (新)     | 组合使用时提交总是旧基准   |  
-| `git diff commitA commitB`   | **commitA** (旧)  | commitB (新)    | 顺序决定新旧               |  
+| **命令**                     | `a` (---) 版本    | `b` (+++) 版本  | 记忆要点                   |
+| ---------------------------- | ----------------- | --------------- | -------------------------- |
+| `git diff`                   | 暂存区 (旧)       | **工作区** (新) | 默认比较：暂存区 vs 工作区 |
+| `git diff --cached`          | **最新提交** (旧) | 暂存区 (新)     | `--cached` 以提交为基准    |
+| `git diff HEAD`              | **最新提交** (旧) | 工作区 (新)     | `HEAD` 指向提交            |
+| `git diff <commit>`          | **指定提交** (旧) | 工作区 (新)     | 提交哈希作为旧基准         |
+| `git diff <commit> --cached` | **指定提交** (旧) | 暂存区 (新)     | 组合使用时提交总是旧基准   |
+| `git diff commitA commitB`   | **commitA** (旧)  | commitB (新)    | 顺序决定新旧               |
     
     
 ### 1. 确定参照物（旧版本 `a`）  
@@ -4994,12 +4998,12 @@ git commit -m "Squash commit: Merge feature branch changes"
    - **正向合并**：在稳定分支（如 `main`）合并特性分支（如 `feature`）  
    - **反向合并**：在特性分支合并稳定分支  
     
-| **场景**         | **正向合并** (`main` ← `feature`) | **反向合并** (`feature` ← `main`) |  
-| ---------------- | --------------------------------- | --------------------------------- |  
-| **工作目录状态** | 影响稳定分支                      | 影响特性分支                      |  
-| **冲突解决责任** | 需确保 `main` 分支稳定性          | 可在特性分支实验性解决            |  
-| **紧急修复影响** | 可能阻塞其他开发                  | 不影响主分支稳定性                |  
-| **典型场景**     | 功能发布前集成测试                | 同步主分支修复到特性分支          |  
+| **场景**         | **正向合并** (`main` ← `feature`) | **反向合并** (`feature` ← `main`) |
+| ---------------- | --------------------------------- | --------------------------------- |
+| **工作目录状态** | 影响稳定分支                      | 影响特性分支                      |
+| **冲突解决责任** | 需确保 `main` 分支稳定性          | 可在特性分支实验性解决            |
+| **紧急修复影响** | 可能阻塞其他开发                  | 不影响主分支稳定性                |
+| **典型场景**     | 功能发布前集成测试                | 同步主分支修复到特性分支          |
     
     
 假设初始状态：  
@@ -5594,13 +5598,13 @@ Git 中的每个分支、标签和提交都有一个引用（reference）。这�
   * `git prune <remote>` 可以指定清理某个远程仓库的引用。  
   * 例如，`git prune origin` 会清理 origin 远程仓库中不再存在的引用。  
     
-| 命令                        | 说明                                                                   |  
-| --------------------------- | ---------------------------------------------------------------------- |  
-| `git prune`                 | 清理本地仓库中不再存在的远程分支的引用                                 |  
-| `git prune --dry-run`       | 模拟清理过程，显示哪些引用将被清理，但不会实际删除                     |  
-| `git prune -v`              | 在清理过程中显示详细信息，包括删除的引用                               |  
-| `git prune --all`           | 清理所有远程仓库的引用（不常见，通常使用 `git remote prune <remote>`） |  
-| `git remote prune <remote>` | 清理指定远程仓库的引用，与 `git prune <remote>` 功能类似，但更明确     |  
+| 命令                        | 说明                                                                   |
+| --------------------------- | ---------------------------------------------------------------------- |
+| `git prune`                 | 清理本地仓库中不再存在的远程分支的引用                                 |
+| `git prune --dry-run`       | 模拟清理过程，显示哪些引用将被清理，但不会实际删除                     |
+| `git prune -v`              | 在清理过程中显示详细信息，包括删除的引用                               |
+| `git prune --all`           | 清理所有远程仓库的引用（不常见，通常使用 `git remote prune <remote>`） |
+| `git remote prune <remote>` | 清理指定远程仓库的引用，与 `git prune <remote>` 功能类似，但更明确     |
     
 * 通常不需要频繁使用 `git prune`，因为 Git 会在特定情况下自动执行清理操作，例如通过 `git fetch` 或 `git remote update` 等命令。  
 * 如果希望在每次 `git fetch` 时自动清理过期引用，可以在配置中启用 `fetch.prune` 选项：  
@@ -6034,14 +6038,14 @@ git tag v1.0.0  # 仅是一个指向提交的指针
   ```  
   输出直接显示目标提交的详情，不会包含标签自身的元数据。  
     
-| 特性       | 附注标签（`-a`）                 | 轻量标签（不加 `-a`）   |  
-| ---------- | -------------------------------- | ----------------------- |  
-| 存储方式   | 独立 Git 对象                    | 仅是一个引用文件        |  
-| 包含元数据 | 是（作者、时间、消息等）         | 否                      |  
-| 适用场景   | 正式版本发布                     | 临时标记或本地快速使用  |  
-| 查看详情   | 显示标签元数据 + 提交            | 直接显示提交内容        |  
-| 签名支持   | 支持（`-s` 签名标签）            | 不支持                  |  
-| 存储位置   | `.git/refs/tags/[name]` + 对象库 | `.git/refs/tags/[name]` |  
+| 特性       | 附注标签（`-a`）                 | 轻量标签（不加 `-a`）   |
+| ---------- | -------------------------------- | ----------------------- |
+| 存储方式   | 独立 Git 对象                    | 仅是一个引用文件        |
+| 包含元数据 | 是（作者、时间、消息等）         | 否                      |
+| 适用场景   | 正式版本发布                     | 临时标记或本地快速使用  |
+| 查看详情   | 显示标签元数据 + 提交            | 直接显示提交内容        |
+| 签名支持   | 支持（`-s` 签名标签）            | 不支持                  |
+| 存储位置   | `.git/refs/tags/[name]` + 对象库 | `.git/refs/tags/[name]` |
     
 ### **实际场景选择建议**  
 #### 1. **必须用附注标签的场景**：  
@@ -6144,15 +6148,15 @@ git tag --sort=<排序键>   # 升序
 git tag --sort=-<排序键>  # 降序（添加减号）  
 ```  
     
-| **排序键**        | **说明**                                                 |  
-| ----------------- | -------------------------------------------------------- |  
-| `refname`         | 按标签名字母顺序（默认方式）                             |  
-| `version:refname` | 按**语义化版本号**排序（如 `v1.10` > `v1.2`）            |  
-| `creatordate`     | 按**标签创建时间**（仅对带注释的标签有效）               |  
-| `taggerdate`      | 同 `creatordate`（别名）                                 |  
-| `committerdate`   | 按标签指向的**提交时间**（对轻量标签和带注释标签均有效） |  
-| `authordate`      | 按原始**作者提交时间**                                   |  
-| `v:refname`       | `version:refname` 的简写                                 |  
+| **排序键**        | **说明**                                                 |
+| ----------------- | -------------------------------------------------------- |
+| `refname`         | 按标签名字母顺序（默认方式）                             |
+| `version:refname` | 按**语义化版本号**排序（如 `v1.10` > `v1.2`）            |
+| `creatordate`     | 按**标签创建时间**（仅对带注释的标签有效）               |
+| `taggerdate`      | 同 `creatordate`（别名）                                 |
+| `committerdate`   | 按标签指向的**提交时间**（对轻量标签和带注释标签均有效） |
+| `authordate`      | 按原始**作者提交时间**                                   |
+| `v:refname`       | `version:refname` 的简写                                 |
     
     
 **注意**：轻量标签（lightweight tags）无独立创建时间，推荐用 `committerdate` 排序。  
@@ -6476,14 +6480,14 @@ git describe [选项] [提交引用]
     
 ## 常用选项  
     
-| 选项            | 说明                                 |  
-| --------------- | ------------------------------------ |  
-| `--tags`        | 包含轻量标签（默认只查找带注释标签） |  
-| `--abbrev=<n>`  | 指定提交哈希缩写长度（默认7）        |  
-| `--dirty`       | 工作区有修改时添加`-dirty`后缀       |  
-| `--always`      | 无标签时显示提交哈希                 |  
-| `--long`        | 总是显示完整格式（即使匹配精确标签） |  
-| `--exact-match` | 仅当当前提交正好是标签时输出         |  
+| 选项            | 说明                                 |
+| --------------- | ------------------------------------ |
+| `--tags`        | 包含轻量标签（默认只查找带注释标签） |
+| `--abbrev=<n>`  | 指定提交哈希缩写长度（默认7）        |
+| `--dirty`       | 工作区有修改时添加`-dirty`后缀       |
+| `--always`      | 无标签时显示提交哈希                 |
+| `--long`        | 总是显示完整格式（即使匹配精确标签） |
+| `--exact-match` | 仅当当前提交正好是标签时输出         |
     
     
 ## 示例仓库结构  
@@ -6769,6 +6773,11 @@ e43f274 merge branch 'branch01'
 ```bash  
 git add *.cpp *.h  
 ```  
+
+## 仅暂存已跟踪的文件
+```bash
+git add -u 
+```
           
 ## 更新最新提交内容  
 如修改一个 bug 但未完成，可以先 [git commit](#git-commit) 提交，防止内容丢失，后续继续修改后用下面命令更新上次提交的内容：  
