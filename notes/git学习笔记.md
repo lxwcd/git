@@ -52,7 +52,15 @@
 # git bash 配置  
 ## 配置主题字体  
 右键选择 option 进行配置，配置完成后保存即可  
-          
+
+![](img/2025-10-15-20-47-57.png)
+![](img/2025-10-15-20-49-13.png)
+![](img/2025-10-15-20-49-43.png)
+![](img/2025-10-15-20-50-55.png)
+![](img/2025-10-15-20-51-23.png)
+![](img/2025-10-15-20-51-53.png)
+![](img/2025-10-15-20-52-12.png)
+
 ## 修改时区  
           
 先查看当前时间是否正确：  
@@ -90,6 +98,11 @@ set -o vi
     
 当前用户永久修改：将上面命令写到 `~/.bashrc` 中，永久生效。  
     
+## git status 显示中文
+```cpp
+git config --global core.quotepath false
+```
+
 ## vim 配置  
 输入 vim 后，输入 `:verion` 查看配置文件的路径，如：  
 ```bash  
@@ -134,7 +147,7 @@ endif
 或者放到 $HOME/.vim/vimrc 中，最好放在这个目录，否则用上面的目录和文件名，gVim 也会使用这个配置文件，但两个有区别。
           
 ### 修改 vim 中光标样式  
-```bash  
+```bash
 " modify cursor style  
 if &term =~ "xterm\\|rxvt"  
   " 设置插入模式下的光标样式为竖线  
@@ -145,6 +158,8 @@ if &term =~ "xterm\\|rxvt"
   let &t_EI .= "\<Esc>[2 q"  " EI = NORMAL mode (ELSE)  
 endif  
 ```  
+
+如果配置失败，则在 git bash 中右键通过设置界面选择
 
 ### 复制到系统剪贴板  
 选中后使用 `"+ y` 复制内容，即复制到系统剪贴板。  
